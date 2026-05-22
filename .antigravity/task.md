@@ -1,0 +1,30 @@
+# Task Checklist: Real Estate "Editorial Blueprint" Listing App
+
+- [x] **Phase 1: Project Initialization & Settings**
+  - [x] Initialize the Flutter app in `C:\Users\dylan\.gemini\antigravity\scratch\realestate_app`
+  - [x] Add dependencies (`flutter_riverpod`, `google_fonts`) in `pubspec.yaml`
+  - [x] Clear default template code and verify initial build compilation
+- [x] **Phase 2: Core Foundation & Themes**
+  - [x] Implement dynamic theme manager in `lib/core/theme/themes.dart`
+  - [x] Create reusable core widgets:
+    - [x] `custom_card.dart`
+    - [x] `custom_chip.dart`
+    - [x] `custom_button.dart`
+    - [x] `custom_text_input.dart`
+- [x] **Phase 3: Domain Data Models & Riverpod State**
+  - [x] Implement room inventory model `room_model.dart`
+  - [x] Implement unified wizard state model `property_state_model.dart`
+  - [x] Implement state notifier/controller `property_controller.dart`
+- [x] **Phase 4: Responsive UI Presentation Screens**
+  - [x] Create main shell layout `property_wizard_shell.dart`
+  - [x] Implement Step 1 Screen: Property Type & Subtypes
+  - [x] Implement Step 2 Screen: Address Autocomplete & Details
+  - [x] Implement Step 3 Screen: Building Info (Technical specs & chip selectors)
+  - [x] Implement Step 4.1 Screen: Property Features (Inventory list & Add custom buttons)
+  - [x] Implement Step 4.2 Screen: Room-by-Room Details (Emoji ratings, custom amenities, notes, and suggestion chips)
+- [x] **Phase 5: Shell Wiring & Final Verification**
+  - [x] Integrate everything in `lib/main.dart` with `ProviderScope`
+  - [x] Perform compiler checks (`flutter analyze`)
+  - [x] Resolve all compilation errors, misplaced imports, and compiler warnings
+  - [x] Verify functionality (Step transitions, Room Details status changes from PENDING to COMPLETE)
+  - [x] Add Suggested Amenities rapid-entry wrap feature
