@@ -1,5 +1,7 @@
+// Step 4.1
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
@@ -42,13 +44,19 @@ class PropertyFeaturesStep extends ConsumerWidget {
     ];
 
     // Combine standard and any custom added outdoor extras
-    final allOutdoorOptions = Set<String>.from(outdoorOptions)..addAll(state.outdoorExtras);
+    final allOutdoorOptions = Set<String>.from(outdoorOptions)
+      ..addAll(state.outdoorExtras);
 
     return Stack(
       children: [
         SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 24.0, bottom: 80.0),
+          padding: const EdgeInsets.only(
+            left: 20.0,
+            right: 20.0,
+            top: 24.0,
+            bottom: 80.0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -90,7 +98,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // List of rooms in this category
                 ListView.builder(
                   shrinkWrap: true,
@@ -106,7 +114,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
                           controller.selectRoomForEditing(room.id);
                         },
                         backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 16.0,
+                        ),
                         child: Row(
                           children: [
                             Expanded(
@@ -133,14 +144,19 @@ class PropertyFeaturesStep extends ConsumerWidget {
                                       Text(
                                         '•',
                                         style: TextStyle(
-                                          color: theme.textSecondary.withOpacity(0.5),
+                                          color: theme.textSecondary
+                                              .withOpacity(0.5),
                                         ),
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        room.isComplete ? 'COMPLETE' : 'PENDING',
+                                        room.isComplete
+                                            ? 'COMPLETE'
+                                            : 'PENDING',
                                         style: textTheme.labelLarge?.copyWith(
-                                          color: room.isComplete ? theme.completeColor : theme.pendingColor,
+                                          color: room.isComplete
+                                              ? theme.completeColor
+                                              : theme.pendingColor,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -169,7 +185,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 hasDashedBorder: true,
                 backgroundColor: theme.backgroundColor.withOpacity(0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                onTap: () => _showAddRoomDialog(context, controller, theme, textTheme),
+                onTap: () =>
+                    _showAddRoomDialog(context, controller, theme, textTheme),
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -224,7 +241,12 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 hasDashedBorder: true,
                 backgroundColor: theme.backgroundColor.withOpacity(0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                onTap: () => _showAddOutdoorDialog(context, controller, theme, textTheme),
+                onTap: () => _showAddOutdoorDialog(
+                  context,
+                  controller,
+                  theme,
+                  textTheme,
+                ),
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -256,7 +278,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E293B), // Dark zinc/black capsule
                 borderRadius: BorderRadius.circular(20),
@@ -319,23 +344,25 @@ class PropertyFeaturesStep extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Category selector dropdown
                   DropdownButtonFormField<String>(
                     value: category,
                     decoration: InputDecoration(
                       labelText: 'Room Category',
-                      labelStyle: textTheme.labelLarge?.copyWith(color: theme.textLabel),
+                      labelStyle: textTheme.labelLarge?.copyWith(
+                        color: theme.textLabel,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                         borderSide: BorderSide(color: theme.borderLight),
                       ),
                     ),
                     items: ['Bedrooms', 'Living & Dining', 'Bathrooms & Powder']
-                        .map((cat) => DropdownMenuItem(
-                              value: cat,
-                              child: Text(cat),
-                            ))
+                        .map(
+                          (cat) =>
+                              DropdownMenuItem(value: cat, child: Text(cat)),
+                        )
                         .toList(),
                     onChanged: (val) {
                       if (val != null) {
@@ -376,7 +403,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Add', style: TextStyle(color: Colors.white)),
+                        child: const Text(
+                          'Add',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -422,7 +452,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: theme.textSecondary)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: theme.textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -433,7 +466,9 @@ class PropertyFeaturesStep extends ConsumerWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text('Add', style: TextStyle(color: Colors.white)),
             ),

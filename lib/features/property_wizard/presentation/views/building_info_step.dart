@@ -1,12 +1,15 @@
+// Step 3
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../controllers/property_controller.dart';
 
 class BuildingInfoStep extends ConsumerWidget {
-  const BuildingInfoStep({Key? key}) : super(key: key);
+  const BuildingInfoStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,9 +70,12 @@ class BuildingInfoStep extends ConsumerWidget {
           CustomTextInput(
             label: 'Construction Year',
             placeholder: 'YYYY',
-            initialValue: state.constructionYear == 'YYYY' ? '' : state.constructionYear,
+            initialValue: state.constructionYear == 'YYYY'
+                ? ''
+                : state.constructionYear,
             keyboardType: TextInputType.number,
-            onChanged: (val) => controller.updateTechnicalSpecs(constructionYear: val),
+            onChanged: (val) =>
+                controller.updateTechnicalSpecs(constructionYear: val),
           ),
           const SizedBox(height: 18),
           CustomTextInput(
@@ -83,7 +89,9 @@ class BuildingInfoStep extends ConsumerWidget {
           CustomTextInput(
             label: 'Zoning Classification',
             placeholder: 'e.g. Residential 1',
-            initialValue: state.zoning == 'e.g. Residential 1' ? '' : state.zoning,
+            initialValue: state.zoning == 'e.g. Residential 1'
+                ? ''
+                : state.zoning,
             onChanged: (val) => controller.updateTechnicalSpecs(zoning: val),
           ),
           const SizedBox(height: 28),

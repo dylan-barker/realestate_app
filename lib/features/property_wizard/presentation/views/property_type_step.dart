@@ -1,12 +1,14 @@
+// Step 1
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../controllers/property_controller.dart';
 
 class PropertyTypeStep extends ConsumerWidget {
-  const PropertyTypeStep({Key? key}) : super(key: key);
+  const PropertyTypeStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,7 +81,10 @@ class PropertyTypeStep extends ConsumerWidget {
               return CustomCard(
                 isSelected: isSelected,
                 onTap: () => controller.selectPropertyType(itemName),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 16.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +92,9 @@ class PropertyTypeStep extends ConsumerWidget {
                     Icon(
                       itemIcon,
                       size: 26,
-                      color: isSelected ? theme.primaryColor : theme.textPrimary.withOpacity(0.6),
+                      color: isSelected
+                          ? theme.primaryColor
+                          : theme.textPrimary.withOpacity(0.6),
                     ),
                     Text(
                       itemName,

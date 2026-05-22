@@ -1,9 +1,11 @@
+// Step 4.2
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/themes.dart';
+import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../controllers/property_controller.dart';
 
@@ -41,11 +43,18 @@ class RoomDetailsStep extends ConsumerWidget {
       'Balcony',
     ];
 
-    final suggestedAmenities = standardAmenities.where((amenity) => !room.features.contains(amenity)).toList();
+    final suggestedAmenities = standardAmenities
+        .where((amenity) => !room.features.contains(amenity))
+        .toList();
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 24.0, bottom: 40.0),
+      padding: const EdgeInsets.only(
+        left: 20.0,
+        right: 20.0,
+        top: 24.0,
+        bottom: 40.0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -63,7 +72,10 @@ class RoomDetailsStep extends ConsumerWidget {
 
           CustomCard(
             backgroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -75,9 +87,20 @@ class RoomDetailsStep extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.edit_outlined, color: theme.textSecondary, size: 20),
-                  onPressed: () => _showRenameDialog(context, controller, room.id, room.name, theme, textTheme),
-                )
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    color: theme.textSecondary,
+                    size: 20,
+                  ),
+                  onPressed: () => _showRenameDialog(
+                    context,
+                    controller,
+                    room.id,
+                    room.name,
+                    theme,
+                    textTheme,
+                  ),
+                ),
               ],
             ),
           ),
@@ -99,9 +122,7 @@ class RoomDetailsStep extends ConsumerWidget {
           const SizedBox(height: 4),
           Text(
             'Rate the current state of the space.',
-            style: textTheme.bodyMedium?.copyWith(
-              color: theme.textSecondary,
-            ),
+            style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary),
           ),
           const SizedBox(height: 16),
 
@@ -122,22 +143,26 @@ class RoomDetailsStep extends ConsumerWidget {
                       roomId: room.id,
                       conditionRating: level,
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14.0,
+                      horizontal: 8.0,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 22),
-                        ),
+                        Text(emoji, style: const TextStyle(fontSize: 22)),
                         const SizedBox(height: 10),
                         Text(
                           label,
                           textAlign: TextAlign.center,
                           style: textTheme.labelMedium?.copyWith(
                             fontSize: 9,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected ? theme.primaryColor : theme.textSecondary,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.textSecondary,
                             height: 1.2,
                           ),
                         ),
@@ -204,7 +229,8 @@ class RoomDetailsStep extends ConsumerWidget {
                 margin: const EdgeInsets.only(bottom: 8.0),
                 child: CustomChip(
                   label: feature,
-                  onDelete: () => controller.removeFeatureFromRoom(room.id, feature),
+                  onDelete: () =>
+                      controller.removeFeatureFromRoom(room.id, feature),
                 ),
               );
             },
@@ -216,16 +242,18 @@ class RoomDetailsStep extends ConsumerWidget {
             hasDashedBorder: true,
             backgroundColor: theme.backgroundColor.withOpacity(0.5),
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            onTap: () => _showAddFeatureDialog(context, controller, room.id, theme, textTheme),
+            onTap: () => _showAddFeatureDialog(
+              context,
+              controller,
+              room.id,
+              theme,
+              textTheme,
+            ),
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.add,
-                    size: 20,
-                    color: theme.primaryColor,
-                  ),
+                  Icon(Icons.add, size: 20, color: theme.primaryColor),
                   const SizedBox(width: 8),
                   Text(
                     'ADD CUSTOM FEATURE',
@@ -260,7 +288,10 @@ class RoomDetailsStep extends ConsumerWidget {
                   onTap: () => controller.addFeatureToRoom(room.id, amenity),
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(color: theme.borderLight),
                       borderRadius: BorderRadius.circular(20),
@@ -327,15 +358,14 @@ class RoomDetailsStep extends ConsumerWidget {
                 TextFormField(
                   initialValue: room.notes,
                   maxLines: 4,
-                  onChanged: (val) => controller.updateRoomDetails(
-                    roomId: room.id,
-                    notes: val,
-                  ),
+                  onChanged: (val) =>
+                      controller.updateRoomDetails(roomId: room.id, notes: val),
                   style: textTheme.bodyLarge?.copyWith(
                     color: theme.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Add specific details about the condition or layout of this room...',
+                    hintText:
+                        'Add specific details about the condition or layout of this room...',
                     hintStyle: textTheme.bodyMedium?.copyWith(
                       color: theme.textSecondary.withOpacity(0.5),
                     ),
@@ -372,7 +402,9 @@ class RoomDetailsStep extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16.0),
         image: const DecorationImage(
           // Utilizing a high-fidelity placeholder asset illustration using gradients
-          image: NetworkImage('https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800'),
+          image: NetworkImage(
+            'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800',
+          ),
           fit: BoxFit.cover,
         ),
       ),
@@ -382,10 +414,7 @@ class RoomDetailsStep extends ConsumerWidget {
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [
-              Colors.black.withOpacity(0.6),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withOpacity(0.6), Colors.transparent],
           ),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -437,7 +466,10 @@ class RoomDetailsStep extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: theme.textSecondary)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: theme.textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -448,7 +480,9 @@ class RoomDetailsStep extends ConsumerWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text('Save', style: TextStyle(color: Colors.white)),
             ),
@@ -492,7 +526,10 @@ class RoomDetailsStep extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: theme.textSecondary)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: theme.textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -503,7 +540,9 @@ class RoomDetailsStep extends ConsumerWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text('Add', style: TextStyle(color: Colors.white)),
             ),

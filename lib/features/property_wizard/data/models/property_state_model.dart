@@ -36,6 +36,19 @@ class PropertyStateModel {
   // Step 4.2: Selected Room details being active
   final String? selectedRoomId;
 
+  // Step 5: Mandate & Contacts
+  final String mandateType;
+  final String leadSource;
+  final bool syncLightstone;
+  final bool syncLoom;
+  final String ownerFirstName;
+  final String ownerLastName;
+  final String ownerEmail;
+  final String ownerPhone;
+  final String ownerIdNumber;
+  final String? mandateStart;
+  final String? mandateEnd;
+
   PropertyStateModel({
     this.currentStep = 1,
     this.propertyType = 'House',
@@ -59,6 +72,17 @@ class PropertyStateModel {
     this.rooms = const [],
     this.outdoorExtras = const ['Swimming Pool'],
     this.selectedRoomId,
+    this.mandateType = 'Exclusive',
+    this.leadSource = 'Referral',
+    this.syncLightstone = true,
+    this.syncLoom = false,
+    this.ownerFirstName = '',
+    this.ownerLastName = '',
+    this.ownerEmail = '',
+    this.ownerPhone = '',
+    this.ownerIdNumber = '',
+    this.mandateStart,
+    this.mandateEnd,
   });
 
   PropertyStateModel copyWith({
@@ -84,6 +108,18 @@ class PropertyStateModel {
     List<RoomModel>? rooms,
     List<String>? outdoorExtras,
     String? selectedRoomId,
+    bool clearRoomId = false,
+    String? mandateType,
+    String? leadSource,
+    bool? syncLightstone,
+    bool? syncLoom,
+    String? ownerFirstName,
+    String? ownerLastName,
+    String? ownerEmail,
+    String? ownerPhone,
+    String? ownerIdNumber,
+    String? mandateStart,
+    String? mandateEnd,
   }) {
     return PropertyStateModel(
       currentStep: currentStep ?? this.currentStep,
@@ -107,7 +143,18 @@ class PropertyStateModel {
       wallExterior: wallExterior ?? this.wallExterior,
       rooms: rooms ?? this.rooms,
       outdoorExtras: outdoorExtras ?? this.outdoorExtras,
-      selectedRoomId: selectedRoomId ?? this.selectedRoomId,
+      selectedRoomId: clearRoomId ? null : (selectedRoomId ?? this.selectedRoomId),
+      mandateType: mandateType ?? this.mandateType,
+      leadSource: leadSource ?? this.leadSource,
+      syncLightstone: syncLightstone ?? this.syncLightstone,
+      syncLoom: syncLoom ?? this.syncLoom,
+      ownerFirstName: ownerFirstName ?? this.ownerFirstName,
+      ownerLastName: ownerLastName ?? this.ownerLastName,
+      ownerEmail: ownerEmail ?? this.ownerEmail,
+      ownerPhone: ownerPhone ?? this.ownerPhone,
+      ownerIdNumber: ownerIdNumber ?? this.ownerIdNumber,
+      mandateStart: mandateStart ?? this.mandateStart,
+      mandateEnd: mandateEnd ?? this.mandateEnd,
     );
   }
 }

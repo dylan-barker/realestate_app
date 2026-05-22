@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/room_model.dart';
 import '../../data/models/property_state_model.dart';
+import '../../data/models/room_model.dart';
 
 class PropertyController extends Notifier<PropertyStateModel> {
   @override
@@ -20,75 +20,13 @@ class PropertyController extends Notifier<PropertyStateModel> {
           'Air Conditioning',
           'Built-in Cupboards',
           'En-suite Bathroom',
-          'Balcony'
+          'Balcony',
         ],
         notes: 'Spacious master suite with premium dynamic views.',
       ),
-      RoomModel(
-        id: 'bed-2',
-        name: 'Bedroom 2',
-        type: 'Bedrooms',
-        description: 'Standard',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'bed-3',
-        name: 'Bedroom 3',
-        type: 'Bedrooms',
-        description: 'Guest Room',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'bed-4',
-        name: 'Bedroom 4',
-        type: 'Bedrooms',
-        description: 'Children\'s Room',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'live-1',
-        name: 'Main Living Area',
-        type: 'Living & Dining',
-        description: 'Open Plan',
-        isComplete: true,
-        conditionRating: 4,
-        features: ['Air Conditioning', 'Built-in Cupboards'],
-        notes: 'Beautiful double-volume ceiling living room.',
-      ),
-      RoomModel(
-        id: 'live-2',
-        name: 'Gourmet Kitchen',
-        type: 'Living & Dining',
-        description: 'Primary kitchen',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'bath-1',
-        name: 'Full Bathroom 1',
-        type: 'Bathrooms & Powder',
-        description: 'En-suite',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'bath-2',
-        name: 'Full Bathroom 2',
-        type: 'Bathrooms & Powder',
-        description: 'Shared Bath',
-        isComplete: false,
-      ),
-      RoomModel(
-        id: 'bath-3',
-        name: 'Powder Room',
-        type: 'Bathrooms & Powder',
-        description: 'Guest WC',
-        isComplete: false,
-      ),
     ];
 
-    return PropertyStateModel(
-      currentStep: 1,
-      rooms: initialRooms,
-    );
+    return PropertyStateModel(currentStep: 1, rooms: initialRooms);
   }
 
   void setStep(int step) {
@@ -206,7 +144,11 @@ class PropertyController extends Notifier<PropertyStateModel> {
 
   // Step 4.2: Room-by-room detail actions
   void selectRoomForEditing(String? roomId) {
-    state = state.copyWith(selectedRoomId: roomId);
+    if (roomId == null) {
+      state = state.copyWith(clearRoomId: true);
+    } else {
+      state = state.copyWith(selectedRoomId: roomId);
+    }
   }
 
   void updateRoomDetails({
@@ -227,7 +169,7 @@ class PropertyController extends Notifier<PropertyStateModel> {
       }
       return room;
     }).toList();
-    
+
     state = state.copyWith(rooms: updatedRooms);
   }
 
@@ -238,10 +180,9 @@ class PropertyController extends Notifier<PropertyStateModel> {
       }
       return room;
     }).toList();
-    
+
     state = state.copyWith(rooms: updatedRooms);
   }
-
 
   void addFeatureToRoom(String roomId, String feature) {
     final updatedRooms = state.rooms.map((room) {
@@ -270,10 +211,50 @@ class PropertyController extends Notifier<PropertyStateModel> {
 
     state = state.copyWith(rooms: updatedRooms);
   }
+
+  // Step 5 actions
+  void selectMandateType(String type) {
+    state = state.copyWith(mandateType: type);
+  }
+
+  void selectLeadSource(String source) {
+    state = state.copyWith(leadSource: source);
+  }
+
+  void toggleSyncLightstone(bool value) {
+    state = state.copyWith(syncLightstone: value);
+  }
+
+  void toggleSyncLoom(bool value) {
+    state = state.copyWith(syncLoom: value);
+  }
+
+  void updateOwnerInfo({
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+    String? idNumber,
+  }) {
+    state = state.copyWith(
+      ownerFirstName: firstName ?? state.ownerFirstName,
+      ownerLastName: lastName ?? state.ownerLastName,
+      ownerEmail: email ?? state.ownerEmail,
+      ownerPhone: phone ?? state.ownerPhone,
+      ownerIdNumber: idNumber ?? state.ownerIdNumber,
+    );
+  }
+
+  void updateMandateDates({String? start, String? end}) {
+    state = state.copyWith(
+      mandateStart: start ?? state.mandateStart,
+      mandateEnd: end ?? state.mandateEnd,
+    );
+  }
 }
 
 // Global Provider
 final propertyControllerProvider =
     NotifierProvider<PropertyController, PropertyStateModel>(() {
-  return PropertyController();
-});
+      return PropertyController();
+    });

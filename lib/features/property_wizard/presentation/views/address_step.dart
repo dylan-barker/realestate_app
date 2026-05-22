@@ -1,5 +1,8 @@
+// Step 2
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_text_input.dart';
@@ -65,23 +68,38 @@ class AddressStep extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           CustomCard(
             backgroundColor: theme.borderLight.withOpacity(0.3),
             padding: const EdgeInsets.all(18.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAddressField(theme, textTheme, 'Street Address', state.streetAddress),
+                _buildAddressField(
+                  theme,
+                  textTheme,
+                  'Street Address',
+                  state.streetAddress,
+                ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
-                      child: _buildAddressField(theme, textTheme, 'Suburb / District', state.suburb),
+                      child: _buildAddressField(
+                        theme,
+                        textTheme,
+                        'Suburb / District',
+                        state.suburb,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildAddressField(theme, textTheme, 'City', state.city),
+                      child: _buildAddressField(
+                        theme,
+                        textTheme,
+                        'City',
+                        state.city,
+                      ),
                     ),
                   ],
                 ),
@@ -89,11 +107,21 @@ class AddressStep extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildAddressField(theme, textTheme, 'Province / State', state.province),
+                      child: _buildAddressField(
+                        theme,
+                        textTheme,
+                        'Province / State',
+                        state.province,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _buildAddressField(theme, textTheme, 'Postal Code', state.postalCode),
+                      child: _buildAddressField(
+                        theme,
+                        textTheme,
+                        'Postal Code',
+                        state.postalCode,
+                      ),
                     ),
                   ],
                 ),
@@ -122,7 +150,8 @@ class AddressStep extends ConsumerWidget {
                   label: 'Complex / Estate Name (Optional)',
                   placeholder: 'e.g. Skyline Towers',
                   initialValue: state.complexName,
-                  onChanged: (val) => controller.updateIdentifiers(complexName: val),
+                  onChanged: (val) =>
+                      controller.updateIdentifiers(complexName: val),
                 ),
                 const SizedBox(height: 16),
                 CustomTextInput(
@@ -130,7 +159,8 @@ class AddressStep extends ConsumerWidget {
                   placeholder: 'Enter registration number',
                   initialValue: state.erfPlotNumber,
                   subtext: 'Found on municipal rates bill or property deed.',
-                  onChanged: (val) => controller.updateIdentifiers(erfPlotNumber: val),
+                  onChanged: (val) =>
+                      controller.updateIdentifiers(erfPlotNumber: val),
                 ),
               ],
             ),

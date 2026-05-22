@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../data/models/property_state_model.dart';
 import '../controllers/property_controller.dart';
-import 'property_type_step.dart';
 import 'address_step.dart';
 import 'building_info_step.dart';
+import 'mandate_contacts_step.dart';
 import 'property_features_step.dart';
+import 'property_type_step.dart';
 import 'room_details_step.dart';
 
 class PropertyWizardShell extends ConsumerWidget {
@@ -28,6 +30,8 @@ class PropertyWizardShell extends ConsumerWidget {
     String headerTitle = 'Property Details';
     if (state.currentStep == 3) {
       headerTitle = 'Building Info';
+    } else if (state.currentStep == 5) {
+      headerTitle = 'Mandate & Contacts';
     }
 
     Widget stepView;
@@ -46,6 +50,9 @@ class PropertyWizardShell extends ConsumerWidget {
           break;
         case 4:
           stepView = const PropertyFeaturesStep();
+          break;
+        case 5:
+          stepView = const MandateContactsStep();
           break;
         default:
           stepView = const PropertyTypeStep();
@@ -69,6 +76,8 @@ class PropertyWizardShell extends ConsumerWidget {
               controller.selectRoomForEditing(null);
             } else if (state.currentStep > 1) {
               controller.prevStep();
+            } else {
+              Navigator.of(context).pop();
             }
           },
         ),
@@ -106,19 +115,14 @@ class PropertyWizardShell extends ConsumerWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            color: theme.borderLight,
-            height: 1.0,
-          ),
+          child: Container(color: theme.borderLight, height: 1.0),
         ),
       ),
-      body: SafeArea(
-        child: stepView,
-      ),
+      body: SafeArea(child: stepView),
       // Standardized dynamic footers
       bottomNavigationBar: isEditingRoom
           ? null // No footer in Step 4.2 Room Details as per screenshot
@@ -138,12 +142,7 @@ class PropertyWizardShell extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: theme.borderLight,
-            width: 1.0,
-          ),
-        ),
+        border: Border(top: BorderSide(color: theme.borderLight, width: 1.0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,6 +184,29 @@ class PropertyWizardShell extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   'Step 2 of 6',
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.textPrimary,
+                  ),
+                ),
+              ],
+            )
+          else if (state.currentStep == 5)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'PROGRESS',
+                  style: textTheme.labelLarge?.copyWith(
+                    color: theme.textSecondary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Step 5 of 6',
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.textPrimary,
@@ -248,11 +270,7 @@ class PropertyWizardShell extends ConsumerWidget {
           if (state.currentStep == 2)
             CustomButton(
               text: 'Next',
-              icon: Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-                size: 16,
-              ),
+              icon: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
               onTap: () => controller.nextStep(),
             )
           else if (state.currentStep == 4)
@@ -264,19 +282,11 @@ class PropertyWizardShell extends ConsumerWidget {
                 size: 14,
               ),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Valuation data capture complete. Pricing Pending.'),
-                    backgroundColor: theme.primaryColor,
-                  ),
-                );
+                controller.nextStep();
               },
             )
           else
-            CustomButton(
-              text: 'Next',
-              onTap: () => controller.nextStep(),
-            )
+            CustomButton(text: 'Next', onTap: () => controller.nextStep()),
         ],
       ),
     );
