@@ -1,6 +1,6 @@
-import '../../domain/entities/property_state.dart';
-import '../../domain/entities/room.dart';
-import '../../domain/repositories/property_repository.dart';
+import '../models/property_state.dart';
+import '../models/room.dart';
+import 'property_repository.dart';
 import '../data_sources/property_local_data_source.dart';
 import '../models/property_state_model.dart';
 
@@ -19,5 +19,10 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   Future<void> savePropertyDraft(PropertyState propertyState) async {
     final stateModel = PropertyStateModel.fromEntity(propertyState);
     await _localDataSource.savePropertyDraft(stateModel);
+  }
+
+  @override
+  Future<List<String>> getInitialOutdoorExtras() async {
+    return _localDataSource.getInitialOutdoorExtras();
   }
 }

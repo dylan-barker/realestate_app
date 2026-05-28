@@ -1,11 +1,11 @@
-import '../enums/architectural_style.dart';
-import '../enums/facing_direction.dart';
-import '../enums/lead_source.dart';
-import '../enums/mandate_type.dart';
-import '../enums/property_subtype.dart';
-import '../enums/property_type.dart';
-import '../enums/roof_configuration.dart';
-import '../enums/wall_exterior.dart';
+import 'enums/architectural_style.dart';
+import 'enums/facing_direction.dart';
+import 'enums/lead_source.dart';
+import 'enums/mandate_type.dart';
+import 'enums/property_subtype.dart';
+import 'enums/property_type.dart';
+import 'enums/roof_configuration.dart';
+import 'enums/wall_exterior.dart';
 import 'room.dart';
 
 class PropertyState {

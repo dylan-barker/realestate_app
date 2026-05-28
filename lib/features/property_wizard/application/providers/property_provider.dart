@@ -1,20 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/data_sources/property_local_data_source.dart';
+import '../../data/models/enums/architectural_style.dart';
+import '../../data/models/enums/facing_direction.dart';
+import '../../data/models/enums/lead_source.dart';
+import '../../data/models/enums/mandate_type.dart';
+import '../../data/models/enums/property_subtype.dart';
+import '../../data/models/enums/property_type.dart';
+import '../../data/models/enums/roof_configuration.dart';
+import '../../data/models/enums/property_wizard_step.dart';
+import '../../data/models/enums/room_category.dart';
+import '../../data/models/enums/wall_exterior.dart';
+import '../../data/models/property_state.dart';
+import '../../data/models/room.dart';
+import '../../data/repositories/property_repository.dart';
 import '../../data/repositories/property_repository_impl.dart';
-import '../../domain/entities/property_state.dart';
-import '../../domain/entities/room.dart';
-import '../../domain/enums/architectural_style.dart';
-import '../../domain/enums/facing_direction.dart';
-import '../../domain/enums/lead_source.dart';
-import '../../domain/enums/mandate_type.dart';
-import '../../domain/enums/property_subtype.dart';
-import '../../domain/enums/property_type.dart';
-import '../../domain/enums/roof_configuration.dart';
-import '../../domain/enums/room_category.dart';
-import '../../domain/enums/wall_exterior.dart';
-import '../../domain/repositories/property_repository.dart';
-import '../../domain/usecases/get_initial_rooms.dart';
-import '../../domain/usecases/save_property_draft.dart';
+import 'get_initial_rooms.dart';
+import 'save_property_draft.dart';
 
 // dependency injection providers
 final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((ref) {
@@ -26,16 +27,6 @@ final propertyRepositoryProvider = Provider<IPropertyRepository>((ref) {
   return PropertyRepositoryImpl(dataSource);
 });
 
-final getInitialRoomsUseCaseProvider = Provider<GetInitialRoomsUseCase>((ref) {
-  final repo = ref.watch(propertyRepositoryProvider);
-  return GetInitialRoomsUseCase(repo);
-});
-
-final savePropertyDraftUseCaseProvider = Provider<SavePropertyDraftUseCase>((ref) {
-  final repo = ref.watch(propertyRepositoryProvider);
-  return SavePropertyDraftUseCase(repo);
-});
-
 final propertyViewModelProvider = NotifierProvider<PropertyViewModel, PropertyState>(() {
   return PropertyViewModel();
 });
@@ -43,15 +34,14 @@ final propertyViewModelProvider = NotifierProvider<PropertyViewModel, PropertySt
 class PropertyViewModel extends Notifier<PropertyState> {
   @override
   PropertyState build() {
-    // initialize state and fetch initial rooms asynchronously
     _loadInitialData();
     return PropertyState(rooms: const [], outdoorExtras: const []);
   }
 
   Future<void> _loadInitialData() async {
-    final rooms = await ref.read(getInitialRoomsUseCaseProvider).execute();
-    // Load outdoor extras from datasource (currently none, placeholder for future extension)
-    final outdoorExtras = await ref.read(propertyLocalDataSourceProvider).getInitialOutdoorExtras?.call() ?? [];
+    final rooms = await ref.read(getInitialRoomsProvider.future);
+    final repository = ref.read(propertyRepositoryProvider);
+    final outdoorExtras = await repository.getInitialOutdoorExtras();
     state = state.copyWith(rooms: rooms, outdoorExtras: outdoorExtras);
   }
 
@@ -60,7 +50,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void nextStep() {
-    if (state.currentStep < 6) {
+    if (state.currentStep < PropertyWizardStep.values.length) {
       state = state.copyWith(currentStep: state.currentStep + 1);
     }
   }
@@ -278,6 +268,6 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   Future<void> saveDraft() async {
-    await ref.read(savePropertyDraftUseCaseProvider).execute(state);
+    await ref.read(savePropertyDraftProvider(state).future);
   }
 }

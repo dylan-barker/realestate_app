@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/router/app_router.dart';
 import 'core/theme/themes.dart';
-import 'features/property_wizard/presentation/views/property_wizard_shell.dart';
 
 void main() {
-  runApp(
-    // Wrap entire app in ProviderScope for Riverpod state management
-    const ProviderScope(child: MyApp()),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -16,14 +13,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dynamic theme setup
     final brandTheme = RealEstateTheme.crimson();
 
-    return MaterialApp(
-      title: 'Real Estate Data Capture Listing Tool',
+    return MaterialApp.router(
+      title: 'Real Estate Data Capture',
       debugShowCheckedModeBanner: false,
       theme: brandTheme.toThemeData(),
-      home: const PropertyWizardShell(),
+      routerConfig: appRouter,
     );
   }
 }

@@ -1,7 +1,7 @@
-import '../../../domain/enums/architectural_style.dart';
-import '../../../domain/enums/facing_direction.dart';
-import '../../../domain/enums/roof_configuration.dart';
-import '../../../domain/enums/wall_exterior.dart';
+import '../../../data/models/enums/architectural_style.dart';
+import '../../../data/models/enums/facing_direction.dart';
+import '../../../data/models/enums/roof_configuration.dart';
+import '../../../data/models/enums/wall_exterior.dart';
 
 class BuildingInfoState {
   final String erfSize;

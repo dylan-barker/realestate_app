@@ -1,4 +1,4 @@
-import '../../../domain/entities/room.dart';
+import '../../../data/models/room.dart';
 
 class PropertyFeaturesState {
   final List<Room> rooms;
@@ -19,6 +19,4 @@ class PropertyFeaturesState {
     );
   }
 
-  @override
-  List<Object?> get props => [rooms, outdoorExtras];
 }

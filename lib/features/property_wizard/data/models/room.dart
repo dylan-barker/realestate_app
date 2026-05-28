@@ -1,4 +1,4 @@
-import '../enums/room_category.dart';
+import 'enums/room_category.dart';
 
 class Room {
   final String id;

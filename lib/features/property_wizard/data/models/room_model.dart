@@ -1,5 +1,5 @@
-import '../../domain/entities/room.dart';
-import '../../domain/enums/room_category.dart';
+import 'room.dart';
+import 'enums/room_category.dart';
 
 class RoomModel {
   final String id;
