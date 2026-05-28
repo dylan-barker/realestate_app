@@ -7,15 +7,15 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../controllers/property_controller.dart';
+import '../viewmodels/property_view_model.dart';
 
 class RoomDetailsStep extends ConsumerWidget {
   const RoomDetailsStep({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
@@ -94,7 +94,7 @@ class RoomDetailsStep extends ConsumerWidget {
                   ),
                   onPressed: () => _showRenameDialog(
                     context,
-                    controller,
+                    viewModel,
                     room.id,
                     room.name,
                     theme,
@@ -139,7 +139,7 @@ class RoomDetailsStep extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: CustomCard(
                     isSelected: isSelected,
-                    onTap: () => controller.updateRoomDetails(
+                    onTap: () => viewModel.updateRoomDetails(
                       roomId: room.id,
                       conditionRating: level,
                     ),
@@ -230,7 +230,7 @@ class RoomDetailsStep extends ConsumerWidget {
                 child: CustomChip(
                   label: feature,
                   onDelete: () =>
-                      controller.removeFeatureFromRoom(room.id, feature),
+                      viewModel.removeFeatureFromRoom(room.id, feature),
                 ),
               );
             },
@@ -244,7 +244,7 @@ class RoomDetailsStep extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             onTap: () => _showAddFeatureDialog(
               context,
-              controller,
+              viewModel,
               room.id,
               theme,
               textTheme,
@@ -285,7 +285,7 @@ class RoomDetailsStep extends ConsumerWidget {
               runSpacing: 8.0,
               children: suggestedAmenities.map((amenity) {
                 return InkWell(
-                  onTap: () => controller.addFeatureToRoom(room.id, amenity),
+                  onTap: () => viewModel.addFeatureToRoom(room.id, amenity),
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -359,7 +359,7 @@ class RoomDetailsStep extends ConsumerWidget {
                   initialValue: room.notes,
                   maxLines: 4,
                   onChanged: (val) =>
-                      controller.updateRoomDetails(roomId: room.id, notes: val),
+                      viewModel.updateRoomDetails(roomId: room.id, notes: val),
                   style: textTheme.bodyLarge?.copyWith(
                     color: theme.textPrimary,
                   ),
@@ -385,7 +385,7 @@ class RoomDetailsStep extends ConsumerWidget {
             fullWidth: true,
             onTap: () {
               // Automatically mark as complete if condition selected
-              controller.selectRoomForEditing(null);
+              viewModel.selectRoomForEditing(null);
             },
           ),
         ],
@@ -432,7 +432,7 @@ class RoomDetailsStep extends ConsumerWidget {
 
   void _showRenameDialog(
     BuildContext context,
-    PropertyController controller,
+    PropertyViewModel viewModel,
     String roomId,
     String currentName,
     RealEstateTheme theme,
@@ -474,7 +474,7 @@ class RoomDetailsStep extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 if (name.trim().isNotEmpty) {
-                  controller.renameRoom(roomId, name.trim());
+                  viewModel.renameRoom(roomId, name.trim());
                   Navigator.pop(context);
                 }
               },
@@ -494,7 +494,7 @@ class RoomDetailsStep extends ConsumerWidget {
 
   void _showAddFeatureDialog(
     BuildContext context,
-    PropertyController controller,
+    PropertyViewModel viewModel,
     String roomId,
     RealEstateTheme theme,
     TextTheme textTheme,
@@ -534,7 +534,7 @@ class RoomDetailsStep extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 if (feature.trim().isNotEmpty) {
-                  controller.addFeatureToRoom(roomId, feature.trim());
+                  viewModel.addFeatureToRoom(roomId, feature.trim());
                   Navigator.pop(context);
                 }
               },

@@ -6,32 +6,30 @@ import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../../data/models/room_model.dart';
-import '../controllers/property_controller.dart';
+import '../../domain/entities/room.dart';
+import '../../domain/enums/room_category.dart';
+import '../viewmodels/property_view_model.dart';
 
 class PropertyFeaturesStep extends ConsumerWidget {
   const PropertyFeaturesStep({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
-    // Categories we support
-    final categories = ['Bedrooms', 'Living & Dining', 'Bathrooms & Powder'];
+    // Categories we support using the enum
+    final categories = RoomCategory.values;
 
-    // Group rooms by category
-    Map<String, List<RoomModel>> groupedRooms = {
+    // Group rooms by category enum
+    Map<RoomCategory, List<Room>> groupedRooms = {
       for (var cat in categories) cat: [],
     };
     for (var room in state.rooms) {
       if (groupedRooms.containsKey(room.type)) {
         groupedRooms[room.type]!.add(room);
-      } else {
-        // Fallback for custom categories
-        groupedRooms[room.type] = [room];
       }
     }
 
@@ -89,7 +87,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
               // Loop through categories
               for (var category in categories) ...[
                 Text(
-                  category.toUpperCase(),
+                  category.displayString.toUpperCase(),
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.textLabel,
@@ -111,7 +109,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                       child: CustomCard(
                         onTap: () {
                           // Select room and enter Step 4.2 Room Details view
-                          controller.selectRoomForEditing(room.id);
+                          viewModel.selectRoomForEditing(room.id);
                         },
                         backgroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
@@ -186,7 +184,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 backgroundColor: theme.backgroundColor.withOpacity(0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 onTap: () =>
-                    _showAddRoomDialog(context, controller, theme, textTheme),
+                    _showAddRoomDialog(context, viewModel, theme, textTheme),
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -230,7 +228,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                   return CustomChip(
                     label: opt,
                     isSelected: isSelected,
-                    onTap: () => controller.toggleOutdoorExtra(opt),
+                    onTap: () => viewModel.toggleOutdoorExtra(opt),
                   );
                 }).toList(),
               ),
@@ -243,7 +241,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 onTap: () => _showAddOutdoorDialog(
                   context,
-                  controller,
+                  viewModel,
                   theme,
                   textTheme,
                 ),
@@ -309,12 +307,12 @@ class PropertyFeaturesStep extends ConsumerWidget {
 
   void _showAddRoomDialog(
     BuildContext context,
-    PropertyController controller,
+    PropertyViewModel viewModel,
     RealEstateTheme theme,
     TextTheme textTheme,
   ) {
     String name = '';
-    String category = 'Bedrooms';
+    RoomCategory category = RoomCategory.bedrooms;
 
     showModalBottomSheet(
       context: context,
@@ -346,7 +344,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                   const SizedBox(height: 20),
 
                   // Category selector dropdown
-                  DropdownButtonFormField<String>(
+                  DropdownButtonFormField<RoomCategory>(
                     value: category,
                     decoration: InputDecoration(
                       labelText: 'Room Category',
@@ -358,10 +356,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
                         borderSide: BorderSide(color: theme.borderLight),
                       ),
                     ),
-                    items: ['Bedrooms', 'Living & Dining', 'Bathrooms & Powder']
+                    items: RoomCategory.values
                         .map(
                           (cat) =>
-                              DropdownMenuItem(value: cat, child: Text(cat)),
+                              DropdownMenuItem(value: cat, child: Text(cat.displayString)),
                         )
                         .toList(),
                     onChanged: (val) {
@@ -393,7 +391,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                       ElevatedButton(
                         onPressed: () {
                           if (name.trim().isNotEmpty) {
-                            controller.addCustomRoom(name.trim(), category);
+                            viewModel.addCustomRoom(name.trim(), category);
                             Navigator.pop(context);
                           }
                         },
@@ -421,7 +419,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
 
   void _showAddOutdoorDialog(
     BuildContext context,
-    PropertyController controller,
+    PropertyViewModel viewModel,
     RealEstateTheme theme,
     TextTheme textTheme,
   ) {
@@ -460,7 +458,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 if (name.trim().isNotEmpty) {
-                  controller.addCustomOutdoorExtra(name.trim());
+                  viewModel.addCustomOutdoorExtra(name.trim());
                   Navigator.pop(context);
                 }
               },

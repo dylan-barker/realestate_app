@@ -6,15 +6,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../controllers/property_controller.dart';
+import '../../domain/enums/architectural_style.dart';
+import '../../domain/enums/facing_direction.dart';
+import '../../domain/enums/roof_configuration.dart';
+import '../../domain/enums/wall_exterior.dart';
+import '../viewmodels/building_info_view_model.dart';
 
 class BuildingInfoStep extends ConsumerWidget {
   const BuildingInfoStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(buildingInfoViewModelProvider);
+    final viewModel = ref.read(buildingInfoViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
@@ -56,7 +60,7 @@ class BuildingInfoStep extends ConsumerWidget {
             placeholder: '0.00',
             initialValue: state.erfSize == '0.00' ? '' : state.erfSize,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (val) => controller.updateTechnicalSpecs(erfSize: val),
+            onChanged: (val) => viewModel.updateTechnicalSpecs(erfSize: val),
           ),
           const SizedBox(height: 18),
           CustomTextInput(
@@ -64,7 +68,7 @@ class BuildingInfoStep extends ConsumerWidget {
             placeholder: '0.00',
             initialValue: state.floorArea == '0.00' ? '' : state.floorArea,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (val) => controller.updateTechnicalSpecs(floorArea: val),
+            onChanged: (val) => viewModel.updateTechnicalSpecs(floorArea: val),
           ),
           const SizedBox(height: 18),
           CustomTextInput(
@@ -75,7 +79,7 @@ class BuildingInfoStep extends ConsumerWidget {
                 : state.constructionYear,
             keyboardType: TextInputType.number,
             onChanged: (val) =>
-                controller.updateTechnicalSpecs(constructionYear: val),
+                viewModel.updateTechnicalSpecs(constructionYear: val),
           ),
           const SizedBox(height: 18),
           CustomTextInput(
@@ -83,7 +87,7 @@ class BuildingInfoStep extends ConsumerWidget {
             placeholder: '0.00',
             initialValue: state.maxHeight == '0.00' ? '' : state.maxHeight,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (val) => controller.updateTechnicalSpecs(maxHeight: val),
+            onChanged: (val) => viewModel.updateTechnicalSpecs(maxHeight: val),
           ),
           const SizedBox(height: 18),
           CustomTextInput(
@@ -92,64 +96,69 @@ class BuildingInfoStep extends ConsumerWidget {
             initialValue: state.zoning == 'e.g. Residential 1'
                 ? ''
                 : state.zoning,
-            onChanged: (val) => controller.updateTechnicalSpecs(zoning: val),
+            onChanged: (val) => viewModel.updateTechnicalSpecs(zoning: val),
           ),
           const SizedBox(height: 28),
 
           // Visual Selector Chips: Facing Direction
-          _buildChipSelector(
+          _buildChipSelector<FacingDirection>(
             theme: theme,
             textTheme: textTheme,
             label: 'Facing Direction',
-            options: ['North', 'East', 'South', 'West'],
+            options: FacingDirection.values,
             selectedOption: state.facingDirection,
-            onSelected: (val) => controller.selectFacingDirection(val),
+            getLabel: (opt) => opt.displayString,
+            onSelected: (val) => viewModel.selectFacingDirection(val),
           ),
           const SizedBox(height: 24),
 
           // Visual Selector Chips: Architectural Style
-          _buildChipSelector(
+          _buildChipSelector<ArchitecturalStyle>(
             theme: theme,
             textTheme: textTheme,
             label: 'Architectural Style',
-            options: ['Modern', 'Contemporary', 'Traditional'],
+            options: ArchitecturalStyle.values,
             selectedOption: state.architecturalStyle,
-            onSelected: (val) => controller.selectArchitecturalStyle(val),
+            getLabel: (opt) => opt.displayString,
+            onSelected: (val) => viewModel.selectArchitecturalStyle(val),
           ),
           const SizedBox(height: 24),
 
           // Visual Selector Chips: Roof Configuration
-          _buildChipSelector(
+          _buildChipSelector<RoofConfiguration>(
             theme: theme,
             textTheme: textTheme,
             label: 'Roof Configuration',
-            options: ['Gabled', 'Flat', 'Hipped', 'Mansard'],
+            options: RoofConfiguration.values,
             selectedOption: state.roofConfiguration,
-            onSelected: (val) => controller.selectRoofConfiguration(val),
+            getLabel: (opt) => opt.displayString,
+            onSelected: (val) => viewModel.selectRoofConfiguration(val),
           ),
           const SizedBox(height: 24),
 
           // Visual Selector Chips: Wall Exterior
-          _buildChipSelector(
+          _buildChipSelector<WallExterior>(
             theme: theme,
             textTheme: textTheme,
             label: 'Wall Exterior',
-            options: ['Brick', 'Stucco', 'Stone', 'Wood'],
+            options: WallExterior.values,
             selectedOption: state.wallExterior,
-            onSelected: (val) => controller.selectWallExterior(val),
+            getLabel: (opt) => opt.displayString,
+            onSelected: (val) => viewModel.selectWallExterior(val),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildChipSelector({
+  Widget _buildChipSelector<T>({
     required RealEstateTheme theme,
     required TextTheme textTheme,
     required String label,
-    required List<String> options,
-    required String selectedOption,
-    required ValueChanged<String> onSelected,
+    required List<T> options,
+    required T selectedOption,
+    required String Function(T) getLabel,
+    required ValueChanged<T> onSelected,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +178,7 @@ class BuildingInfoStep extends ConsumerWidget {
           children: options.map((opt) {
             final isSelected = selectedOption == opt;
             return CustomChip(
-              label: opt,
+              label: getLabel(opt),
               isSelected: isSelected,
               onTap: () => onSelected(opt),
             );

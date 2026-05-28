@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
-import '../../data/models/property_state_model.dart';
-import '../controllers/property_controller.dart';
+import '../../domain/entities/property_state.dart';
+import '../viewmodels/property_view_model.dart';
 import 'address_step.dart';
 import 'building_info_step.dart';
 import 'mandate_contacts_step.dart';
@@ -18,8 +18,8 @@ class PropertyWizardShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
@@ -73,9 +73,9 @@ class PropertyWizardShell extends ConsumerWidget {
           ),
           onPressed: () {
             if (isEditingRoom) {
-              controller.selectRoomForEditing(null);
+              viewModel.selectRoomForEditing(null);
             } else if (state.currentStep > 1) {
-              controller.prevStep();
+              viewModel.prevStep();
             } else {
               Navigator.of(context).pop();
             }
@@ -126,15 +126,15 @@ class PropertyWizardShell extends ConsumerWidget {
       // Standardized dynamic footers
       bottomNavigationBar: isEditingRoom
           ? null // No footer in Step 4.2 Room Details as per screenshot
-          : _buildFooter(context, ref, state, controller, theme, textTheme),
+          : _buildFooter(context, ref, state, viewModel, theme, textTheme),
     );
   }
 
   Widget _buildFooter(
     BuildContext context,
     WidgetRef ref,
-    PropertyStateModel state,
-    PropertyController controller,
+    PropertyState state,
+    PropertyViewModel viewModel,
     RealEstateTheme theme,
     TextTheme textTheme,
   ) {
@@ -242,6 +242,7 @@ class PropertyWizardShell extends ConsumerWidget {
                 const SizedBox(width: 20),
                 GestureDetector(
                   onTap: () {
+                    viewModel.saveDraft();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text('Draft saved successfully'),
@@ -263,7 +264,7 @@ class PropertyWizardShell extends ConsumerWidget {
             CustomButton(
               text: 'Back',
               type: ButtonType.back,
-              onTap: () => controller.prevStep(),
+              onTap: () => viewModel.prevStep(),
             ),
 
           // Right side CTA button
@@ -271,7 +272,7 @@ class PropertyWizardShell extends ConsumerWidget {
             CustomButton(
               text: 'Next',
               icon: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
-              onTap: () => controller.nextStep(),
+              onTap: () => viewModel.nextStep(),
             )
           else if (state.currentStep == 4)
             CustomButton(
@@ -282,11 +283,11 @@ class PropertyWizardShell extends ConsumerWidget {
                 size: 14,
               ),
               onTap: () {
-                controller.nextStep();
+                viewModel.nextStep();
               },
             )
           else
-            CustomButton(text: 'Next', onTap: () => controller.nextStep()),
+            CustomButton(text: 'Next', onTap: () => viewModel.nextStep()),
         ],
       ),
     );

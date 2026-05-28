@@ -5,36 +5,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
-import '../controllers/property_controller.dart';
+import '../../domain/enums/property_subtype.dart';
+import '../../domain/enums/property_type.dart';
+import '../viewmodels/property_view_model.dart';
 
 class PropertyTypeStep extends ConsumerWidget {
   const PropertyTypeStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
-    // Property types details
+    // Property types details using enums
     final types = [
-      {'name': 'House', 'icon': Icons.home_outlined},
-      {'name': 'Townhouse', 'icon': Icons.business_outlined},
-      {'name': 'Apartment', 'icon': Icons.corporate_fare_outlined},
-      {'name': 'Vacant Land', 'icon': Icons.terrain_outlined},
-      {'name': 'Plot', 'icon': Icons.grid_view_outlined},
+      {'type': PropertyType.house, 'icon': Icons.home_outlined},
+      {'type': PropertyType.townhouse, 'icon': Icons.business_outlined},
+      {'type': PropertyType.apartment, 'icon': Icons.corporate_fare_outlined},
+      {'type': PropertyType.vacantLand, 'icon': Icons.terrain_outlined},
+      {'type': PropertyType.plot, 'icon': Icons.grid_view_outlined},
     ];
 
-    // Subtypes lists
-    final subtypes = [
-      'Free Standing',
-      'Cluster',
-      'Simplex',
-      'Duplex',
-      'Triplex',
-      'Small Holding',
-    ];
+    // Subtypes lists from enum values
+    final subtypes = PropertySubtype.values;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -74,13 +69,13 @@ class PropertyTypeStep extends ConsumerWidget {
             itemCount: types.length,
             itemBuilder: (context, index) {
               final item = types[index];
-              final itemName = item['name'] as String;
+              final itemType = item['type'] as PropertyType;
               final itemIcon = item['icon'] as IconData;
-              final isSelected = state.propertyType == itemName;
+              final isSelected = state.propertyType == itemType;
 
               return CustomCard(
                 isSelected: isSelected,
-                onTap: () => controller.selectPropertyType(itemName),
+                onTap: () => viewModel.selectPropertyType(itemType),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
                   vertical: 16.0,
@@ -97,7 +92,7 @@ class PropertyTypeStep extends ConsumerWidget {
                           : theme.textPrimary.withOpacity(0.6),
                     ),
                     Text(
-                      itemName,
+                      itemType.displayString,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.textPrimary,
@@ -128,9 +123,9 @@ class PropertyTypeStep extends ConsumerWidget {
             children: subtypes.map((subtype) {
               final isSelected = state.propertySubtype == subtype;
               return CustomChip(
-                label: subtype,
+                label: subtype.displayString,
                 isSelected: isSelected,
-                onTap: () => controller.selectPropertySubtype(subtype),
+                onTap: () => viewModel.selectPropertySubtype(subtype),
               );
             }).toList(),
           ),

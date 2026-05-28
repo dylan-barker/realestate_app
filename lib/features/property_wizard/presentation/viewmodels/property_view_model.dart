@@ -1,32 +1,58 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/property_state_model.dart';
-import '../../data/models/room_model.dart';
+import '../../data/data_sources/property_local_data_source.dart';
+import '../../data/repositories/property_repository_impl.dart';
+import '../../domain/entities/property_state.dart';
+import '../../domain/entities/room.dart';
+import '../../domain/enums/architectural_style.dart';
+import '../../domain/enums/facing_direction.dart';
+import '../../domain/enums/lead_source.dart';
+import '../../domain/enums/mandate_type.dart';
+import '../../domain/enums/property_subtype.dart';
+import '../../domain/enums/property_type.dart';
+import '../../domain/enums/roof_configuration.dart';
+import '../../domain/enums/room_category.dart';
+import '../../domain/enums/wall_exterior.dart';
+import '../../domain/repositories/property_repository.dart';
+import '../../domain/usecases/get_initial_rooms.dart';
+import '../../domain/usecases/save_property_draft.dart';
 
-class PropertyController extends Notifier<PropertyStateModel> {
+// dependency injection providers
+final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((ref) {
+  return PropertyLocalDataSource();
+});
+
+final propertyRepositoryProvider = Provider<IPropertyRepository>((ref) {
+  final dataSource = ref.watch(propertyLocalDataSourceProvider);
+  return PropertyRepositoryImpl(dataSource);
+});
+
+final getInitialRoomsUseCaseProvider = Provider<GetInitialRoomsUseCase>((ref) {
+  final repo = ref.watch(propertyRepositoryProvider);
+  return GetInitialRoomsUseCase(repo);
+});
+
+final savePropertyDraftUseCaseProvider = Provider<SavePropertyDraftUseCase>((ref) {
+  final repo = ref.watch(propertyRepositoryProvider);
+  return SavePropertyDraftUseCase(repo);
+});
+
+final propertyViewModelProvider = NotifierProvider<PropertyViewModel, PropertyState>(() {
+  return PropertyViewModel();
+});
+
+class PropertyViewModel extends Notifier<PropertyState> {
   @override
-  PropertyStateModel build() {
-    // Populate standard high-fidelity rooms corresponding to the screenshot!
-    final initialRooms = [
-      RoomModel(
-        id: 'bed-1',
-        name: 'Bedroom 1',
-        type: 'Bedrooms',
-        description: 'Master Suite',
-        isComplete: true,
-        conditionRating: 3,
-        features: [
-          'Ceiling Fan',
-          'Wall-to-Wall Carpets',
-          'Air Conditioning',
-          'Built-in Cupboards',
-          'En-suite Bathroom',
-          'Balcony',
-        ],
-        notes: 'Spacious master suite with premium dynamic views.',
-      ),
-    ];
+  PropertyState build() {
+    // initialize state and fetch initial rooms asynchronously
+    _loadInitialData();
+    return PropertyState(rooms: const [], outdoorExtras: const []);
+  }
 
-    return PropertyStateModel(currentStep: 1, rooms: initialRooms);
+  Future<void> _loadInitialData() async {
+    final rooms = await ref.read(getInitialRoomsUseCaseProvider).execute();
+    // Load outdoor extras from datasource (currently none, placeholder for future extension)
+    final outdoorExtras = await ref.read(propertyLocalDataSourceProvider).getInitialOutdoorExtras?.call() ?? [];
+    state = state.copyWith(rooms: rooms, outdoorExtras: outdoorExtras);
   }
 
   void setStep(int step) {
@@ -46,11 +72,11 @@ class PropertyController extends Notifier<PropertyStateModel> {
   }
 
   // Step 1 actions
-  void selectPropertyType(String type) {
+  void selectPropertyType(PropertyType type) {
     state = state.copyWith(propertyType: type);
   }
 
-  void selectPropertySubtype(String subtype) {
+  void selectPropertySubtype(PropertySubtype subtype) {
     state = state.copyWith(propertySubtype: subtype);
   }
 
@@ -95,28 +121,28 @@ class PropertyController extends Notifier<PropertyStateModel> {
     );
   }
 
-  void selectFacingDirection(String direction) {
+  void selectFacingDirection(FacingDirection direction) {
     state = state.copyWith(facingDirection: direction);
   }
 
-  void selectArchitecturalStyle(String style) {
+  void selectArchitecturalStyle(ArchitecturalStyle style) {
     state = state.copyWith(architecturalStyle: style);
   }
 
-  void selectRoofConfiguration(String config) {
+  void selectRoofConfiguration(RoofConfiguration config) {
     state = state.copyWith(roofConfiguration: config);
   }
 
-  void selectWallExterior(String wall) {
+  void selectWallExterior(WallExterior wall) {
     state = state.copyWith(wallExterior: wall);
   }
 
   // Step 4.1 actions - Rooms
-  void addCustomRoom(String name, String type) {
-    final newRoom = RoomModel(
+  void addCustomRoom(String name, RoomCategory category) {
+    final newRoom = Room(
       id: 'custom-${DateTime.now().millisecondsSinceEpoch}',
       name: name,
-      type: type,
+      type: category,
       description: 'Custom Space',
       isComplete: false,
     );
@@ -163,7 +189,6 @@ class PropertyController extends Notifier<PropertyStateModel> {
           conditionRating: conditionRating ?? room.conditionRating,
           features: features ?? room.features,
           notes: notes ?? room.notes,
-          // Mark room as complete if condition rating is assigned
           isComplete: conditionRating != null,
         );
       }
@@ -213,11 +238,11 @@ class PropertyController extends Notifier<PropertyStateModel> {
   }
 
   // Step 5 actions
-  void selectMandateType(String type) {
+  void selectMandateType(MandateType type) {
     state = state.copyWith(mandateType: type);
   }
 
-  void selectLeadSource(String source) {
+  void selectLeadSource(LeadSource source) {
     state = state.copyWith(leadSource: source);
   }
 
@@ -251,10 +276,8 @@ class PropertyController extends Notifier<PropertyStateModel> {
       mandateEnd: end ?? state.mandateEnd,
     );
   }
-}
 
-// Global Provider
-final propertyControllerProvider =
-    NotifierProvider<PropertyController, PropertyStateModel>(() {
-      return PropertyController();
-    });
+  Future<void> saveDraft() async {
+    await ref.read(savePropertyDraftUseCaseProvider).execute(state);
+  }
+}

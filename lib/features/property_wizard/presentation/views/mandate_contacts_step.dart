@@ -4,15 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../controllers/property_controller.dart';
+import '../../domain/enums/lead_source.dart';
+import '../../domain/enums/mandate_type.dart';
+import '../viewmodels/property_view_model.dart';
 
 class MandateContactsStep extends ConsumerWidget {
   const MandateContactsStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
@@ -56,8 +58,9 @@ class MandateContactsStep extends ConsumerWidget {
                   textTheme: textTheme,
                   title: 'Exclusive',
                   subtitle: 'Sole agency rights for a fixed period',
-                  isSelected: state.mandateType == 'Exclusive',
-                  onTap: () => controller.selectMandateType('Exclusive'),
+                  isSelected: state.mandateType == MandateType.exclusive,
+                  onTap: () =>
+                      viewModel.selectMandateType(MandateType.exclusive),
                 ),
               ),
               const SizedBox(width: 12),
@@ -67,8 +70,8 @@ class MandateContactsStep extends ConsumerWidget {
                   textTheme: textTheme,
                   title: 'Open',
                   subtitle: 'Multiple agencies can list',
-                  isSelected: state.mandateType == 'Open',
-                  onTap: () => controller.selectMandateType('Open'),
+                  isSelected: state.mandateType == MandateType.open,
+                  onTap: () => viewModel.selectMandateType(MandateType.open),
                 ),
               ),
             ],
@@ -87,17 +90,11 @@ class MandateContactsStep extends ConsumerWidget {
           Wrap(
             spacing: 8.0,
             runSpacing: 10.0,
-            children: [
-              'Referral',
-              'Website',
-              'Walk-in',
-              'Social Media',
-              'Other'
-            ].map((opt) {
+            children: LeadSource.values.map((opt) {
               return CustomChip(
-                label: opt,
+                label: opt.displayString,
                 isSelected: state.leadSource == opt,
-                onTap: () => controller.selectLeadSource(opt),
+                onTap: () => viewModel.selectLeadSource(opt),
               );
             }).toList(),
           ),
@@ -129,7 +126,7 @@ class MandateContactsStep extends ConsumerWidget {
             textTheme: textTheme,
             title: 'Lightstone',
             isChecked: state.syncLightstone,
-            onChanged: (val) => controller.toggleSyncLightstone(val ?? false),
+            onChanged: (val) => viewModel.toggleSyncLightstone(val ?? false),
           ),
           const SizedBox(height: 12),
           _buildIntegrationTile(
@@ -137,7 +134,7 @@ class MandateContactsStep extends ConsumerWidget {
             textTheme: textTheme,
             title: 'Loom',
             isChecked: state.syncLoom,
-            onChanged: (val) => controller.toggleSyncLoom(val ?? false),
+            onChanged: (val) => viewModel.toggleSyncLoom(val ?? false),
           ),
           const SizedBox(height: 32),
 
@@ -195,7 +192,8 @@ class MandateContactsStep extends ConsumerWidget {
                         placeholder: 'John',
                         initialValue: state.ownerFirstName,
                         style: InputStyle.cardBorder,
-                        onChanged: (val) => controller.updateOwnerInfo(firstName: val),
+                        onChanged: (val) =>
+                            viewModel.updateOwnerInfo(firstName: val),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -205,7 +203,8 @@ class MandateContactsStep extends ConsumerWidget {
                         placeholder: 'Doe',
                         initialValue: state.ownerLastName,
                         style: InputStyle.cardBorder,
-                        onChanged: (val) => controller.updateOwnerInfo(lastName: val),
+                        onChanged: (val) =>
+                            viewModel.updateOwnerInfo(lastName: val),
                       ),
                     ),
                   ],
@@ -216,7 +215,7 @@ class MandateContactsStep extends ConsumerWidget {
                   placeholder: 'john.doe@example.com',
                   initialValue: state.ownerEmail,
                   keyboardType: TextInputType.emailAddress,
-                  onChanged: (val) => controller.updateOwnerInfo(email: val),
+                  onChanged: (val) => viewModel.updateOwnerInfo(email: val),
                 ),
                 const SizedBox(height: 16),
                 CustomTextInput(
@@ -224,14 +223,14 @@ class MandateContactsStep extends ConsumerWidget {
                   placeholder: '+27 82 000 0000',
                   initialValue: state.ownerPhone,
                   keyboardType: TextInputType.phone,
-                  onChanged: (val) => controller.updateOwnerInfo(phone: val),
+                  onChanged: (val) => viewModel.updateOwnerInfo(phone: val),
                 ),
                 const SizedBox(height: 16),
                 CustomTextInput(
                   label: 'ID NUMBER',
                   placeholder: 'Optional',
                   initialValue: state.ownerIdNumber,
-                  onChanged: (val) => controller.updateOwnerInfo(idNumber: val),
+                  onChanged: (val) => viewModel.updateOwnerInfo(idNumber: val),
                 ),
               ],
             ),
@@ -294,7 +293,7 @@ class MandateContactsStep extends ConsumerWidget {
                     color: theme.primaryColor.withOpacity(0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -310,7 +309,9 @@ class MandateContactsStep extends ConsumerWidget {
                   size: 20,
                 ),
                 Icon(
-                  isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                  isSelected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
                   color: isSelected ? theme.primaryColor : theme.borderLight,
                   size: 20,
                 ),
@@ -327,9 +328,7 @@ class MandateContactsStep extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: theme.textSecondary,
-              ),
+              style: textTheme.bodySmall?.copyWith(color: theme.textSecondary),
             ),
           ],
         ),
@@ -351,9 +350,7 @@ class MandateContactsStep extends ConsumerWidget {
         border: Border.all(color: theme.borderLight),
       ),
       child: Theme(
-        data: ThemeData(
-          unselectedWidgetColor: theme.borderLight,
-        ),
+        data: ThemeData(unselectedWidgetColor: theme.borderLight),
         child: CheckboxListTile(
           value: isChecked,
           onChanged: onChanged,
@@ -367,8 +364,13 @@ class MandateContactsStep extends ConsumerWidget {
             ),
           ),
           controlAffinity: ListTileControlAffinity.leading,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 4,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -407,14 +409,20 @@ class MandateContactsStep extends ConsumerWidget {
                 Icon(
                   Icons.calendar_today_outlined,
                   size: 18,
-                  color: isPlaceholder ? theme.textSecondary : theme.primaryColor,
+                  color: isPlaceholder
+                      ? theme.textSecondary
+                      : theme.primaryColor,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   value,
                   style: textTheme.bodyLarge?.copyWith(
-                    color: isPlaceholder ? theme.textSecondary : theme.textPrimary,
-                    fontWeight: isPlaceholder ? FontWeight.normal : FontWeight.w600,
+                    color: isPlaceholder
+                        ? theme.textSecondary
+                        : theme.textPrimary,
+                    fontWeight: isPlaceholder
+                        ? FontWeight.normal
+                        : FontWeight.w600,
                   ),
                 ),
               ],

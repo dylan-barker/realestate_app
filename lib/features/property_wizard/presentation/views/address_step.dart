@@ -6,15 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../controllers/property_controller.dart';
+import '../viewmodels/property_view_model.dart';
 
 class AddressStep extends ConsumerWidget {
   const AddressStep({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(propertyControllerProvider);
-    final controller = ref.read(propertyControllerProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
@@ -54,7 +54,7 @@ class AddressStep extends ConsumerWidget {
             ),
             onChanged: (val) {
               // Simulating auto-completion / updating street address
-              controller.updateAddress(streetAddress: val);
+              viewModel.updateAddress(streetAddress: val);
             },
           ),
           const SizedBox(height: 24),
@@ -151,7 +151,7 @@ class AddressStep extends ConsumerWidget {
                   placeholder: 'e.g. Skyline Towers',
                   initialValue: state.complexName,
                   onChanged: (val) =>
-                      controller.updateIdentifiers(complexName: val),
+                      viewModel.updateIdentifiers(complexName: val),
                 ),
                 const SizedBox(height: 16),
                 CustomTextInput(
@@ -160,7 +160,7 @@ class AddressStep extends ConsumerWidget {
                   initialValue: state.erfPlotNumber,
                   subtext: 'Found on municipal rates bill or property deed.',
                   onChanged: (val) =>
-                      controller.updateIdentifiers(erfPlotNumber: val),
+                      viewModel.updateIdentifiers(erfPlotNumber: val),
                 ),
               ],
             ),
