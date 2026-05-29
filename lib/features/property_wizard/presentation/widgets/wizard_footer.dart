@@ -31,14 +31,7 @@ class WizardFooter extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Left side
-          if (navData.currentStep.stepNumber == 4)
-            CustomButton(
-              text: 'Back',
-              type: ButtonType.back,
-              onTap: onBack ?? () {},
-            )
-          else
-            Column(
+          Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

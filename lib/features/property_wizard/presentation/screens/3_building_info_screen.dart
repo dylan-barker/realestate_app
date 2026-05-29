@@ -13,7 +13,6 @@ import '../../data/models/enums/facing_direction.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/roof_configuration.dart';
 import '../../data/models/enums/wall_exterior.dart';
-import '../../application/providers/building_info_provider.dart';
 import '../../application/providers/property_provider.dart';
 import '../../application/providers/wizard_navigation_provider.dart';
 
@@ -22,8 +21,8 @@ class BuildingInfoStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(buildingInfoViewModelProvider);
-    final viewModel = ref.read(buildingInfoViewModelProvider.notifier);
+    final state = ref.watch(propertyViewModelProvider);
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = ref.watch(themeProvider);
     final textTheme = theme.toThemeData().textTheme;
     final navData = ref.watch(wizardNavigationProvider);
@@ -99,7 +98,7 @@ class BuildingInfoStep extends ConsumerWidget {
               CustomTextInput(
                 label: 'Erf Size (m²)',
                 placeholder: '0.00',
-                initialValue: state.erfSize == '0.00' ? '' : state.erfSize,
+                initialValue: state.erfSize,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (val) => viewModel.updateTechnicalSpecs(erfSize: val),
               ),
@@ -107,7 +106,7 @@ class BuildingInfoStep extends ConsumerWidget {
               CustomTextInput(
                 label: 'Floor Area (m²)',
                 placeholder: '0.00',
-                initialValue: state.floorArea == '0.00' ? '' : state.floorArea,
+                initialValue: state.floorArea,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (val) => viewModel.updateTechnicalSpecs(floorArea: val),
               ),
@@ -115,7 +114,7 @@ class BuildingInfoStep extends ConsumerWidget {
               CustomTextInput(
                 label: 'Construction Year',
                 placeholder: 'YYYY',
-                initialValue: state.constructionYear == 'YYYY' ? '' : state.constructionYear,
+                initialValue: state.constructionYear,
                 keyboardType: TextInputType.number,
                 onChanged: (val) => viewModel.updateTechnicalSpecs(constructionYear: val),
               ),
@@ -123,7 +122,7 @@ class BuildingInfoStep extends ConsumerWidget {
               CustomTextInput(
                 label: 'Max Height (m)',
                 placeholder: '0.00',
-                initialValue: state.maxHeight == '0.00' ? '' : state.maxHeight,
+                initialValue: state.maxHeight,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (val) => viewModel.updateTechnicalSpecs(maxHeight: val),
               ),
@@ -131,7 +130,7 @@ class BuildingInfoStep extends ConsumerWidget {
               CustomTextInput(
                 label: 'Zoning Classification',
                 placeholder: 'e.g. Residential 1',
-                initialValue: state.zoning == 'e.g. Residential 1' ? '' : state.zoning,
+                initialValue: state.zoning,
                 onChanged: (val) => viewModel.updateTechnicalSpecs(zoning: val),
               ),
               const SizedBox(height: 28),

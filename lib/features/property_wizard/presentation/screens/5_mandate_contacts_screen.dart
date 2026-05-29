@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_chip.dart';
+import '../../../../core/widgets/custom_date_selector.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../widgets/wizard_footer.dart';
 import '../../data/models/enums/lead_source.dart';
@@ -155,9 +156,21 @@ class MandateContactsStep extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Row(children: [
-                Expanded(child: _buildDateSelector(theme: theme, textTheme: textTheme, label: 'MANDATE START', value: state.mandateStart ?? '24 Oct 2023', onTap: () {})),
+                Expanded(
+                  child: CustomDateSelector(
+                    label: 'MANDATE START',
+                    value: state.mandateStart,
+                    onDateSelected: (date) => viewModel.updateMandateDates(start: date),
+                  ),
+                ),
                 const SizedBox(width: 16),
-                Expanded(child: _buildDateSelector(theme: theme, textTheme: textTheme, label: 'MANDATE END', value: state.mandateEnd ?? 'Select Date', isPlaceholder: state.mandateEnd == null, onTap: () {})),
+                Expanded(
+                  child: CustomDateSelector(
+                    label: 'MANDATE END',
+                    value: state.mandateEnd,
+                    onDateSelected: (date) => viewModel.updateMandateDates(end: date),
+                  ),
+                ),
               ]),
             ],
           ),
@@ -222,28 +235,5 @@ class MandateContactsStep extends ConsumerWidget {
     );
   }
 
-  Widget _buildDateSelector({required RealEstateTheme theme, required TextTheme textTheme, required String label, required String value, required VoidCallback onTap, bool isPlaceholder = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: textTheme.labelLarge?.copyWith(color: theme.textLabel, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: theme.borderLight)),
-            child: Row(children: [
-              Icon(Icons.calendar_today_outlined, size: 18, color: isPlaceholder ? theme.textSecondary : theme.primaryColor),
-              const SizedBox(width: 12),
-              Text(value, style: textTheme.bodyLarge?.copyWith(
-                color: isPlaceholder ? theme.textSecondary : theme.textPrimary,
-                fontWeight: isPlaceholder ? FontWeight.normal : FontWeight.w600,
-              )),
-            ]),
-          ),
-        ),
-      ],
-    );
-  }
+
 }

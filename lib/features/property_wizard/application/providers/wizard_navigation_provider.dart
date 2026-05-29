@@ -38,7 +38,7 @@ class WizardNavigationData {
       case PropertyWizardStep.address:
         return state.streetAddress.isNotEmpty;
       case PropertyWizardStep.buildingInfo:
-        return state.erfSize != '0.00' && state.floorArea != '0.00';
+        return state.erfSize.isNotEmpty && state.floorArea.isNotEmpty;
       case PropertyWizardStep.propertyFeatures:
         return state.rooms.isNotEmpty;
       case PropertyWizardStep.mandateContacts:

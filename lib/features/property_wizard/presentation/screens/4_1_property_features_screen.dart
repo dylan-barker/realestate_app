@@ -87,12 +87,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
         ),
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 24.0, bottom: 80.0),
-              child: Column(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+          child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -218,28 +216,11 @@ class PropertyFeaturesStep extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))],
-                  ),
-                  child: Text(navData.progressLabel, style: textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
       bottomNavigationBar: WizardFooter(
         onNext: () {
           viewModel.nextStep();
