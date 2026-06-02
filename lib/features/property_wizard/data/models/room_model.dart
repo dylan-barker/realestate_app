@@ -10,6 +10,7 @@ class RoomModel {
   final int? conditionRating;
   final List<String> features;
   final String notes;
+  final String? imagePath;
 
   RoomModel({
     required this.id,
@@ -20,6 +21,7 @@ class RoomModel {
     this.conditionRating,
     this.features = const [],
     this.notes = '',
+    this.imagePath,
   });
 
   /// Convert Room Entity to RoomModel
@@ -33,6 +35,7 @@ class RoomModel {
       conditionRating: entity.conditionRating,
       features: entity.features,
       notes: entity.notes,
+      imagePath: entity.imagePath,
     );
   }
 
@@ -47,6 +50,7 @@ class RoomModel {
       conditionRating: conditionRating,
       features: features,
       notes: notes,
+      imagePath: imagePath,
     );
   }
 
@@ -60,6 +64,7 @@ class RoomModel {
       'conditionRating': conditionRating,
       'features': features,
       'notes': notes,
+      'imagePath': imagePath,
     };
   }
 
@@ -73,6 +78,7 @@ class RoomModel {
       conditionRating: map['conditionRating'],
       features: List<String>.from(map['features'] ?? []),
       notes: map['notes'] ?? '',
+      imagePath: map['imagePath'],
     );
   }
 }

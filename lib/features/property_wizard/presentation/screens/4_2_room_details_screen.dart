@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -10,6 +13,8 @@ import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../application/providers/property_provider.dart';
+import '../../data/models/enums/standard_amenity.dart';
+import '../../data/models/room.dart';
 
 class RoomDetailsStep extends ConsumerWidget {
   final String roomId;
@@ -35,10 +40,7 @@ class RoomDetailsStep extends ConsumerWidget {
       {'level': 4, 'emoji': '\u{1F600}', 'label': 'LEVEL 4\nPerfect\ncondition'},
     ];
 
-    final standardAmenities = [
-      'Ceiling Fan', 'Wall-to-Wall Carpets', 'Air Conditioning',
-      'Built-in Cupboards', 'En-suite Bathroom', 'Balcony',
-    ];
+    final standardAmenities = StandardAmenity.values.map((e) => e.displayString).toList();
 
     final suggestedAmenities = standardAmenities
         .where((amenity) => !room.features.contains(amenity))
@@ -112,7 +114,7 @@ class RoomDetailsStep extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildRoomGraphic(theme, textTheme),
+              _buildRoomGraphic(context, theme, textTheme, room, viewModel),
               const SizedBox(height: 28),
               Text('Room Condition Rating', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.textPrimary, fontSize: 16)),
               const SizedBox(height: 4),
@@ -275,34 +277,107 @@ class RoomDetailsStep extends ConsumerWidget {
     );
   }
 
-  Widget _buildRoomGraphic(RealEstateTheme theme, TextTheme textTheme) {
-    return Container(
-      height: 180,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
-        borderRadius: BorderRadius.circular(16.0),
-        image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800'),
-          fit: BoxFit.cover,
-        ),
-      ),
+  Widget _buildRoomGraphic(BuildContext context, RealEstateTheme theme, TextTheme textTheme, Room room, PropertyViewModel viewModel) {
+    final hasImage = room.imagePath != null;
+
+    return GestureDetector(
+      onTap: () => _showImagePickerOptions(context, viewModel, room.id, theme, textTheme),
       child: Container(
+        height: 180,
+        width: double.infinity,
         decoration: BoxDecoration(
+          color: const Color(0xFFE5E7EB),
           borderRadius: BorderRadius.circular(16.0),
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [Colors.black.withOpacity(0.6), Colors.transparent],
-          ),
+          image: hasImage
+              ? null
+              : const DecorationImage(
+                  image: NetworkImage('https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800'),
+                  fit: BoxFit.cover,
+                ),
         ),
-        padding: const EdgeInsets.all(16.0),
-        alignment: Alignment.bottomLeft,
-        child: Text('Premium Interior Architectural Blueprint View',
-          style: textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (hasImage)
+              Image.file(File(room.imagePath!), fit: BoxFit.cover),
+            if (!hasImage)
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                  ),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                alignment: Alignment.bottomLeft,
+                child: Text('Tap to add room photo',
+                  style: textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> _showImagePickerOptions(BuildContext context, PropertyViewModel viewModel, String roomId, RealEstateTheme theme, TextTheme textTheme) async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: const Text('Camera'),
+                  onTap: () => Navigator.pop(context, 'camera'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: const Text('Gallery'),
+                  onTap: () => Navigator.pop(context, 'gallery'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result == null) return;
+
+    final ImageSource source = result == 'camera' ? ImageSource.camera : ImageSource.gallery;
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+
+    if (picked != null) {
+      viewModel.updateRoomDetails(roomId: roomId, imagePath: picked.path);
+    }
   }
 
   void _showRenameDialog(BuildContext context, PropertyViewModel viewModel, String roomId, String currentName, RealEstateTheme theme, TextTheme textTheme) {

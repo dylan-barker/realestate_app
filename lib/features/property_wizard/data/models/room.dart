@@ -9,6 +9,7 @@ class Room {
   final int? conditionRating;
   final List<String> features;
   final String notes;
+  final String? imagePath;
 
   Room({
     required this.id,
@@ -19,6 +20,7 @@ class Room {
     this.conditionRating,
     this.features = const [],
     this.notes = '',
+    this.imagePath,
   });
 
   Room copyWith({
@@ -30,6 +32,7 @@ class Room {
     int? conditionRating,
     List<String>? features,
     String? notes,
+    String? imagePath,
   }) {
     return Room(
       id: id ?? this.id,
@@ -40,6 +43,7 @@ class Room {
       conditionRating: conditionRating ?? this.conditionRating,
       features: features ?? this.features,
       notes: notes ?? this.notes,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 }

@@ -10,6 +10,7 @@ import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../widgets/wizard_footer.dart';
 import '../../data/models/room.dart';
+import '../../data/models/enums/outdoor_extra.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/room_category.dart';
 import '../../application/providers/property_provider.dart';
@@ -37,12 +38,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
       }
     }
 
-    final outdoorOptions = [
-      'Swimming Pool',
-      '3-Car Garage',
-      'Patio / Deck',
-      'Fireplace',
-    ];
+    final outdoorOptions = OutdoorExtra.values.map((e) => e.displayString).toList();
 
     final allOutdoorOptions = Set<String>.from(outdoorOptions)
       ..addAll(state.outdoorExtras);

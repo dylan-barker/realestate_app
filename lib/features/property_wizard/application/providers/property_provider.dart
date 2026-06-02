@@ -172,6 +172,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     int? conditionRating,
     List<String>? features,
     String? notes,
+    String? imagePath,
   }) {
     final updatedRooms = state.rooms.map((room) {
       if (room.id == roomId) {
@@ -179,6 +180,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
           conditionRating: conditionRating ?? room.conditionRating,
           features: features ?? room.features,
           notes: notes ?? room.notes,
+          imagePath: imagePath ?? room.imagePath,
           isComplete: conditionRating != null,
         );
       }
