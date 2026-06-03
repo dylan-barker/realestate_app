@@ -7,6 +7,7 @@ import 'enums/property_subtype.dart';
 import 'enums/property_type.dart';
 import 'enums/roof_configuration.dart';
 import 'enums/wall_exterior.dart';
+import 'outdoor_extra_item.dart';
 import 'room_model.dart';
 
 class PropertyStateModel {
@@ -30,7 +31,7 @@ class PropertyStateModel {
   final String roofConfiguration;
   final String wallExterior;
   final List<RoomModel> rooms;
-  final List<String> outdoorExtras;
+  final List<OutdoorExtraItem> outdoorExtras;
   final String? selectedRoomId;
   final String mandateType;
   final String leadSource;
@@ -103,7 +104,7 @@ class PropertyStateModel {
       roofConfiguration: entity.roofConfiguration.displayString,
       wallExterior: entity.wallExterior.displayString,
       rooms: entity.rooms.map((room) => RoomModel.fromEntity(room)).toList(),
-      outdoorExtras: entity.outdoorExtras,
+      outdoorExtras: entity.outdoorExtras.map((e) => OutdoorExtraItem(name: e.name, quantity: e.quantity)).toList(),
       selectedRoomId: entity.selectedRoomId,
       mandateType: entity.mandateType.displayString,
       leadSource: entity.leadSource.displayString,
@@ -142,7 +143,7 @@ class PropertyStateModel {
       roofConfiguration: RoofConfigurationExtension.fromString(roofConfiguration),
       wallExterior: WallExteriorExtension.fromString(wallExterior),
       rooms: rooms.map((roomModel) => roomModel.toEntity()).toList(),
-      outdoorExtras: outdoorExtras,
+      outdoorExtras: outdoorExtras.map((e) => OutdoorExtraItem(name: e.name, quantity: e.quantity)).toList(),
       selectedRoomId: selectedRoomId,
       mandateType: MandateTypeExtension.fromString(mandateType),
       leadSource: LeadSourceExtension.fromString(leadSource),

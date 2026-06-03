@@ -40,11 +40,7 @@ class RoomDetailsStep extends ConsumerWidget {
       {'level': 4, 'emoji': '\u{1F600}', 'label': 'LEVEL 4\nPerfect\ncondition'},
     ];
 
-    final standardAmenities = StandardAmenity.values.map((e) => e.displayString).toList();
-
-    final suggestedAmenities = standardAmenities
-        .where((amenity) => !room.features.contains(amenity))
-        .toList();
+    final amenityCategories = AmenityCategory.values;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -175,18 +171,19 @@ class RoomDetailsStep extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: room.features.length,
-                itemBuilder: (context, index) {
-                  final feature = room.features[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8.0),
-                    child: CustomChip(label: feature, onDelete: () => viewModel.removeFeatureFromRoom(room.id, feature)),
-                  );
-                },
-              ),
+              if (room.features.isNotEmpty)
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: room.features.length,
+                  itemBuilder: (context, index) {
+                    final feature = room.features[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8.0),
+                      child: CustomChip(label: feature, onDelete: () => viewModel.removeFeatureFromRoom(room.id, feature)),
+                    );
+                  },
+                ),
               const SizedBox(height: 12),
               CustomCard(
                 hasDashedBorder: true,
@@ -204,33 +201,11 @@ class RoomDetailsStep extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              if (suggestedAmenities.isNotEmpty) ...[
-                Text('SUGGESTED AMENITIES', style: textTheme.labelLarge?.copyWith(color: theme.textSecondary, fontSize: 10, letterSpacing: 0.5)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0, runSpacing: 8.0,
-                  children: suggestedAmenities.map((amenity) {
-                    return InkWell(
-                      onTap: () => viewModel.addFeatureToRoom(room.id, amenity),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(border: Border.all(color: theme.borderLight), borderRadius: BorderRadius.circular(20), color: Colors.white),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add, size: 12, color: theme.textSecondary),
-                            const SizedBox(width: 4),
-                            Text(amenity, style: textTheme.bodyMedium?.copyWith(fontSize: 12, color: theme.textSecondary)),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 28),
-              ] else const SizedBox(height: 28),
+              const SizedBox(height: 20),
+              for (var cat in amenityCategories) ...[
+                _buildAmenityCategory(theme, textTheme, cat, room, viewModel),
+                const SizedBox(height: 16),
+              ],
               Text('ROOM NOTES', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 13, letterSpacing: 0.5)),
               const SizedBox(height: 12),
               CustomCard(
@@ -274,6 +249,64 @@ class RoomDetailsStep extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAmenityCategory(
+    RealEstateTheme theme,
+    TextTheme textTheme,
+    AmenityCategory cat,
+    Room room,
+    PropertyViewModel viewModel,
+  ) {
+    final amenitiesInCategory = StandardAmenity.values
+        .where((a) => a.category == cat)
+        .toList();
+
+    final suggestedInCategory = amenitiesInCategory
+        .where((a) => !room.features.contains(a.displayString))
+        .toList();
+
+    if (suggestedInCategory.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          cat.displayString.toUpperCase(),
+          style: textTheme.labelLarge?.copyWith(
+            color: theme.textSecondary,
+            fontSize: 10,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8.0, runSpacing: 8.0,
+          children: suggestedInCategory.map((amenity) {
+            return InkWell(
+              onTap: () => viewModel.addFeatureToRoom(room.id, amenity.displayString),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.borderLight),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 12, color: theme.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(amenity.displayString, style: textTheme.bodyMedium?.copyWith(fontSize: 12, color: theme.textSecondary)),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 

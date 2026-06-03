@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
-import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../widgets/wizard_footer.dart';
+import '../../data/models/outdoor_extra_item.dart';
 import '../../data/models/room.dart';
 import '../../data/models/enums/outdoor_extra.dart';
 import '../../data/models/enums/property_wizard_step.dart';
@@ -38,10 +38,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
       }
     }
 
-    final outdoorOptions = OutdoorExtra.values.map((e) => e.displayString).toList();
-
-    final allOutdoorOptions = Set<String>.from(outdoorOptions)
-      ..addAll(state.outdoorExtras);
+    final outdoorCategories = OutdoorExtraCategory.values;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -87,136 +84,62 @@ class PropertyFeaturesStep extends ConsumerWidget {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    navData.progressLabel.toUpperCase(),
-                    style: textTheme.labelLarge?.copyWith(
-                      color: theme.primaryColor, fontWeight: FontWeight.bold, letterSpacing: 0.8,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Property Features',
-                    style: textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 22),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Detail and configure every room in the residence.',
-                    style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary.withOpacity(0.9)),
-                  ),
-                  const SizedBox(height: 28),
-                  for (var category in categories) ...[
-                    Text(
-                      category.displayString.toUpperCase(),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 13, letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: groupedRooms[category]!.length,
-                      itemBuilder: (context, idx) {
-                        final room = groupedRooms[category]![idx];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12.0),
-                          child: CustomCard(
-                            onTap: () {
-                              viewModel.selectRoomForEditing(room.id);
-                              context.push('/wizard/room-details/${room.id}');
-                            },
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        room.name,
-                                        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.textPrimary),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(children: [
-                                        Text(room.description, style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary)),
-                                        const SizedBox(width: 6),
-                                        Text('•', style: TextStyle(color: theme.textSecondary.withOpacity(0.5))),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          room.isComplete ? 'COMPLETE' : 'PENDING',
-                                          style: textTheme.labelLarge?.copyWith(
-                                            color: room.isComplete ? theme.completeColor : theme.pendingColor,
-                                            fontSize: 10, fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ]),
-                                    ],
-                                  ),
-                                ),
-                                Icon(Icons.arrow_forward_ios, size: 14, color: theme.textSecondary.withOpacity(0.5)),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 4),
-                  ],
-                  CustomCard(
-                    hasDashedBorder: true,
-                    backgroundColor: theme.backgroundColor.withOpacity(0.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    onTap: () => _showAddRoomDialog(context, viewModel, theme, textTheme),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_circle_outline, size: 20, color: theme.textLabel),
-                          const SizedBox(width: 8),
-                          Text('Add Room', style: textTheme.bodyLarge?.copyWith(color: theme.textLabel, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'OUTDOOR & EXTRAS',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 13, letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8.0, runSpacing: 10.0,
-                    children: allOutdoorOptions.map((opt) {
-                      final isSelected = state.outdoorExtras.contains(opt);
-                      return CustomChip(label: opt, isSelected: isSelected, onTap: () => viewModel.toggleOutdoorExtra(opt));
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  CustomCard(
-                    hasDashedBorder: true,
-                    backgroundColor: theme.backgroundColor.withOpacity(0.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    onTap: () => _showAddOutdoorDialog(context, viewModel, theme, textTheme),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_circle_outline, size: 20, color: theme.textLabel),
-                          const SizedBox(width: 8),
-                          Text('Add Outdoor/Extra Item', style: textTheme.bodyLarge?.copyWith(color: theme.textLabel, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                navData.progressLabel.toUpperCase(),
+                style: textTheme.labelLarge?.copyWith(
+                  color: theme.primaryColor, fontWeight: FontWeight.bold, letterSpacing: 0.8,
                 ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Property Features',
+                style: textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Detail and configure every room in the residence.',
+                style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary.withOpacity(0.9)),
+              ),
+              const SizedBox(height: 28),
+              for (var category in categories) ...[
+                _buildRoomSection(context, theme, textTheme, category, groupedRooms[category]!, viewModel),
+                const SizedBox(height: 20),
               ],
-            ),
+              const SizedBox(height: 12),
+              Text(
+                'OUTDOOR & EXTRAS',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 13, letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              for (var outdoorCat in outdoorCategories) ...[
+                _buildOutdoorSubcategory(theme, textTheme, outdoorCat, state.outdoorExtras, viewModel),
+                const SizedBox(height: 16),
+              ],
+              CustomCard(
+                hasDashedBorder: true,
+                backgroundColor: theme.backgroundColor.withOpacity(0.5),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                onTap: () => _showAddOutdoorDialog(context, viewModel, theme, textTheme),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_circle_outline, size: 20, color: theme.textLabel),
+                      const SizedBox(width: 8),
+                      Text('Add Custom Outdoor / Extra Item', style: textTheme.bodyLarge?.copyWith(color: theme.textLabel, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
           ),
         ),
+      ),
       bottomNavigationBar: WizardFooter(
         onNext: () {
           viewModel.nextStep();
@@ -230,9 +153,270 @@ class PropertyFeaturesStep extends ConsumerWidget {
     );
   }
 
-  void _showAddRoomDialog(BuildContext context, PropertyViewModel viewModel, RealEstateTheme theme, TextTheme textTheme) {
-    String name = '';
-    RoomCategory category = RoomCategory.bedrooms;
+  Widget _buildRoomSection(
+    BuildContext context,
+    RealEstateTheme theme,
+    TextTheme textTheme,
+    RoomCategory category,
+    List<Room> rooms,
+    PropertyViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              category.displayString.toUpperCase(),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 13, letterSpacing: 0.5,
+              ),
+            ),
+            GestureDetector(
+              onTap: () => _showAddRoomDialog(context, viewModel, category, theme, textTheme),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.borderLight),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 14, color: theme.primaryColor),
+                    const SizedBox(width: 4),
+                    Text('Add', style: textTheme.labelLarge?.copyWith(color: theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (rooms.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            alignment: Alignment.center,
+            child: Text(
+              'No rooms added yet. Tap "Add" to add a ${category.displayString.toLowerCase()} room.',
+              style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary.withOpacity(0.7)),
+              textAlign: TextAlign.center,
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: rooms.length,
+            itemBuilder: (context, idx) {
+              final room = rooms[idx];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10.0),
+                child: CustomCard(
+                  onTap: () {
+                    viewModel.selectRoomForEditing(room.id);
+                    context.push('/wizard/room-details/${room.id}');
+                  },
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              room.name,
+                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.textPrimary),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(children: [
+                              Text(room.description, style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary, fontSize: 12)),
+                              if (room.description.isNotEmpty) ...[
+                                const SizedBox(width: 6),
+                                Text('•', style: TextStyle(color: theme.textSecondary.withOpacity(0.5), fontSize: 12)),
+                                const SizedBox(width: 6),
+                              ],
+                              Text(
+                                room.isComplete ? 'COMPLETE' : 'PENDING',
+                                style: textTheme.labelLarge?.copyWith(
+                                  color: room.isComplete ? theme.completeColor : theme.pendingColor,
+                                  fontSize: 10, fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ]),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => _confirmDeleteRoom(context, viewModel, room, theme, textTheme),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: theme.borderLight.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(Icons.delete_outline, size: 16, color: theme.textSecondary),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(Icons.arrow_forward_ios, size: 12, color: theme.textSecondary.withOpacity(0.5)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildOutdoorSubcategory(
+    RealEstateTheme theme,
+    TextTheme textTheme,
+    OutdoorExtraCategory outdoorCat,
+    List<OutdoorExtraItem> selectedItems,
+    PropertyViewModel viewModel,
+  ) {
+    final predefinedInCategory = OutdoorExtra.values
+        .where((e) => e.category == outdoorCat)
+        .toList();
+    final customInCategory = selectedItems
+        .where((item) => !predefinedInCategory.any((e) => e.displayString == item.name))
+        .where((item) => _inferCategory(item.name) == outdoorCat)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          outdoorCat.displayString.toUpperCase(),
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold, color: theme.textLabel, fontSize: 11, letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8.0, runSpacing: 8.0,
+          children: [
+            ...predefinedInCategory.map((extra) {
+              final isSelected = selectedItems.any((item) => item.name == extra.displayString);
+              final item = selectedItems.where((item) => item.name == extra.displayString).firstOrNull;
+              return _buildOutdoorChip(theme, textTheme, extra.displayString, isSelected, item?.quantity ?? 0, viewModel);
+            }),
+            ...customInCategory.map((item) {
+              return _buildOutdoorChip(theme, textTheme, item.name, true, item.quantity, viewModel);
+            }),
+          ],
+        ),
+      ],
+    );
+  }
+
+  OutdoorExtraCategory _inferCategory(String name) {
+    for (final extra in OutdoorExtra.values) {
+      if (extra.displayString.toLowerCase() == name.toLowerCase()) {
+        return extra.category;
+      }
+    }
+    return OutdoorExtraCategory.outdoorLiving;
+  }
+
+  Widget _buildOutdoorChip(
+    RealEstateTheme theme,
+    TextTheme textTheme,
+    String label,
+    bool isSelected,
+    int quantity,
+    PropertyViewModel viewModel,
+  ) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? theme.primaryColor : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSelected ? theme.primaryColor : theme.borderLight,
+        ),
+      ),
+      child: isSelected
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () => viewModel.decrementOutdoorQuantity(label),
+                  child: Icon(Icons.remove_circle_outline, size: 18, color: Colors.white),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  quantity > 1 ? '$label x$quantity' : label,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () => viewModel.incrementOutdoorQuantity(label),
+                  child: Icon(Icons.add_circle_outline, size: 18, color: Colors.white),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () => viewModel.removeOutdoorExtra(label),
+                  child: Icon(Icons.close, size: 14, color: Colors.white70),
+                ),
+              ],
+            )
+          : GestureDetector(
+              onTap: () => viewModel.addOutdoorExtra(label),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 14, color: theme.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(
+                    label,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: theme.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+  void _confirmDeleteRoom(BuildContext context, PropertyViewModel viewModel, Room room, RealEstateTheme theme, TextTheme textTheme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          title: Text('Remove Room', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          content: Text('Are you sure you want to remove "${room.name}"?', style: textTheme.bodyLarge),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: theme.textSecondary))),
+            ElevatedButton(
+              onPressed: () {
+                viewModel.removeRoom(room.id);
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: theme.primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+              child: const Text('Remove', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddRoomDialog(BuildContext context, PropertyViewModel viewModel, RoomCategory category, RealEstateTheme theme, TextTheme textTheme) {
+    final predefined = category.predefinedRoomTypes;
 
     showModalBottomSheet(
       context: context,
@@ -240,6 +424,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
       builder: (context) {
+        String customName = '';
+
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
@@ -251,21 +437,50 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Add Custom Room', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 20),
-                  DropdownButtonFormField<RoomCategory>(
-                    value: category,
-                    decoration: InputDecoration(
-                      labelText: 'Room Category',
-                      labelStyle: textTheme.labelLarge?.copyWith(color: theme.textLabel),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: BorderSide(color: theme.borderLight)),
+                  Text('Add ${category.displayString} Room', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  Text('Choose a room type:', style: textTheme.bodyLarge?.copyWith(color: theme.textSecondary)),
+                  const SizedBox(height: 12),
+                  if (predefined.isNotEmpty)
+                    Wrap(
+                      spacing: 8.0, runSpacing: 8.0,
+                      children: predefined.map((type) {
+                        return InkWell(
+                          onTap: () {
+                            viewModel.addCustomRoom(type, category);
+                            Navigator.pop(context);
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: theme.borderLight),
+                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.white,
+                            ),
+                            child: Text(type, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    items: RoomCategory.values.map((cat) => DropdownMenuItem(value: cat, child: Text(cat.displayString))).toList(),
-                    onChanged: (val) { if (val != null) setState(() => category = val); },
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: theme.borderLight)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('OR', style: textTheme.labelLarge?.copyWith(color: theme.textSecondary)),
+                      ),
+                      Expanded(child: Divider(color: theme.borderLight)),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  CustomTextInput(label: 'Room Name', placeholder: 'e.g. Guest Bedroom 2, Study Office', onChanged: (val) => name = val),
-                  const SizedBox(height: 24),
+                  CustomTextInput(
+                    label: 'Custom Room Name',
+                    placeholder: 'e.g. Yoga Studio, Wine Cellar',
+                    onChanged: (val) => customName = val,
+                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -276,13 +491,13 @@ class PropertyFeaturesStep extends ConsumerWidget {
                       const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
-                          if (name.trim().isNotEmpty) {
-                            viewModel.addCustomRoom(name.trim(), category);
+                          if (customName.trim().isNotEmpty) {
+                            viewModel.addCustomRoom(customName.trim(), category);
                             Navigator.pop(context);
                           }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: theme.primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        child: const Text('Add', style: TextStyle(color: Colors.white)),
+                        child: const Text('Add Custom', style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
@@ -313,7 +528,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 if (name.trim().isNotEmpty) {
-                  viewModel.addCustomOutdoorExtra(name.trim());
+                  viewModel.addOutdoorExtra(name.trim());
                   Navigator.pop(context);
                 }
               },

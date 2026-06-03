@@ -72,7 +72,7 @@ class RoomModel {
     return RoomModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      type: map['type'] ?? 'Bedrooms',
+      type: map['type'] ?? 'Bedrooms & Bathrooms',
       description: map['description'] ?? '',
       isComplete: map['isComplete'] ?? false,
       conditionRating: map['conditionRating'],

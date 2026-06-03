@@ -150,7 +150,7 @@ class ReviewStep extends ConsumerWidget {
                     ),
                   )),
                   const SizedBox(height: 8),
-                  _buildDetailRow(textTheme, 'Outdoor Extras', state.outdoorExtras.isEmpty ? 'None' : state.outdoorExtras.join(', ')),
+                  _buildDetailRow(textTheme, 'Outdoor Extras', state.outdoorExtras.isEmpty ? 'None' : state.outdoorExtras.map((e) => e.quantity > 1 ? '${e.name} x${e.quantity}' : e.name).join(', ')),
                 ],
               ),
               const SizedBox(height: 16),

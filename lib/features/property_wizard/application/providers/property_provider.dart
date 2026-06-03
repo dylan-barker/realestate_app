@@ -10,6 +10,7 @@ import '../../data/models/enums/roof_configuration.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/room_category.dart';
 import '../../data/models/enums/wall_exterior.dart';
+import '../../data/models/outdoor_extra_item.dart';
 import '../../data/models/property_state.dart';
 import '../../data/models/room.dart';
 import '../../data/repositories/property_repository.dart';
@@ -17,7 +18,6 @@ import '../../data/repositories/property_repository_impl.dart';
 import 'get_initial_rooms.dart';
 import 'save_property_draft.dart';
 
-// dependency injection providers
 final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((ref) {
   return PropertyLocalDataSource();
 });
@@ -139,21 +139,49 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.copyWith(rooms: [...state.rooms, newRoom]);
   }
 
+  void removeRoom(String roomId) {
+    final updatedRooms = state.rooms.where((r) => r.id != roomId).toList();
+    state = state.copyWith(rooms: updatedRooms);
+  }
+
   // Outdoor items actions
-  void toggleOutdoorExtra(String extra) {
-    final current = List<String>.from(state.outdoorExtras);
-    if (current.contains(extra)) {
-      current.remove(extra);
+  void addOutdoorExtra(String name) {
+    final current = List<OutdoorExtraItem>.from(state.outdoorExtras);
+    final existingIdx = current.indexWhere((item) => item.name == name);
+    if (existingIdx >= 0) {
+      current[existingIdx] = current[existingIdx].copyWith(
+        quantity: current[existingIdx].quantity + 1,
+      );
     } else {
-      current.add(extra);
+      current.add(OutdoorExtraItem(name: name));
     }
     state = state.copyWith(outdoorExtras: current);
   }
 
-  void addCustomOutdoorExtra(String extra) {
-    final current = List<String>.from(state.outdoorExtras);
-    if (!current.contains(extra)) {
-      current.add(extra);
+  void removeOutdoorExtra(String name) {
+    final current = List<OutdoorExtraItem>.from(state.outdoorExtras);
+    current.removeWhere((item) => item.name == name);
+    state = state.copyWith(outdoorExtras: current);
+  }
+
+  void incrementOutdoorQuantity(String name) {
+    final current = List<OutdoorExtraItem>.from(state.outdoorExtras);
+    final idx = current.indexWhere((item) => item.name == name);
+    if (idx >= 0) {
+      current[idx] = current[idx].copyWith(quantity: current[idx].quantity + 1);
+      state = state.copyWith(outdoorExtras: current);
+    }
+  }
+
+  void decrementOutdoorQuantity(String name) {
+    final current = List<OutdoorExtraItem>.from(state.outdoorExtras);
+    final idx = current.indexWhere((item) => item.name == name);
+    if (idx >= 0) {
+      if (current[idx].quantity <= 1) {
+        current.removeAt(idx);
+      } else {
+        current[idx] = current[idx].copyWith(quantity: current[idx].quantity - 1);
+      }
       state = state.copyWith(outdoorExtras: current);
     }
   }

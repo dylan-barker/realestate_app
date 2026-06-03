@@ -6,6 +6,7 @@ import 'enums/property_subtype.dart';
 import 'enums/property_type.dart';
 import 'enums/roof_configuration.dart';
 import 'enums/wall_exterior.dart';
+import 'outdoor_extra_item.dart';
 import 'room.dart';
 
 class PropertyState {
@@ -39,7 +40,7 @@ class PropertyState {
 
   // Step 4: Property Features
   final List<Room> rooms;
-  final List<String> outdoorExtras;
+  final List<OutdoorExtraItem> outdoorExtras;
 
   // Step 4.2: Selected Room details being active
   final String? selectedRoomId;
@@ -114,7 +115,7 @@ class PropertyState {
     RoofConfiguration? roofConfiguration,
     WallExterior? wallExterior,
     List<Room>? rooms,
-    List<String>? outdoorExtras,
+    List<OutdoorExtraItem>? outdoorExtras,
     String? selectedRoomId,
     bool clearRoomId = false,
     MandateType? mandateType,
