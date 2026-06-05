@@ -1,24 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/data_sources/property_local_data_source.dart';
-import '../../data/models/enums/architectural_style.dart';
-import '../../data/models/enums/facing_direction.dart';
-import '../../data/models/enums/lead_source.dart';
-import '../../data/models/enums/mandate_type.dart';
-import '../../data/models/enums/property_subtype.dart';
-import '../../data/models/enums/property_type.dart';
-import '../../data/models/enums/roof_configuration.dart';
-import '../../data/models/enums/property_wizard_step.dart';
-import '../../data/models/enums/room_category.dart';
-import '../../data/models/enums/wall_exterior.dart';
-import '../../data/models/outdoor_extra_item.dart';
-import '../../data/models/property_state.dart';
-import '../../data/models/room.dart';
-import '../../data/repositories/property_repository.dart';
-import '../../data/repositories/property_repository_impl.dart';
+
+import '../data/data_sources/property_local_data_source.dart';
+import '../data/models/enums/architectural_style.dart';
+import '../data/models/enums/facing_direction.dart';
+import '../data/models/enums/lead_source.dart';
+import '../data/models/enums/mandate_type.dart';
+import '../data/models/enums/property_subtype.dart';
+import '../data/models/enums/property_type.dart';
+import '../data/models/enums/property_wizard_step.dart';
+import '../data/models/enums/roof_configuration.dart';
+import '../data/models/enums/outdoor_extra.dart';
+import '../data/models/enums/room_category.dart';
+import '../data/models/enums/wall_exterior.dart';
+import '../data/models/outdoor_extra_item.dart';
+import '../data/models/property_state.dart';
+import '../data/models/room.dart';
+import '../data/repositories/property_repository.dart';
+import '../data/repositories/property_repository_impl.dart';
 import 'get_initial_rooms.dart';
 import 'save_property_draft.dart';
 
-final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((ref) {
+final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((
+  ref,
+) {
   return PropertyLocalDataSource();
 });
 
@@ -27,9 +31,10 @@ final propertyRepositoryProvider = Provider<IPropertyRepository>((ref) {
   return PropertyRepositoryImpl(dataSource);
 });
 
-final propertyViewModelProvider = NotifierProvider<PropertyViewModel, PropertyState>(() {
-  return PropertyViewModel();
-});
+final propertyViewModelProvider =
+    NotifierProvider<PropertyViewModel, PropertyState>(() {
+      return PropertyViewModel();
+    });
 
 class PropertyViewModel extends Notifier<PropertyState> {
   @override
@@ -145,7 +150,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   // Outdoor items actions
-  void addOutdoorExtra(String name) {
+  void addOutdoorExtra(String name, {OutdoorExtraCategory? category}) {
     final current = List<OutdoorExtraItem>.from(state.outdoorExtras);
     final existingIdx = current.indexWhere((item) => item.name == name);
     if (existingIdx >= 0) {
@@ -153,7 +158,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
         quantity: current[existingIdx].quantity + 1,
       );
     } else {
-      current.add(OutdoorExtraItem(name: name));
+      current.add(OutdoorExtraItem(name: name, category: category));
     }
     state = state.copyWith(outdoorExtras: current);
   }
@@ -180,7 +185,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
       if (current[idx].quantity <= 1) {
         current.removeAt(idx);
       } else {
-        current[idx] = current[idx].copyWith(quantity: current[idx].quantity - 1);
+        current[idx] = current[idx].copyWith(
+          quantity: current[idx].quantity - 1,
+        );
       }
       state = state.copyWith(outdoorExtras: current);
     }

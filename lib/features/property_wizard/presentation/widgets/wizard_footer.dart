@@ -3,17 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_button.dart';
-import '../../application/providers/wizard_navigation_provider.dart';
+import '../../providers/wizard_navigation_provider.dart';
 
 class WizardFooter extends ConsumerWidget {
   final VoidCallback? onNext;
   final VoidCallback? onBack;
 
-  const WizardFooter({
-    super.key,
-    this.onNext,
-    this.onBack,
-  });
+  const WizardFooter({super.key, this.onNext, this.onBack});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,25 +28,25 @@ class WizardFooter extends ConsumerWidget {
         children: [
           // Left side
           Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  navData.progressLabel,
-                  style: textTheme.labelMedium?.copyWith(
-                    color: theme.textSecondary,
-                  ),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                navData.progressLabel,
+                style: textTheme.labelMedium?.copyWith(
+                  color: theme.textSecondary,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  navData.currentStep.title,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.textPrimary,
-                  ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                navData.currentStep.title,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.textPrimary,
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
 
           // Right side
           CustomButton(
@@ -58,8 +54,12 @@ class WizardFooter extends ConsumerWidget {
             icon: navData.currentStep.stepNumber == 2
                 ? const Icon(Icons.arrow_forward, color: Colors.white, size: 16)
                 : navData.currentStep.stepNumber == 4
-                    ? const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14)
-                    : null,
+                ? const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 14,
+                  )
+                : null,
             onTap: navData.canGoNext ? (onNext ?? () {}) : null,
           ),
         ],

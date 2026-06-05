@@ -6,12 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
-import '../widgets/wizard_footer.dart';
 import '../../data/models/enums/property_subtype.dart';
 import '../../data/models/enums/property_type.dart';
 import '../../data/models/enums/property_wizard_step.dart';
-import '../../application/providers/property_provider.dart';
-import '../../application/providers/wizard_navigation_provider.dart';
+import '../../providers/property_provider.dart';
+import '../../providers/wizard_navigation_provider.dart';
+import '../widgets/wizard_footer.dart';
 
 class PropertyTypeStep extends ConsumerWidget {
   const PropertyTypeStep({super.key});
@@ -66,8 +66,22 @@ class PropertyTypeStep extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('K', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.textPrimary)),
-                Text('W', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.primaryColor)),
+                Text(
+                  'K',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.textPrimary,
+                  ),
+                ),
+                Text(
+                  'W',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.primaryColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -119,12 +133,21 @@ class PropertyTypeStep extends ConsumerWidget {
                   return CustomCard(
                     isSelected: isSelected,
                     onTap: () => viewModel.selectPropertyType(itemType),
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 16.0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(itemIcon, size: 26, color: isSelected ? theme.primaryColor : theme.textPrimary.withOpacity(0.6)),
+                        Icon(
+                          itemIcon,
+                          size: 26,
+                          color: isSelected
+                              ? theme.primaryColor
+                              : theme.textPrimary.withOpacity(0.6),
+                        ),
                         Text(
                           itemType.displayString,
                           style: textTheme.titleMedium?.copyWith(

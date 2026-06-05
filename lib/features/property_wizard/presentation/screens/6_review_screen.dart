@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../data/models/enums/architectural_style.dart';
@@ -17,8 +17,8 @@ import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/roof_configuration.dart';
 import '../../data/models/enums/room_category.dart';
 import '../../data/models/enums/wall_exterior.dart';
-import '../../application/providers/property_provider.dart';
-import '../../application/providers/wizard_navigation_provider.dart';
+import '../../providers/property_provider.dart';
+import '../../providers/wizard_navigation_provider.dart';
 
 class ReviewStep extends ConsumerWidget {
   const ReviewStep({super.key});
@@ -38,7 +38,11 @@ class ReviewStep extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: theme.textPrimary, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.textPrimary,
+            size: 20,
+          ),
           onPressed: () {
             viewModel.prevStep();
             context.pop();
@@ -59,8 +63,22 @@ class ReviewStep extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('K', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.textPrimary)),
-                Text('W', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.primaryColor)),
+                Text(
+                  'K',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.textPrimary,
+                  ),
+                ),
+                Text(
+                  'W',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.primaryColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -88,25 +106,40 @@ class ReviewStep extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 'Review & Submit',
-                style: textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 22),
+                style: textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Review all property details before submitting.',
-                style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary.withOpacity(0.9)),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: theme.textSecondary.withOpacity(0.9),
+                ),
               ),
               const SizedBox(height: 28),
               _buildSectionCard(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 title: 'PROPERTY TYPE',
                 children: [
-                  _buildDetailRow(textTheme, 'Type', state.propertyType.displayString),
-                  _buildDetailRow(textTheme, 'Subtype', state.propertySubtype.displayString),
+                  _buildDetailRow(
+                    textTheme,
+                    'Type',
+                    state.propertyType.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Subtype',
+                    state.propertySubtype.displayString,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 title: 'ADDRESS',
                 children: [
                   _buildDetailRow(textTheme, 'Street', state.streetAddress),
@@ -114,65 +147,174 @@ class ReviewStep extends ConsumerWidget {
                   _buildDetailRow(textTheme, 'City', state.city),
                   _buildDetailRow(textTheme, 'Province', state.province),
                   _buildDetailRow(textTheme, 'Postal Code', state.postalCode),
-                  if (state.complexName.isNotEmpty) _buildDetailRow(textTheme, 'Complex', state.complexName),
-                  if (state.erfPlotNumber.isNotEmpty) _buildDetailRow(textTheme, 'Erf / Plot', state.erfPlotNumber),
+                  if (state.complexName.isNotEmpty)
+                    _buildDetailRow(textTheme, 'Complex', state.complexName),
+                  if (state.erfPlotNumber.isNotEmpty)
+                    _buildDetailRow(
+                      textTheme,
+                      'Erf / Plot',
+                      state.erfPlotNumber,
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 title: 'BUILDING INFO',
                 children: [
-                  if (state.erfSize.isNotEmpty) _buildDetailRow(textTheme, 'Erf Size', '${state.erfSize} m²'),
-                  if (state.floorArea.isNotEmpty) _buildDetailRow(textTheme, 'Floor Area', '${state.floorArea} m²'),
-                  if (state.constructionYear.isNotEmpty) _buildDetailRow(textTheme, 'Construction Year', state.constructionYear),
-                  if (state.maxHeight.isNotEmpty) _buildDetailRow(textTheme, 'Max Height', '${state.maxHeight} m'),
-                  if (state.zoning.isNotEmpty) _buildDetailRow(textTheme, 'Zoning', state.zoning),
-                  _buildDetailRow(textTheme, 'Facing', state.facingDirection.displayString),
-                  _buildDetailRow(textTheme, 'Architecture', state.architecturalStyle.displayString),
-                  _buildDetailRow(textTheme, 'Roof', state.roofConfiguration.displayString),
-                  _buildDetailRow(textTheme, 'Walls', state.wallExterior.displayString),
+                  if (state.erfSize.isNotEmpty)
+                    _buildDetailRow(
+                      textTheme,
+                      'Erf Size',
+                      '${state.erfSize} m²',
+                    ),
+                  if (state.floorArea.isNotEmpty)
+                    _buildDetailRow(
+                      textTheme,
+                      'Floor Area',
+                      '${state.floorArea} m²',
+                    ),
+                  if (state.constructionYear.isNotEmpty)
+                    _buildDetailRow(
+                      textTheme,
+                      'Construction Year',
+                      state.constructionYear,
+                    ),
+                  if (state.maxHeight.isNotEmpty)
+                    _buildDetailRow(
+                      textTheme,
+                      'Max Height',
+                      '${state.maxHeight} m',
+                    ),
+                  if (state.zoning.isNotEmpty)
+                    _buildDetailRow(textTheme, 'Zoning', state.zoning),
+                  _buildDetailRow(
+                    textTheme,
+                    'Facing',
+                    state.facingDirection.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Architecture',
+                    state.architecturalStyle.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Roof',
+                    state.roofConfiguration.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Walls',
+                    state.wallExterior.displayString,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 title: 'PROPERTY FEATURES',
                 children: [
-                  _buildDetailRow(textTheme, 'Rooms', state.rooms.isEmpty ? 'None' : '${state.rooms.length} room(s)'),
-                  ...state.rooms.map((room) => Padding(
-                    padding: const EdgeInsets.only(left: 16.0, top: 4.0),
-                    child: Text(
-                      '• ${room.name} (${room.type.displayString})${room.isComplete ? '' : ' — PENDING'}',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: room.isComplete ? theme.textPrimary : theme.pendingColor,
+                  _buildDetailRow(
+                    textTheme,
+                    'Rooms',
+                    state.rooms.isEmpty
+                        ? 'None'
+                        : '${state.rooms.length} room(s)',
+                  ),
+                  ...state.rooms.map(
+                    (room) => Padding(
+                      padding: const EdgeInsets.only(left: 16.0, top: 4.0),
+                      child: Text(
+                        '• ${room.name} (${room.type.displayString})${room.isComplete ? '' : ' — PENDING'}',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: room.isComplete
+                              ? theme.textPrimary
+                              : theme.pendingColor,
+                        ),
                       ),
                     ),
-                  )),
+                  ),
                   const SizedBox(height: 8),
-                  _buildDetailRow(textTheme, 'Outdoor Extras', state.outdoorExtras.isEmpty ? 'None' : state.outdoorExtras.map((e) => e.quantity > 1 ? '${e.name} x${e.quantity}' : e.name).join(', ')),
+                  _buildDetailRow(
+                    textTheme,
+                    'Outdoor Extras',
+                    state.outdoorExtras.isEmpty
+                        ? 'None'
+                        : state.outdoorExtras
+                              .map(
+                                (e) => e.quantity > 1
+                                    ? '${e.name} x${e.quantity}'
+                                    : e.name,
+                              )
+                              .join(', '),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
               _buildSectionCard(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 title: 'MANDATE & CONTACTS',
                 children: [
-                  _buildDetailRow(textTheme, 'Mandate Type', state.mandateType.displayString),
-                  _buildDetailRow(textTheme, 'Lead Source', state.leadSource.displayString),
-                  _buildDetailRow(textTheme, 'Sync Lightstone', state.syncLightstone ? 'Yes' : 'No'),
-                  _buildDetailRow(textTheme, 'Sync Loom', state.syncLoom ? 'Yes' : 'No'),
+                  _buildDetailRow(
+                    textTheme,
+                    'Mandate Type',
+                    state.mandateType.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Lead Source',
+                    state.leadSource.displayString,
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Sync Lightstone',
+                    state.syncLightstone ? 'Yes' : 'No',
+                  ),
+                  _buildDetailRow(
+                    textTheme,
+                    'Sync Loom',
+                    state.syncLoom ? 'Yes' : 'No',
+                  ),
                   const SizedBox(height: 8),
-                  Text('Owner', style: textTheme.labelLarge?.copyWith(color: theme.textLabel, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Owner',
+                    style: textTheme.labelLarge?.copyWith(
+                      color: theme.textLabel,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  _buildDetailRow(textTheme, 'Name', '${state.ownerFirstName} ${state.ownerLastName}'),
+                  _buildDetailRow(
+                    textTheme,
+                    'Name',
+                    '${state.ownerFirstName} ${state.ownerLastName}',
+                  ),
                   _buildDetailRow(textTheme, 'Email', state.ownerEmail),
                   _buildDetailRow(textTheme, 'Phone', state.ownerPhone),
-                  _buildDetailRow(textTheme, 'ID Number', state.ownerIdNumber.isEmpty ? '—' : state.ownerIdNumber),
-                  if (state.mandateStart != null || state.mandateEnd != null) ...[
+                  _buildDetailRow(
+                    textTheme,
+                    'ID Number',
+                    state.ownerIdNumber.isEmpty ? '—' : state.ownerIdNumber,
+                  ),
+                  if (state.mandateStart != null ||
+                      state.mandateEnd != null) ...[
                     const SizedBox(height: 8),
-                    if (state.mandateStart != null) _buildDetailRow(textTheme, 'Mandate Start', state.mandateStart!),
-                    if (state.mandateEnd != null) _buildDetailRow(textTheme, 'Mandate End', state.mandateEnd!),
+                    if (state.mandateStart != null)
+                      _buildDetailRow(
+                        textTheme,
+                        'Mandate Start',
+                        state.mandateStart!,
+                      ),
+                    if (state.mandateEnd != null)
+                      _buildDetailRow(
+                        textTheme,
+                        'Mandate End',
+                        state.mandateEnd!,
+                      ),
                   ],
                 ],
               ),
@@ -197,7 +339,9 @@ class ReviewStep extends ConsumerWidget {
                 viewModel.saveDraft();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Property listing submitted successfully!'),
+                    content: const Text(
+                      'Property listing submitted successfully!',
+                    ),
                     backgroundColor: theme.primaryColor,
                   ),
                 );

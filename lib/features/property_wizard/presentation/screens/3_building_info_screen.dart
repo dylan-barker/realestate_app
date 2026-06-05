@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../widgets/wizard_footer.dart';
 import '../../data/models/enums/architectural_style.dart';
 import '../../data/models/enums/facing_direction.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/roof_configuration.dart';
 import '../../data/models/enums/wall_exterior.dart';
-import '../../application/providers/property_provider.dart';
-import '../../application/providers/wizard_navigation_provider.dart';
+import '../../providers/property_provider.dart';
+import '../../providers/wizard_navigation_provider.dart';
+import '../widgets/wizard_footer.dart';
 
 class BuildingInfoStep extends ConsumerWidget {
   const BuildingInfoStep({super.key});
@@ -34,7 +34,11 @@ class BuildingInfoStep extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: theme.textPrimary, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.textPrimary,
+            size: 20,
+          ),
           onPressed: () {
             ref.read(propertyViewModelProvider.notifier).prevStep();
             context.pop();
@@ -55,8 +59,22 @@ class BuildingInfoStep extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('K', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.textPrimary)),
-                Text('W', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.primaryColor)),
+                Text(
+                  'K',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.textPrimary,
+                  ),
+                ),
+                Text(
+                  'W',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.primaryColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -92,23 +110,31 @@ class BuildingInfoStep extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 'Provide the core structural specifications of the property for valuation and regulatory compliance.',
-                style: textTheme.bodyMedium?.copyWith(color: theme.textSecondary.withOpacity(0.9)),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: theme.textSecondary.withOpacity(0.9),
+                ),
               ),
               const SizedBox(height: 28),
               CustomTextInput(
                 label: 'Erf Size (m²)',
                 placeholder: '0.00',
                 initialValue: state.erfSize,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                onChanged: (val) => viewModel.updateTechnicalSpecs(erfSize: val),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                onChanged: (val) =>
+                    viewModel.updateTechnicalSpecs(erfSize: val),
               ),
               const SizedBox(height: 18),
               CustomTextInput(
                 label: 'Floor Area (m²)',
                 placeholder: '0.00',
                 initialValue: state.floorArea,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                onChanged: (val) => viewModel.updateTechnicalSpecs(floorArea: val),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                onChanged: (val) =>
+                    viewModel.updateTechnicalSpecs(floorArea: val),
               ),
               const SizedBox(height: 18),
               CustomTextInput(
@@ -116,15 +142,19 @@ class BuildingInfoStep extends ConsumerWidget {
                 placeholder: 'YYYY',
                 initialValue: state.constructionYear,
                 keyboardType: TextInputType.number,
-                onChanged: (val) => viewModel.updateTechnicalSpecs(constructionYear: val),
+                onChanged: (val) =>
+                    viewModel.updateTechnicalSpecs(constructionYear: val),
               ),
               const SizedBox(height: 18),
               CustomTextInput(
                 label: 'Max Height (m)',
                 placeholder: '0.00',
                 initialValue: state.maxHeight,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                onChanged: (val) => viewModel.updateTechnicalSpecs(maxHeight: val),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                onChanged: (val) =>
+                    viewModel.updateTechnicalSpecs(maxHeight: val),
               ),
               const SizedBox(height: 18),
               CustomTextInput(
@@ -135,7 +165,8 @@ class BuildingInfoStep extends ConsumerWidget {
               ),
               const SizedBox(height: 28),
               _buildChipSelector<FacingDirection>(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 label: 'Facing Direction',
                 options: FacingDirection.values,
                 selectedOption: state.facingDirection,
@@ -144,7 +175,8 @@ class BuildingInfoStep extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               _buildChipSelector<ArchitecturalStyle>(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 label: 'Architectural Style',
                 options: ArchitecturalStyle.values,
                 selectedOption: state.architecturalStyle,
@@ -153,7 +185,8 @@ class BuildingInfoStep extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               _buildChipSelector<RoofConfiguration>(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 label: 'Roof Configuration',
                 options: RoofConfiguration.values,
                 selectedOption: state.roofConfiguration,
@@ -162,7 +195,8 @@ class BuildingInfoStep extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               _buildChipSelector<WallExterior>(
-                theme: theme, textTheme: textTheme,
+                theme: theme,
+                textTheme: textTheme,
                 label: 'Wall Exterior',
                 options: WallExterior.values,
                 selectedOption: state.wallExterior,
@@ -200,14 +234,23 @@ class BuildingInfoStep extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.textPrimary, fontSize: 15),
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.textPrimary,
+            fontSize: 15,
+          ),
         ),
         const SizedBox(height: 12),
         Wrap(
-          spacing: 8.0, runSpacing: 10.0,
+          spacing: 8.0,
+          runSpacing: 10.0,
           children: options.map((opt) {
             final isSelected = selectedOption == opt;
-            return CustomChip(label: getLabel(opt), isSelected: isSelected, onTap: () => onSelected(opt));
+            return CustomChip(
+              label: getLabel(opt),
+              isSelected: isSelected,
+              onTap: () => onSelected(opt),
+            );
           }).toList(),
         ),
       ],

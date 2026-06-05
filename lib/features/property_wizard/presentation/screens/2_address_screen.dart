@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/theme/themes.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../widgets/wizard_footer.dart';
 import '../../data/models/enums/property_wizard_step.dart';
-import '../../application/providers/property_provider.dart';
-import '../../application/providers/wizard_navigation_provider.dart';
+import '../../providers/property_provider.dart';
+import '../../providers/wizard_navigation_provider.dart';
+import '../widgets/wizard_footer.dart';
 
 class AddressStep extends ConsumerWidget {
   const AddressStep({Key? key}) : super(key: key);
@@ -30,7 +30,11 @@ class AddressStep extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: theme.textPrimary, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: theme.textPrimary,
+            size: 20,
+          ),
           onPressed: () {
             viewModel.prevStep();
             context.pop();
@@ -51,8 +55,22 @@ class AddressStep extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('K', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.textPrimary)),
-                Text('W', style: GoogleFonts.inter(fontWeight: FontWeight.w900, fontSize: 22, color: theme.primaryColor)),
+                Text(
+                  'K',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.textPrimary,
+                  ),
+                ),
+                Text(
+                  'W',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: theme.primaryColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -97,7 +115,11 @@ class AddressStep extends ConsumerWidget {
                 label: 'Search address',
                 placeholder: 'Search address on Google Maps...',
                 keyboardType: TextInputType.streetAddress,
-                prefixIcon: Icon(Icons.search, color: theme.textSecondary, size: 20),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: theme.textSecondary,
+                  size: 20,
+                ),
                 onChanged: (val) => viewModel.updateAddress(streetAddress: val),
               ),
               const SizedBox(height: 24),
@@ -115,19 +137,56 @@ class AddressStep extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildAddressField(theme, textTheme, 'Street Address', state.streetAddress),
+                    _buildAddressField(
+                      theme,
+                      textTheme,
+                      'Street Address',
+                      state.streetAddress,
+                    ),
                     const SizedBox(height: 14),
-                    Row(children: [
-                      Expanded(child: _buildAddressField(theme, textTheme, 'Suburb / District', state.suburb)),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildAddressField(theme, textTheme, 'City', state.city)),
-                    ]),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildAddressField(
+                            theme,
+                            textTheme,
+                            'Suburb / District',
+                            state.suburb,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildAddressField(
+                            theme,
+                            textTheme,
+                            'City',
+                            state.city,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 14),
-                    Row(children: [
-                      Expanded(child: _buildAddressField(theme, textTheme, 'Province / State', state.province)),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildAddressField(theme, textTheme, 'Postal Code', state.postalCode)),
-                    ]),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildAddressField(
+                            theme,
+                            textTheme,
+                            'Province / State',
+                            state.province,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildAddressField(
+                            theme,
+                            textTheme,
+                            'Postal Code',
+                            state.postalCode,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -150,15 +209,18 @@ class AddressStep extends ConsumerWidget {
                       label: 'Complex / Estate Name (Optional)',
                       placeholder: 'e.g. Skyline Towers',
                       initialValue: state.complexName,
-                      onChanged: (val) => viewModel.updateIdentifiers(complexName: val),
+                      onChanged: (val) =>
+                          viewModel.updateIdentifiers(complexName: val),
                     ),
                     const SizedBox(height: 16),
                     CustomTextInput(
                       label: 'Erf / Plot Number',
                       placeholder: 'Enter registration number',
                       initialValue: state.erfPlotNumber,
-                      subtext: 'Found on municipal rates bill or property deed.',
-                      onChanged: (val) => viewModel.updateIdentifiers(erfPlotNumber: val),
+                      subtext:
+                          'Found on municipal rates bill or property deed.',
+                      onChanged: (val) =>
+                          viewModel.updateIdentifiers(erfPlotNumber: val),
                     ),
                   ],
                 ),
@@ -180,15 +242,29 @@ class AddressStep extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddressField(RealEstateTheme theme, TextTheme textTheme, String label, String value) {
+  Widget _buildAddressField(
+    RealEstateTheme theme,
+    TextTheme textTheme,
+    String label,
+    String value,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: textTheme.labelLarge?.copyWith(color: theme.textLabel.withOpacity(0.8), fontSize: 11)),
+        Text(
+          label,
+          style: textTheme.labelLarge?.copyWith(
+            color: theme.textLabel.withOpacity(0.8),
+            fontSize: 11,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(
           value.isEmpty ? '—' : value,
-          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.textPrimary),
+          style: textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.textPrimary,
+          ),
         ),
       ],
     );

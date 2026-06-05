@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/property_state.dart';
-import '../../data/models/enums/property_wizard_step.dart';
+
+import '../data/models/enums/property_wizard_step.dart';
+import '../data/models/property_state.dart';
 import 'property_provider.dart';
 
 class WizardNavigationData {
@@ -24,7 +25,9 @@ class WizardNavigationData {
 
     return WizardNavigationData(
       headerTitle: isEditingRoom ? 'Property Details' : step.headerTitle,
-      progressLabel: isEditingRoom ? '' : 'Step ${step.stepNumber} of ${PropertyWizardStep.values.length}',
+      progressLabel: isEditingRoom
+          ? ''
+          : 'Step ${step.stepNumber} of ${PropertyWizardStep.values.length}',
       stepTitle: step.title,
       canGoNext: _isStepValid(state, step),
       currentStep: step,
@@ -42,7 +45,8 @@ class WizardNavigationData {
       case PropertyWizardStep.propertyFeatures:
         return state.rooms.isNotEmpty;
       case PropertyWizardStep.mandateContacts:
-        return state.ownerFirstName.isNotEmpty && state.ownerLastName.isNotEmpty;
+        return state.ownerFirstName.isNotEmpty &&
+            state.ownerLastName.isNotEmpty;
       case PropertyWizardStep.review:
         return true;
     }
