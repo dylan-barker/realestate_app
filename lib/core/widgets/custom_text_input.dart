@@ -16,6 +16,7 @@ class CustomTextInput extends StatefulWidget {
   final bool isRequired;
   final int maxLines;
   final String? subtext;
+  final RealEstateTheme? theme;
 
   const CustomTextInput({
     Key? key,
@@ -31,6 +32,7 @@ class CustomTextInput extends StatefulWidget {
     this.isRequired = false,
     this.maxLines = 1,
     this.subtext,
+    this.theme,
   }) : super(key: key);
 
   @override
@@ -60,7 +62,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
+    final theme = widget.theme ?? RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
     final resolvedBorderColor = _isFocused ? theme.primaryColor : theme.borderLight;
@@ -79,7 +81,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
       decoration: InputDecoration(
         hintText: widget.placeholder,
         hintStyle: textTheme.bodyLarge?.copyWith(
-          color: theme.textSecondary.withOpacity(0.5),
+          color: theme.textSecondary.withValues(alpha: 0.5),
           fontWeight: FontWeight.normal,
         ),
         prefixIcon: widget.prefixIcon != null 
@@ -167,7 +169,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
             widget.subtext!,
             style: textTheme.bodyMedium?.copyWith(
               fontSize: 11,
-              color: theme.textSecondary.withOpacity(0.8),
+              color: theme.textSecondary.withValues(alpha: 0.8),
               fontStyle: FontStyle.italic,
             ),
           ),

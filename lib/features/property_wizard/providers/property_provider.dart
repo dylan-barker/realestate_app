@@ -17,8 +17,7 @@ import '../data/models/property_state.dart';
 import '../data/models/room.dart';
 import '../data/repositories/property_repository.dart';
 import '../data/repositories/property_repository_impl.dart';
-import 'get_initial_rooms.dart';
-import 'save_property_draft.dart';
+
 
 final propertyLocalDataSourceProvider = Provider<PropertyLocalDataSource>((
   ref,
@@ -44,10 +43,14 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   Future<void> _loadInitialData() async {
-    final rooms = await ref.read(getInitialRoomsProvider.future);
-    final repository = ref.read(propertyRepositoryProvider);
-    final outdoorExtras = await repository.getInitialOutdoorExtras();
-    state = state.copyWith(rooms: rooms, outdoorExtras: outdoorExtras);
+    try {
+      final repository = ref.read(propertyRepositoryProvider);
+      final rooms = await repository.getInitialRooms();
+      final outdoorExtras = await repository.getInitialOutdoorExtras();
+      state = state.copyWith(rooms: rooms, outdoorExtras: outdoorExtras);
+    } catch (e) {
+      state = state.copyWith(rooms: const [], outdoorExtras: const []);
+    }
   }
 
   void setStep(int step) {
@@ -195,11 +198,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
 
   // Step 4.2: Room-by-room detail actions
   void selectRoomForEditing(String? roomId) {
-    if (roomId == null) {
-      state = state.copyWith(clearRoomId: true);
-    } else {
-      state = state.copyWith(selectedRoomId: roomId);
-    }
+    state = state.copyWith(selectedRoomId: roomId);
   }
 
   void updateRoomDetails({
@@ -305,6 +304,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   Future<void> saveDraft() async {
-    await ref.read(savePropertyDraftProvider(state).future);
+    final repository = ref.read(propertyRepositoryProvider);
+    await repository.savePropertyDraft(state);
   }
 }

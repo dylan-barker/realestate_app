@@ -1,5 +1,8 @@
+import 'standard_amenity.dart';
+
 enum RoomCategory {
-  bedroomsAndBathrooms,
+  bedroom,
+  bathroom,
   livingSpaces,
   kitchenAndUtility,
   workAndStudy,
@@ -10,8 +13,10 @@ enum RoomCategory {
 extension RoomCategoryExtension on RoomCategory {
   String get displayString {
     switch (this) {
-      case RoomCategory.bedroomsAndBathrooms:
-        return 'Bedrooms & Bathrooms';
+      case RoomCategory.bedroom:
+        return 'Bedrooms';
+      case RoomCategory.bathroom:
+        return 'Bathrooms';
       case RoomCategory.livingSpaces:
         return 'Living Spaces';
       case RoomCategory.kitchenAndUtility:
@@ -25,12 +30,34 @@ extension RoomCategoryExtension on RoomCategory {
     }
   }
 
+  List<AmenityCategory> get relevantAmenityCategories {
+    switch (this) {
+      case RoomCategory.bedroom:
+        return [AmenityCategory.bedroom, AmenityCategory.generalInterior];
+      case RoomCategory.bathroom:
+        return [AmenityCategory.bathroom, AmenityCategory.generalInterior];
+      case RoomCategory.livingSpaces:
+        return [AmenityCategory.livingAreas, AmenityCategory.generalInterior];
+      case RoomCategory.kitchenAndUtility:
+        return [AmenityCategory.kitchen, AmenityCategory.generalInterior];
+      case RoomCategory.workAndStudy:
+        return [AmenityCategory.generalInterior];
+      case RoomCategory.entertainment:
+        return [AmenityCategory.livingAreas, AmenityCategory.generalInterior];
+      case RoomCategory.additional:
+        return [AmenityCategory.generalInterior];
+    }
+  }
+
   List<String> get predefinedRoomTypes {
     switch (this) {
-      case RoomCategory.bedroomsAndBathrooms:
+      case RoomCategory.bedroom:
         return [
           'Bedroom',
           'Main Bedroom / Master Suite',
+        ];
+      case RoomCategory.bathroom:
+        return [
           'En-suite Bathroom',
           'Full Bathroom',
           'Guest Toilet / Powder Room',
@@ -75,9 +102,12 @@ extension RoomCategoryExtension on RoomCategory {
 
   static RoomCategory fromString(String val) {
     switch (val.trim().toLowerCase()) {
-      case 'bedrooms & bathrooms':
-      case 'bedroomsandbathrooms':
-        return RoomCategory.bedroomsAndBathrooms;
+      case 'bedrooms':
+      case 'bedroom':
+        return RoomCategory.bedroom;
+      case 'bathrooms':
+      case 'bathroom':
+        return RoomCategory.bathroom;
       case 'living spaces':
       case 'livingspaces':
         return RoomCategory.livingSpaces;

@@ -13,6 +13,7 @@ class CustomCard extends StatelessWidget {
   final bool hasDashedBorder;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
+  final RealEstateTheme? theme;
 
   const CustomCard({
     Key? key,
@@ -26,14 +27,14 @@ class CustomCard extends StatelessWidget {
     this.hasDashedBorder = false,
     this.padding = const EdgeInsets.all(16.0),
     this.margin,
+    this.theme,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Standard real estate themes fallback
-    final theme = RealEstateTheme.crimson();
+    final theme = this.theme ?? RealEstateTheme.crimson();
     
-    final resolvedBg = backgroundColor ?? (isSelected ? Colors.white : theme.backgroundColor.withOpacity(0.4));
+    final resolvedBg = backgroundColor ?? (isSelected ? Colors.white : theme.backgroundColor.withValues(alpha: 0.4));
     final resolvedBorderColor = isSelected ? theme.borderSelected : theme.borderLight;
     final resolvedBorderWidth = isSelected ? 1.5 : borderWidth;
 
@@ -56,7 +57,7 @@ class CustomCard extends StatelessWidget {
     if (hasDashedBorder) {
       cardContent = CustomPaint(
         painter: _DashedRectPainter(
-          color: theme.textSecondary.withOpacity(0.5),
+          color: theme.textSecondary.withValues(alpha: 0.5),
           radius: borderRadius,
           strokeWidth: 1.0,
         ),
@@ -70,8 +71,8 @@ class CustomCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius),
-          splashColor: theme.primaryColor.withOpacity(0.05),
-          highlightColor: theme.primaryColor.withOpacity(0.02),
+          splashColor: theme.primaryColor.withValues(alpha: 0.05),
+          highlightColor: theme.primaryColor.withValues(alpha: 0.02),
           child: cardContent,
         ),
       );

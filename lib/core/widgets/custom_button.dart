@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final Widget? icon;
   final bool fullWidth;
   final double height;
+  final RealEstateTheme? theme;
 
   const CustomButton({
     Key? key,
@@ -19,11 +20,12 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.fullWidth = false,
     this.height = 54.0,
+    this.theme,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
+    final theme = this.theme ?? RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
     if (type == ButtonType.back) {

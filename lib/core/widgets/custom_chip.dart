@@ -5,8 +5,9 @@ class CustomChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback? onTap;
-  final VoidCallback? onDelete; // Shows clear/close icon on the right
+  final VoidCallback? onDelete;
   final bool isRequired;
+  final RealEstateTheme? theme;
 
   const CustomChip({
     Key? key,
@@ -15,11 +16,12 @@ class CustomChip extends StatelessWidget {
     this.onTap,
     this.onDelete,
     this.isRequired = false,
+    this.theme,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
+    final theme = this.theme ?? RealEstateTheme.crimson();
     final isSelectedState = isSelected;
 
     Widget chipContent = AnimatedContainer(
@@ -31,7 +33,7 @@ class CustomChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: isSelectedState 
             ? theme.primaryColor 
-            : (onDelete != null ? Colors.white : theme.borderLight.withOpacity(0.5)),
+            : (onDelete != null ? Colors.white : theme.borderLight.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(20.0),
         border: Border.all(
           color: isSelectedState 
@@ -48,7 +50,7 @@ class CustomChip extends StatelessWidget {
             style: theme.toThemeData().textTheme.bodyMedium?.copyWith(
               color: isSelectedState 
                   ? Colors.white 
-                  : (onDelete != null ? theme.textPrimary : theme.textPrimary.withOpacity(0.8)),
+                  : (onDelete != null ? theme.textPrimary : theme.textPrimary.withValues(alpha: 0.8)),
               fontWeight: isSelectedState || onDelete != null ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

@@ -6,12 +6,14 @@ class CustomDateSelector extends StatelessWidget {
   final String label;
   final String? value;
   final ValueChanged<String> onDateSelected;
+  final RealEstateTheme? theme;
 
   const CustomDateSelector({
     super.key,
     required this.label,
     this.value,
     required this.onDateSelected,
+    this.theme,
   });
 
   Future<void> _pickDate(BuildContext context) async {
@@ -37,7 +39,7 @@ class CustomDateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
+    final theme = this.theme ?? RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
     final isPlaceholder = value == null || value!.isEmpty;
     final displayValue = isPlaceholder ? 'Select Date' : value!;

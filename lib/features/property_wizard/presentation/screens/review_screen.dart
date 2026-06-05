@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
+import '../../../../core/widgets/wizard_header.dart';
 import '../../data/models/enums/architectural_style.dart';
 import '../../data/models/enums/facing_direction.dart';
 import '../../data/models/enums/lead_source.dart';
@@ -33,60 +34,12 @@ class ReviewStep extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.textPrimary,
-            size: 20,
-          ),
-          onPressed: () {
-            viewModel.prevStep();
-            context.pop();
-          },
-        ),
-        centerTitle: true,
-        title: Text(
-          navData.headerTitle,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
-            letterSpacing: -0.2,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'K',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.textPrimary,
-                  ),
-                ),
-                Text(
-                  'W',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: theme.borderLight, height: 1.0),
-        ),
+      appBar: WizardAppBar(
+        title: navData.headerTitle,
+        onBack: () {
+          viewModel.prevStep();
+          context.pop();
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -95,28 +48,10 @@ class ReviewStep extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                navData.progressLabel.toUpperCase(),
-                style: textTheme.labelLarge?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Review & Submit',
-                style: textTheme.displayMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Review all property details before submitting.',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: theme.textSecondary.withOpacity(0.9),
-                ),
+              WizardHeader(
+                progressLabel: navData.progressLabel,
+                title: 'Review & Submit',
+                description: 'Review all property details before submitting.',
               ),
               const SizedBox(height: 28),
               _buildSectionCard(
@@ -334,6 +269,7 @@ class ReviewStep extends ConsumerWidget {
             width: double.infinity,
             height: 54,
             child: CustomButton(
+              theme: theme,
               text: 'Submit Listing',
               onTap: () {
                 viewModel.saveDraft();
@@ -361,6 +297,7 @@ class ReviewStep extends ConsumerWidget {
     required List<Widget> children,
   }) {
     return CustomCard(
+      theme: theme,
       backgroundColor: Colors.white,
       padding: const EdgeInsets.all(18.0),
       child: Column(
@@ -393,7 +330,7 @@ class ReviewStep extends ConsumerWidget {
             child: Text(
               label,
               style: textTheme.bodyMedium?.copyWith(
-                color: textTheme.bodyMedium?.color?.withOpacity(0.7),
+                color: textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),

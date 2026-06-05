@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/theme_provider.dart';
@@ -12,6 +11,10 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
+import '../../../../core/widgets/rating_slider.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
+import '../../../../core/widgets/real_estate_dialog.dart';
+import '../../data/models/enums/room_category.dart';
 import '../../data/models/enums/standard_amenity.dart';
 import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
@@ -60,64 +63,16 @@ class RoomDetailsStep extends ConsumerWidget {
       },
     ];
 
-    final amenityCategories = AmenityCategory.values;
+    final amenityCategories = room.type.relevantAmenityCategories;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.textPrimary,
-            size: 20,
-          ),
-          onPressed: () {
-            viewModel.selectRoomForEditing(null);
-            context.pop();
-          },
-        ),
-        centerTitle: true,
-        title: Text(
-          'Property Details',
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
-            letterSpacing: -0.2,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'K',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.textPrimary,
-                  ),
-                ),
-                Text(
-                  'W',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: theme.borderLight, height: 1.0),
-        ),
+      appBar: WizardAppBar(
+        title: 'Property Details',
+        onBack: () {
+          viewModel.selectRoomForEditing(null);
+          context.pop();
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -241,7 +196,7 @@ class RoomDetailsStep extends ConsumerWidget {
                                 fontWeight: FontWeight.bold,
                                 color: isSelected
                                     ? theme.primaryColor
-                                    : theme.textSecondary.withOpacity(0.6),
+                                    : theme.textSecondary.withValues(alpha: 0.6),
                               ),
                             ),
                           ],
@@ -252,7 +207,7 @@ class RoomDetailsStep extends ConsumerWidget {
                 }).toList(),
               ),
               const SizedBox(height: 20),
-              _RatingSlider(
+              RatingSlider(
                 conditionRating: room.conditionRating,
                 theme: theme,
                 textTheme: textTheme,
@@ -340,7 +295,7 @@ class RoomDetailsStep extends ConsumerWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: theme.primaryColor,
                     side: BorderSide(
-                      color: theme.primaryColor.withOpacity(0.4),
+                      color: theme.primaryColor.withValues(alpha: 0.4),
                       width: 1.5,
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -410,7 +365,7 @@ class RoomDetailsStep extends ConsumerWidget {
                         hintText:
                             'Add specific details about the condition or layout of this room...',
                         hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: theme.textSecondary.withOpacity(0.5),
+                          color: theme.textSecondary.withValues(alpha: 0.5),
                         ),
                         border: InputBorder.none,
                         isDense: true,
@@ -570,7 +525,7 @@ class RoomDetailsStep extends ConsumerWidget {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.5),
+                        Colors.black.withValues(alpha: 0.5),
                         Colors.transparent,
                       ],
                     ),
@@ -591,7 +546,7 @@ class RoomDetailsStep extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
@@ -674,55 +629,29 @@ class RoomDetailsStep extends ConsumerWidget {
   ) {
     String name = currentName;
 
-    showDialog(
+    showRealEstateDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          title: Text(
-            'Rename Room',
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomTextInput(
-                label: 'Room Name',
-                placeholder: 'e.g. Master Bedroom Suite',
-                initialValue: currentName,
-                onChanged: (val) => name = val,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: theme.textSecondary),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (name.trim().isNotEmpty) {
-                  viewModel.renameRoom(roomId, name.trim());
-                  Navigator.pop(context);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
+      title: 'Rename Room',
+      content: CustomTextInput(
+        theme: theme,
+        label: 'Room Name',
+        placeholder: 'e.g. Master Bedroom Suite',
+        initialValue: currentName,
+        onChanged: (val) => name = val,
+      ),
+      actions: [
+        dialogCancelButton(context: context, theme: theme),
+        dialogActionButton(
+          theme: theme,
+          text: 'Save',
+          onPressed: () {
+            if (name.trim().isNotEmpty) {
+              viewModel.renameRoom(roomId, name.trim());
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -735,227 +664,30 @@ class RoomDetailsStep extends ConsumerWidget {
   ) {
     String feature = '';
 
-    showDialog(
+    showRealEstateDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          title: Text(
-            'Add Amenity / Feature',
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomTextInput(
-                label: 'Feature Name',
-                placeholder: 'e.g. USB Outlets, Underfloor Heating',
-                onChanged: (val) => feature = val,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: theme.textSecondary),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (feature.trim().isNotEmpty) {
-                  viewModel.addFeatureToRoom(roomId, feature.trim());
-                  Navigator.pop(context);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Add', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _RatingSlider extends StatefulWidget {
-  final int? conditionRating;
-  final RealEstateTheme theme;
-  final TextTheme textTheme;
-  final ValueChanged<int> onChanged;
-
-  const _RatingSlider({
-    required this.conditionRating,
-    required this.theme,
-    required this.textTheme,
-    required this.onChanged,
-  });
-
-  @override
-  State<_RatingSlider> createState() => _RatingSliderState();
-}
-
-class _RatingSliderState extends State<_RatingSlider> {
-  double _dragValue = 0;
-  bool _fromSelfChange = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _dragValue = _levelToMidpoint(widget.conditionRating ?? 1);
-  }
-
-  @override
-  void didUpdateWidget(_RatingSlider old) {
-    super.didUpdateWidget(old);
-    if (widget.conditionRating != old.conditionRating) {
-      if (!_fromSelfChange) {
-        _dragValue = _levelToMidpoint(widget.conditionRating ?? 1);
-      }
-      _fromSelfChange = false;
-    }
-  }
-
-  static double _levelToMidpoint(int? level) {
-    switch (level) {
-      case 1: return 12;
-      case 2: return 37;
-      case 3: return 62;
-      case 4: return 87;
-      default: return 0;
-    }
-  }
-
-  static int _valueToLevel(double value) {
-    if (value < 25) return 1;
-    if (value < 50) return 2;
-    if (value < 75) return 3;
-    return 4;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final activeLevel = _valueToLevel(_dragValue);
-    final displayValue = _dragValue;
-
-    final segments = [
-      {'range': '0\u201324%', 'level': 1},
-      {'range': '25\u201349%', 'level': 2},
-      {'range': '50\u201374%', 'level': 3},
-      {'range': '75\u2013100%', 'level': 4},
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final barWidth = constraints.maxWidth;
-
-        return GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            final pixelsPerPercent = barWidth / 100;
-            setState(() {
-              _dragValue = (_dragValue +
-                      details.delta.dx / pixelsPerPercent)
-                  .clamp(0.0, 100.0);
-            });
-          },
-          onHorizontalDragEnd: (_) {
-            if (_valueToLevel(_dragValue) != widget.conditionRating) {
-              _fromSelfChange = true;
-              widget.onChanged(_valueToLevel(_dragValue));
-            } else {
-              setState(() {});
+      title: 'Add Amenity / Feature',
+      content: CustomTextInput(
+        theme: theme,
+        label: 'Feature Name',
+        placeholder: 'e.g. USB Outlets, Underfloor Heating',
+        onChanged: (val) => feature = val,
+      ),
+      actions: [
+        dialogCancelButton(context: context, theme: theme),
+        dialogActionButton(
+          theme: theme,
+          text: 'Add',
+          onPressed: () {
+            if (feature.trim().isNotEmpty) {
+              viewModel.addFeatureToRoom(roomId, feature.trim());
+              Navigator.pop(context);
             }
           },
-          onTapUp: (details) {
-            final tapPercent = (details.localPosition.dx / barWidth) * 100;
-            _dragValue = tapPercent;
-            _fromSelfChange = true;
-            widget.onChanged(_valueToLevel(tapPercent));
-          },
-          child: Container(
-            height: 56,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: widget.theme.borderLight),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(9),
-              child: Stack(
-                children: [
-                  Row(
-                    children: List.generate(4, (i) {
-                      final lvl = i + 1;
-                  final isActive = lvl == activeLevel;
-                          return Expanded(
-                            child: Container(
-                              color: isActive
-                                  ? widget.theme.primaryColor.withOpacity(0.12)
-                                  : Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    segments[i]['range'] as String,
-                                    style: widget.textTheme.labelLarge?.copyWith(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: isActive
-                                          ? widget.theme.primaryColor
-                                          : widget.theme.textSecondary
-                                              .withOpacity(0.5),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                      Positioned(
-                        left: ((displayValue / 100) * barWidth - 14).clamp(0.0, barWidth - 28),
-                        top: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 28,
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(
-                            color: widget.theme.primaryColor,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: widget.theme.primaryColor.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${displayValue.round()}%',
-                              style: widget.textTheme.labelLarge?.copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
+
+

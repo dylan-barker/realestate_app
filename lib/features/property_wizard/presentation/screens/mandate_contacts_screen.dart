@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_date_selector.dart';
 import '../../../../core/widgets/custom_text_input.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
+import '../../../../core/widgets/wizard_header.dart';
 import '../../data/models/enums/lead_source.dart';
 import '../../data/models/enums/mandate_type.dart';
 import '../../data/models/enums/property_wizard_step.dart';
@@ -28,60 +29,12 @@ class MandateContactsStep extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.textPrimary,
-            size: 20,
-          ),
-          onPressed: () {
-            viewModel.prevStep();
-            context.pop();
-          },
-        ),
-        centerTitle: true,
-        title: Text(
-          navData.headerTitle,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
-            letterSpacing: -0.2,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'K',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.textPrimary,
-                  ),
-                ),
-                Text(
-                  'W',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: theme.borderLight, height: 1.0),
-        ),
+      appBar: WizardAppBar(
+        title: navData.headerTitle,
+        onBack: () {
+          viewModel.prevStep();
+          context.pop();
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -90,28 +43,10 @@ class MandateContactsStep extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                navData.progressLabel.toUpperCase(),
-                style: textTheme.labelLarge?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Mandate Details',
-                style: textTheme.displayMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Select the agreement type for this listing.',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: theme.textSecondary.withOpacity(0.9),
-                ),
+              WizardHeader(
+                progressLabel: navData.progressLabel,
+                title: 'Mandate Details',
+                description: 'Select the agreement type for this listing.',
               ),
               const SizedBox(height: 28),
               Text(
@@ -163,6 +98,7 @@ class MandateContactsStep extends ConsumerWidget {
                 runSpacing: 10.0,
                 children: LeadSource.values.map((opt) {
                   return CustomChip(
+                    theme: theme,
                     label: opt.displayString,
                     isSelected: state.leadSource == opt,
                     onTap: () => viewModel.selectLeadSource(opt),
@@ -186,7 +122,7 @@ class MandateContactsStep extends ConsumerWidget {
               Text(
                 'Select external services to sync with this listing.',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: theme.textSecondary.withOpacity(0.9),
+                  color: theme.textSecondary.withValues(alpha: 0.9),
                 ),
               ),
               const SizedBox(height: 16),
@@ -247,7 +183,7 @@ class MandateContactsStep extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -259,6 +195,7 @@ class MandateContactsStep extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: CustomTextInput(
+                            theme: theme,
                             label: 'FIRST NAME',
                             placeholder: 'John',
                             initialValue: state.ownerFirstName,
@@ -270,6 +207,7 @@ class MandateContactsStep extends ConsumerWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: CustomTextInput(
+                            theme: theme,
                             label: 'LAST NAME',
                             placeholder: 'Doe',
                             initialValue: state.ownerLastName,
@@ -282,6 +220,7 @@ class MandateContactsStep extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     CustomTextInput(
+                      theme: theme,
                       label: 'EMAIL ADDRESS',
                       placeholder: 'john.doe@example.com',
                       initialValue: state.ownerEmail,
@@ -290,6 +229,7 @@ class MandateContactsStep extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     CustomTextInput(
+                      theme: theme,
                       label: 'PHONE NUMBER',
                       placeholder: '+27 82 000 0000',
                       initialValue: state.ownerPhone,
@@ -298,6 +238,7 @@ class MandateContactsStep extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     CustomTextInput(
+                      theme: theme,
                       label: 'ID NUMBER',
                       placeholder: 'Optional',
                       initialValue: state.ownerIdNumber,
@@ -312,6 +253,7 @@ class MandateContactsStep extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: CustomDateSelector(
+                      theme: theme,
                       label: 'MANDATE START',
                       value: state.mandateStart,
                       onDateSelected: (date) =>
@@ -321,6 +263,7 @@ class MandateContactsStep extends ConsumerWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: CustomDateSelector(
+                      theme: theme,
                       label: 'MANDATE END',
                       value: state.mandateEnd,
                       onDateSelected: (date) =>
@@ -369,7 +312,7 @@ class MandateContactsStep extends ConsumerWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: theme.primaryColor.withOpacity(0.1),
+                    color: theme.primaryColor.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

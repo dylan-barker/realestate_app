@@ -1,12 +1,12 @@
 import 'package:go_router/go_router.dart';
 
-import '../../features/property_wizard/presentation/screens/1_property_type_screen.dart';
-import '../../features/property_wizard/presentation/screens/2_address_screen.dart';
-import '../../features/property_wizard/presentation/screens/3_building_info_screen.dart';
-import '../../features/property_wizard/presentation/screens/4_1_property_features_screen.dart';
-import '../../features/property_wizard/presentation/screens/4_2_room_details_screen.dart';
-import '../../features/property_wizard/presentation/screens/5_mandate_contacts_screen.dart';
-import '../../features/property_wizard/presentation/screens/6_review_screen.dart';
+import '../../features/property_wizard/presentation/screens/property_type_screen.dart';
+import '../../features/property_wizard/presentation/screens/address_screen.dart';
+import '../../features/property_wizard/presentation/screens/building_info_screen.dart';
+import '../../features/property_wizard/presentation/screens/property_features_screen.dart';
+import '../../features/property_wizard/presentation/screens/room_details_screen.dart';
+import '../../features/property_wizard/presentation/screens/mandate_contacts_screen.dart';
+import '../../features/property_wizard/presentation/screens/review_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/wizard/property-type',

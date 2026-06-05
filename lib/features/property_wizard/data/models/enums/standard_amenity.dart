@@ -1,6 +1,7 @@
 enum AmenityCategory {
   kitchen,
-  bedroomBathroom,
+  bedroom,
+  bathroom,
   livingAreas,
   generalInterior,
 }
@@ -10,8 +11,10 @@ extension AmenityCategoryExtension on AmenityCategory {
     switch (this) {
       case AmenityCategory.kitchen:
         return 'Kitchen';
-      case AmenityCategory.bedroomBathroom:
-        return 'Bedroom / Bathroom';
+      case AmenityCategory.bedroom:
+        return 'Bedroom';
+      case AmenityCategory.bathroom:
+        return 'Bathroom';
       case AmenityCategory.livingAreas:
         return 'Living Areas';
       case AmenityCategory.generalInterior:
@@ -31,10 +34,9 @@ enum StandardAmenity {
   dishwasherConnection('Dishwasher Connection', AmenityCategory.kitchen),
   washingMachineConnection('Washing Machine Connection', AmenityCategory.kitchen),
   breakfastNook('Breakfast Nook', AmenityCategory.kitchen),
-  walkInCloset('Walk-in Closet', AmenityCategory.bedroomBathroom),
-  ensuiteBathroom('En-suite Bathroom', AmenityCategory.bedroomBathroom),
-  ceilingFan('Ceiling Fan', AmenityCategory.bedroomBathroom),
-  balconyAccess('Balcony Access', AmenityCategory.bedroomBathroom),
+  walkInCloset('Walk-in Closet', AmenityCategory.bedroom),
+  ensuiteBathroom('En-suite Bathroom', AmenityCategory.bedroom),
+  balconyAccess('Balcony Access', AmenityCategory.bedroom),
   fireplace('Fireplace', AmenityCategory.livingAreas),
   underfloorHeating('Underfloor Heating', AmenityCategory.livingAreas),
   builtInBraai('Built-in Braai', AmenityCategory.livingAreas),
@@ -43,6 +45,7 @@ enum StandardAmenity {
   tiledFloors('Tiled Floors', AmenityCategory.livingAreas),
   woodenLaminateFloors('Wooden / Laminate Floors', AmenityCategory.livingAreas),
   highCeilings('High Ceilings / Exposed Beams / Exposed Trusses', AmenityCategory.livingAreas),
+  ceilingFan('Ceiling Fan', AmenityCategory.generalInterior),
   fibreReady('Fibre Ready / Fibre Installed', AmenityCategory.generalInterior),
   alarmSystem('Alarm System', AmenityCategory.generalInterior),
   intercom('Intercom', AmenityCategory.generalInterior),

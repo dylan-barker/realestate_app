@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_text_input.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
+import '../../../../core/widgets/wizard_header.dart';
+import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../data/models/enums/outdoor_extra.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/room_category.dart';
@@ -41,60 +43,12 @@ class PropertyFeaturesStep extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.textPrimary,
-            size: 20,
-          ),
-          onPressed: () {
-            viewModel.prevStep();
-            context.pop();
-          },
-        ),
-        centerTitle: true,
-        title: Text(
-          navData.headerTitle,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
-            letterSpacing: -0.2,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'K',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.textPrimary,
-                  ),
-                ),
-                Text(
-                  'W',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: theme.borderLight, height: 1.0),
-        ),
+      appBar: WizardAppBar(
+        title: navData.headerTitle,
+        onBack: () {
+          viewModel.prevStep();
+          context.pop();
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -103,28 +57,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                navData.progressLabel.toUpperCase(),
-                style: textTheme.labelLarge?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Property Features',
-                style: textTheme.displayMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Detail and configure every room in the residence.',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: theme.textSecondary.withOpacity(0.9),
-                ),
+              WizardHeader(
+                progressLabel: navData.progressLabel,
+                title: 'Property Features',
+                description: 'Detail and configure every room in the residence.',
               ),
               const SizedBox(height: 28),
               Text(
@@ -250,7 +186,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: theme.primaryColor.withOpacity(0.1),
+                color: theme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -274,7 +210,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 child: Text(
                   'No rooms added yet.',
                   style: textTheme.bodyMedium?.copyWith(
-                    color: theme.textSecondary.withOpacity(0.7),
+                    color: theme.textSecondary.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -306,10 +242,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.backgroundColor.withOpacity(0.3),
+                        color: theme.backgroundColor.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: theme.borderLight.withOpacity(0.5),
+                          color: theme.borderLight.withValues(alpha: 0.5),
                         ),
                       ),
                       child: Row(
@@ -340,7 +276,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                                       Text(
                                         '•',
                                         style: TextStyle(
-                                          color: theme.textSecondary.withOpacity(
+                                          color: theme.textSecondary.withValues(alpha: 
                                             0.5,
                                           ),
                                           fontSize: 12,
@@ -374,7 +310,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: theme.borderLight.withOpacity(0.3),
+                                color: theme.borderLight.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
@@ -388,7 +324,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                           Icon(
                             Icons.arrow_forward_ios,
                             size: 12,
-                            color: theme.textSecondary.withOpacity(0.5),
+                            color: theme.textSecondary.withValues(alpha: 0.5),
                           ),
                         ],
                       ),
@@ -584,49 +520,24 @@ class PropertyFeaturesStep extends ConsumerWidget {
     RealEstateTheme theme,
     TextTheme textTheme,
   ) {
-    showDialog(
+    showRealEstateDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          title: Text(
-            'Remove Room',
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Are you sure you want to remove "${room.name}"?',
-            style: textTheme.bodyLarge,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: theme.textSecondary),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                viewModel.removeRoom(room.id);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Remove',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
+      title: 'Remove Room',
+      content: Text(
+        'Are you sure you want to remove "${room.name}"?',
+        style: textTheme.bodyLarge,
+      ),
+      actions: [
+        dialogCancelButton(context: context, theme: theme),
+        dialogActionButton(
+          theme: theme,
+          text: 'Remove',
+          onPressed: () {
+            viewModel.removeRoom(room.id);
+            Navigator.pop(context);
+          },
+        ),
+      ],
     );
   }
 
@@ -639,13 +550,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
   ) {
     final predefined = category.predefinedRoomTypes;
 
-    showModalBottomSheet(
+    showRealEstateBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-      ),
       builder: (context) {
         String customName = '';
 
@@ -725,6 +631,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   CustomTextInput(
+                    theme: theme,
                     label: 'Custom Room Name',
                     placeholder: 'e.g. Yoga Studio, Wine Cellar',
                     onChanged: (val) => customName = val,
@@ -782,97 +689,71 @@ class PropertyFeaturesStep extends ConsumerWidget {
     String name = '';
     OutdoorExtraCategory selectedCategory = OutdoorExtraCategory.outdoorLiving;
 
-    showDialog(
+    showRealEstateDialog(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
+      title: 'Add Outdoor/Extra Item',
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomTextInput(
+                theme: theme,
+                label: 'Item Name',
+                placeholder: 'e.g. Tennis Court, Lapa',
+                onChanged: (val) => name = val,
               ),
-              title: Text(
-                'Add Outdoor/Extra Item',
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomTextInput(
-                    label: 'Item Name',
-                    placeholder: 'e.g. Tennis Court, Lapa',
-                    onChanged: (val) => name = val,
+              const SizedBox(height: 16),
+              DropdownButtonFormField<OutdoorExtraCategory>(
+                initialValue: selectedCategory,
+                decoration: InputDecoration(
+                  labelText: 'Category',
+                  labelStyle: TextStyle(color: theme.textSecondary),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: theme.borderLight),
                   ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<OutdoorExtraCategory>(
-                    value: selectedCategory,
-                    decoration: InputDecoration(
-                      labelText: 'Category',
-                      labelStyle: TextStyle(color: theme.textSecondary),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: theme.borderLight),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: theme.borderLight),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                    ),
-                    items: OutdoorExtraCategory.values.map((cat) {
-                      return DropdownMenuItem(
-                        value: cat,
-                        child: Text(cat.displayString),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() => selectedCategory = val);
-                      }
-                    },
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: theme.borderLight),
                   ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: theme.textSecondary),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (name.trim().isNotEmpty) {
-                      viewModel.addOutdoorExtra(
-                        name.trim(),
-                        category: selectedCategory,
-                      );
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Add',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            );
+                items: OutdoorExtraCategory.values.map((cat) {
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Text(cat.displayString),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => selectedCategory = val);
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        dialogCancelButton(context: context, theme: theme),
+        dialogActionButton(
+          theme: theme,
+          text: 'Add',
+          onPressed: () {
+            if (name.trim().isNotEmpty) {
+              viewModel.addOutdoorExtra(
+                name.trim(),
+                category: selectedCategory,
+              );
+              Navigator.pop(context);
+            }
           },
-        );
-      },
+        ),
+      ],
     );
   }
 }
