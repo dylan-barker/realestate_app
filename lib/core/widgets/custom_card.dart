@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../theme/themes.dart';
 
 class CustomCard extends StatelessWidget {
@@ -16,7 +18,7 @@ class CustomCard extends StatelessWidget {
   final RealEstateTheme? theme;
 
   const CustomCard({
-    Key? key,
+    super.key,
     required this.child,
     this.onTap,
     this.isSelected = false,
@@ -28,14 +30,20 @@ class CustomCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16.0),
     this.margin,
     this.theme,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = this.theme ?? RealEstateTheme.crimson();
-    
-    final resolvedBg = backgroundColor ?? (isSelected ? Colors.white : theme.backgroundColor.withValues(alpha: 0.4));
-    final resolvedBorderColor = isSelected ? theme.borderSelected : theme.borderLight;
+
+    final resolvedBg =
+        backgroundColor ??
+        (isSelected
+            ? Colors.white
+            : theme.backgroundColor.withValues(alpha: 0.4));
+    final resolvedBorderColor = isSelected
+        ? theme.borderSelected
+        : theme.borderLight;
     final resolvedBorderWidth = isSelected ? 1.5 : borderWidth;
 
     Widget cardContent = Container(
@@ -43,8 +51,8 @@ class CustomCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: resolvedBg,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: hasDashedBorder 
-            ? null 
+        border: hasDashedBorder
+            ? null
             : Border.all(
                 color: resolvedBorderColor,
                 width: resolvedBorderWidth,
@@ -78,7 +86,7 @@ class CustomCard extends StatelessWidget {
       );
     }
 
-    return margin != null 
+    return margin != null
         ? Padding(padding: margin!, child: cardContent)
         : cardContent;
   }

@@ -14,7 +14,7 @@ import '../../providers/wizard_navigation_provider.dart';
 import '../widgets/wizard_footer.dart';
 
 class AddressStep extends ConsumerWidget {
-  const AddressStep({Key? key}) : super(key: key);
+  const AddressStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,7 +43,8 @@ class AddressStep extends ConsumerWidget {
               WizardHeader(
                 progressLabel: navData.progressLabel,
                 title: 'Where is the property?',
-                description: 'Start typing the address to auto-populate details.',
+                description:
+                    'Start typing the address to auto-populate details.',
               ),
               const SizedBox(height: 20),
               CustomTextInput(
@@ -157,7 +158,8 @@ class AddressStep extends ConsumerWidget {
                       label: 'Erf / Plot Number',
                       placeholder: 'Enter registration number',
                       initialValue: state.erfPlotNumber,
-                      subtext: 'Found on municipal rates bill or property deed.',
+                      subtext:
+                          'Found on municipal rates bill or property deed.',
                       onChanged: (val) =>
                           viewModel.updateIdentifiers(erfPlotNumber: val),
                     ),

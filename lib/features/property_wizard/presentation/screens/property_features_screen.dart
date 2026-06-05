@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_text_input.dart';
+import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../../../core/widgets/wizard_header.dart';
-import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../data/models/enums/outdoor_extra.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/room_category.dart';
@@ -18,7 +18,7 @@ import '../../providers/wizard_navigation_provider.dart';
 import '../widgets/wizard_footer.dart';
 
 class PropertyFeaturesStep extends ConsumerWidget {
-  const PropertyFeaturesStep({Key? key}) : super(key: key);
+  const PropertyFeaturesStep({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,7 +60,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
               WizardHeader(
                 progressLabel: navData.progressLabel,
                 title: 'Property Features',
-                description: 'Detail and configure every room in the residence.',
+                description:
+                    'Detail and configure every room in the residence.',
               ),
               const SizedBox(height: 28),
               Text(
@@ -111,7 +112,10 @@ class PropertyFeaturesStep extends ConsumerWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () => _showAddOutdoorDialog(
-                    context, viewModel, theme, textTheme,
+                    context,
+                    viewModel,
+                    theme,
+                    textTheme,
                   ),
                   icon: const Icon(Icons.add_circle_outline, size: 22),
                   label: const Text('Add Custom Outdoor / Extra Item'),
@@ -119,10 +123,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: theme.textLabel,
                     elevation: 0,
-                    side: BorderSide(
-                      color: theme.borderLight,
-                      width: 1.5,
-                    ),
+                    side: BorderSide(color: theme.borderLight, width: 1.5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -218,7 +219,11 @@ class PropertyFeaturesStep extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: _buildAddButton(
-                context, theme, textTheme, category, viewModel,
+                context,
+                theme,
+                textTheme,
+                category,
+                viewModel,
               ),
             ),
           ] else ...[
@@ -276,8 +281,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
                                       Text(
                                         '•',
                                         style: TextStyle(
-                                          color: theme.textSecondary.withValues(alpha: 
-                                            0.5,
+                                          color: theme.textSecondary.withValues(
+                                            alpha: 0.5,
                                           ),
                                           fontSize: 12,
                                         ),
@@ -337,7 +342,11 @@ class PropertyFeaturesStep extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: _buildAddButton(
-                context, theme, textTheme, category, viewModel,
+                context,
+                theme,
+                textTheme,
+                category,
+                viewModel,
               ),
             ),
           ],
@@ -354,9 +363,8 @@ class PropertyFeaturesStep extends ConsumerWidget {
     PropertyViewModel viewModel,
   ) {
     return ElevatedButton.icon(
-      onPressed: () => _showAddRoomDialog(
-        context, viewModel, category, theme, textTheme,
-      ),
+      onPressed: () =>
+          _showAddRoomDialog(context, viewModel, category, theme, textTheme),
       icon: const Icon(Icons.add, size: 20),
       label: const Text('Add Room'),
       style: ElevatedButton.styleFrom(
@@ -364,9 +372,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

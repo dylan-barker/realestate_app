@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/themes.dart';
 
 class CustomChip extends StatelessWidget {
@@ -10,14 +11,14 @@ class CustomChip extends StatelessWidget {
   final RealEstateTheme? theme;
 
   const CustomChip({
-    Key? key,
+    super.key,
     required this.label,
     this.isSelected = false,
     this.onTap,
     this.onDelete,
     this.isRequired = false,
     this.theme,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +32,15 @@ class CustomChip extends StatelessWidget {
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: isSelectedState 
-            ? theme.primaryColor 
-            : (onDelete != null ? Colors.white : theme.borderLight.withValues(alpha: 0.5)),
+        color: isSelectedState
+            ? theme.primaryColor
+            : (onDelete != null
+                  ? Colors.white
+                  : theme.borderLight.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(20.0),
         border: Border.all(
-          color: isSelectedState 
-              ? theme.primaryColor 
+          color: isSelectedState
+              ? theme.primaryColor
               : (onDelete != null ? theme.borderLight : Colors.transparent),
           width: 1.0,
         ),
@@ -48,32 +51,29 @@ class CustomChip extends StatelessWidget {
           Text(
             label,
             style: theme.toThemeData().textTheme.bodyMedium?.copyWith(
-              color: isSelectedState 
-                  ? Colors.white 
-                  : (onDelete != null ? theme.textPrimary : theme.textPrimary.withValues(alpha: 0.8)),
-              fontWeight: isSelectedState || onDelete != null ? FontWeight.w600 : FontWeight.normal,
+              color: isSelectedState
+                  ? Colors.white
+                  : (onDelete != null
+                        ? theme.textPrimary
+                        : theme.textPrimary.withValues(alpha: 0.8)),
+              fontWeight: isSelectedState || onDelete != null
+                  ? FontWeight.w600
+                  : FontWeight.normal,
             ),
           ),
           if (onDelete != null) ...[
             const SizedBox(width: 12),
             GestureDetector(
               onTap: onDelete,
-              child: Icon(
-                Icons.close,
-                size: 16,
-                color: theme.textSecondary,
-              ),
+              child: Icon(Icons.close, size: 16, color: theme.textSecondary),
             ),
-          ]
+          ],
         ],
       ),
     );
 
     if (onTap != null && onDelete == null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: chipContent,
-      );
+      return GestureDetector(onTap: onTap, child: chipContent);
     }
 
     return chipContent;

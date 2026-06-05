@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/themes.dart';
 
 enum InputStyle { bottomBorder, cardBorder }
@@ -19,7 +20,7 @@ class CustomTextInput extends StatefulWidget {
   final RealEstateTheme? theme;
 
   const CustomTextInput({
-    Key? key,
+    super.key,
     required this.label,
     this.placeholder,
     this.initialValue,
@@ -33,7 +34,7 @@ class CustomTextInput extends StatefulWidget {
     this.maxLines = 1,
     this.subtext,
     this.theme,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomTextInput> createState() => _CustomTextInputState();
@@ -65,7 +66,9 @@ class _CustomTextInputState extends State<CustomTextInput> {
     final theme = widget.theme ?? RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
-    final resolvedBorderColor = _isFocused ? theme.primaryColor : theme.borderLight;
+    final resolvedBorderColor = _isFocused
+        ? theme.primaryColor
+        : theme.borderLight;
 
     Widget textField = TextFormField(
       controller: widget.controller,
@@ -84,13 +87,16 @@ class _CustomTextInputState extends State<CustomTextInput> {
           color: theme.textSecondary.withValues(alpha: 0.5),
           fontWeight: FontWeight.normal,
         ),
-        prefixIcon: widget.prefixIcon != null 
+        prefixIcon: widget.prefixIcon != null
             ? Padding(
                 padding: const EdgeInsets.only(right: 12.0),
                 child: widget.prefixIcon,
               )
             : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 24,
+          minHeight: 24,
+        ),
         suffixIcon: widget.suffixIcon,
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,

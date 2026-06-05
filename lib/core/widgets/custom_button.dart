@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/themes.dart';
 
 enum ButtonType { primary, outline, text, back }
@@ -13,7 +14,7 @@ class CustomButton extends StatelessWidget {
   final RealEstateTheme? theme;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onTap,
     this.type = ButtonType.primary,
@@ -21,7 +22,7 @@ class CustomButton extends StatelessWidget {
     this.fullWidth = false,
     this.height = 54.0,
     this.theme,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +83,11 @@ class CustomButton extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       decoration: BoxDecoration(
-        color: onTap == null 
-            ? theme.borderLight 
+        color: onTap == null
+            ? theme.borderLight
             : (isOutline ? Colors.transparent : theme.primaryColor),
         borderRadius: BorderRadius.circular(12.0),
-        border: isOutline 
+        border: isOutline
             ? Border.all(color: theme.borderLight, width: 1.5)
             : null,
       ),
@@ -102,10 +103,7 @@ class CustomButton extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (icon != null) ...[
-              const SizedBox(width: 8),
-              icon!,
-            ]
+            if (icon != null) ...[const SizedBox(width: 8), icon!],
           ],
         ),
       ),
