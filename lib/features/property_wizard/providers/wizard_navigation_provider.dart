@@ -35,21 +35,7 @@ class WizardNavigationData {
   }
 
   static bool _isStepValid(PropertyState state, PropertyWizardStep step) {
-    switch (step) {
-      case PropertyWizardStep.propertyType:
-        return true;
-      case PropertyWizardStep.address:
-        return state.streetAddress.isNotEmpty;
-      case PropertyWizardStep.buildingInfo:
-        return state.erfSize.isNotEmpty && state.floorArea.isNotEmpty;
-      case PropertyWizardStep.propertyFeatures:
-        return state.rooms.isNotEmpty;
-      case PropertyWizardStep.mandateContacts:
-        return state.ownerFirstName.isNotEmpty &&
-            state.ownerLastName.isNotEmpty;
-      case PropertyWizardStep.review:
-        return true;
-    }
+    return true;
   }
 }
 
