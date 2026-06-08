@@ -21,21 +21,16 @@ class AddressStep extends ConsumerWidget {
 
     return WizardScaffold(
       title: 'Where is the property?',
-      description:
-          'Start typing the address to auto-populate details.',
+      description: 'Start typing the address to auto-populate details.',
       onBack: () => goBackWizard(context, ref),
       onNext: () => advanceWizard(context, ref),
       children: [
         CustomTextInput(
           theme: theme,
           label: 'Search address',
-          placeholder: 'Search address on Google Maps...',
+          placeholder: 'Search address...',
           keyboardType: TextInputType.streetAddress,
-          prefixIcon: Icon(
-            Icons.search,
-            color: theme.textSecondary,
-            size: 20,
-          ),
+          prefixIcon: Icon(Icons.search, color: theme.textSecondary, size: 20),
           onChanged: (val) => viewModel.updateAddress(streetAddress: val),
         ),
         const SizedBox(height: 24),
@@ -137,8 +132,7 @@ class AddressStep extends ConsumerWidget {
                 label: 'Erf / Plot Number',
                 placeholder: 'Enter registration number',
                 initialValue: state.erfPlotNumber,
-                subtext:
-                    'Found on municipal rates bill or property deed.',
+                subtext: 'Found on municipal rates bill or property deed.',
                 onChanged: (val) =>
                     viewModel.updateIdentifiers(erfPlotNumber: val),
               ),
