@@ -12,7 +12,7 @@ import 'room.dart';
 
 class PropertyState {
   final int currentStep;
-  
+
   // Step 1: Property Type & Subtype
   final PropertyType propertyType;
   final PropertySubtype propertySubtype;
@@ -32,7 +32,7 @@ class PropertyState {
   final String constructionYear;
   final String maxHeight;
   final String zoning;
-  
+
   // Step 3 Selectors (Enums)
   final FacingDirection facingDirection;
   final ArchitecturalStyle architecturalStyle;
@@ -60,11 +60,11 @@ class PropertyState {
     this.currentStep = 1,
     this.propertyType = PropertyType.house,
     this.propertySubtype = PropertySubtype.freeStanding,
-    this.streetAddress = '124 Architecture Way',
-    this.suburb = 'Westside Hills',
-    this.city = 'San Francisco',
-    this.province = 'California',
-    this.postalCode = '94103',
+    this.streetAddress = '124 Some Street',
+    this.suburb = 'Strand',
+    this.city = 'Cape Town',
+    this.province = 'Western Cape',
+    this.postalCode = '7140',
     this.complexName = '',
     this.erfPlotNumber = '',
     this.erfSize = '',
