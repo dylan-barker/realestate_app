@@ -566,11 +566,8 @@ class RoomDetailsStep extends ConsumerWidget {
     RealEstateTheme theme,
     TextTheme textTheme,
   ) async {
-    final result = await showModalBottomSheet<String>(
+    final result = await showRealEstateBottomSheet<String>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (context) {
         return SafeArea(
           child: Padding(
@@ -689,5 +686,3 @@ class RoomDetailsStep extends ConsumerWidget {
     );
   }
 }
-
-

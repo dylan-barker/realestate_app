@@ -59,11 +59,11 @@ Widget dialogActionButton({
   );
 }
 
-void showRealEstateBottomSheet({
+Future<T?> showRealEstateBottomSheet<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
 }) {
-  showModalBottomSheet(
+  return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.white,

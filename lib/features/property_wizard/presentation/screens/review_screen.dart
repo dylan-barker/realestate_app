@@ -6,8 +6,7 @@ import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
-import '../../../../core/widgets/wizard_app_bar.dart';
-import '../../../../core/widgets/wizard_header.dart';
+import '../../../../core/widgets/wizard_scaffold.dart';
 import '../../data/models/enums/architectural_style.dart';
 import '../../data/models/enums/entity_type.dart';
 import '../../data/models/enums/facing_direction.dart';
@@ -21,7 +20,7 @@ import '../../data/models/enums/room_category.dart';
 import '../../data/models/enums/wall_exterior.dart';
 import '../../data/models/owner.dart';
 import '../../providers/property_provider.dart';
-import '../../providers/wizard_navigation_provider.dart';
+import '../widgets/wizard_actions.dart';
 
 class ReviewStep extends ConsumerWidget {
   const ReviewStep({super.key});
@@ -32,263 +31,232 @@ class ReviewStep extends ConsumerWidget {
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = ref.watch(themeProvider);
     final textTheme = theme.toThemeData().textTheme;
-    final navData = ref.watch(wizardNavigationProvider);
 
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: WizardAppBar(
-        title: navData.headerTitle,
-        onBack: () {
-          viewModel.prevStep();
-          context.pop();
-        },
+    final bottomWidget = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: theme.borderLight, width: 1.0)),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WizardHeader(
-                progressLabel: navData.progressLabel,
-                title: 'Review & Submit',
-                description: 'Review all property details before submitting.',
+      child: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: CustomButton(
+            theme: theme,
+            text: 'Submit Listing',
+            onTap: () {
+              viewModel.saveDraft();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text(
+                    'Property listing submitted successfully!',
+                  ),
+                  backgroundColor: theme.primaryColor,
+                ),
+              );
+              context.go(PropertyWizardStep.propertyType.routePath);
+            },
+          ),
+        ),
+      ),
+    );
+
+    return WizardScaffold(
+      title: 'Review & Submit',
+      description: 'Review all property details before submitting.',
+      onBack: () => goBackWizard(context, ref),
+      bottomWidget: bottomWidget,
+      children: [
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'PROPERTY TYPE',
+          children: [
+            _buildDetailRow(
+              textTheme,
+              'Type',
+              state.propertyType.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Subtype',
+              state.propertySubtype.displayString,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'ADDRESS',
+          children: [
+            _buildDetailRow(textTheme, 'Street', state.streetAddress),
+            _buildDetailRow(textTheme, 'Suburb', state.suburb),
+            _buildDetailRow(textTheme, 'City', state.city),
+            _buildDetailRow(textTheme, 'Province', state.province),
+            _buildDetailRow(textTheme, 'Postal Code', state.postalCode),
+            if (state.complexName.isNotEmpty)
+              _buildDetailRow(textTheme, 'Complex', state.complexName),
+            if (state.erfPlotNumber.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Erf / Plot',
+                state.erfPlotNumber,
               ),
-              const SizedBox(height: 28),
-              _buildSectionCard(
-                theme: theme,
-                textTheme: textTheme,
-                title: 'PROPERTY TYPE',
-                children: [
-                  _buildDetailRow(
-                    textTheme,
-                    'Type',
-                    state.propertyType.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Subtype',
-                    state.propertySubtype.displayString,
-                  ),
-                ],
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'BUILDING INFO',
+          children: [
+            if (state.erfSize.isNotEmpty)
+              _buildDetailRow(textTheme, 'Erf Size', '${state.erfSize} m\u00B2'),
+            if (state.floorArea.isNotEmpty)
+              _buildDetailRow(textTheme, 'Floor Area', '${state.floorArea} m\u00B2'),
+            if (state.constructionYear.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Construction Year',
+                state.constructionYear,
               ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                theme: theme,
-                textTheme: textTheme,
-                title: 'ADDRESS',
-                children: [
-                  _buildDetailRow(textTheme, 'Street', state.streetAddress),
-                  _buildDetailRow(textTheme, 'Suburb', state.suburb),
-                  _buildDetailRow(textTheme, 'City', state.city),
-                  _buildDetailRow(textTheme, 'Province', state.province),
-                  _buildDetailRow(textTheme, 'Postal Code', state.postalCode),
-                  if (state.complexName.isNotEmpty)
-                    _buildDetailRow(textTheme, 'Complex', state.complexName),
-                  if (state.erfPlotNumber.isNotEmpty)
-                    _buildDetailRow(
-                      textTheme,
-                      'Erf / Plot',
-                      state.erfPlotNumber,
-                    ),
-                ],
+            if (state.maxHeight.isNotEmpty)
+              _buildDetailRow(textTheme, 'Max Height', '${state.maxHeight} m'),
+            if (state.zoning.isNotEmpty)
+              _buildDetailRow(textTheme, 'Zoning', state.zoning),
+            _buildDetailRow(
+              textTheme,
+              'Facing',
+              state.facingDirection.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Architecture',
+              state.architecturalStyle.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Roof',
+              state.roofConfiguration.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Walls',
+              state.wallExterior.displayString,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'PROPERTY FEATURES',
+          children: [
+            _buildDetailRow(
+              textTheme,
+              'Rooms',
+              state.rooms.isEmpty
+                  ? 'None'
+                  : '${state.rooms.length} room(s)',
+            ),
+            ...state.rooms.map(
+              (room) => Padding(
+                padding: const EdgeInsets.only(left: 16.0, top: 4.0),
+                child: Text(
+                  '\u2022 ${room.name} (${room.type.displayString})${room.isComplete ? '' : ' \u2014 PENDING'}',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: room.isComplete
+                        ? theme.textPrimary
+                        : theme.pendingColor,
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                theme: theme,
-                textTheme: textTheme,
-                title: 'BUILDING INFO',
-                children: [
-                  if (state.erfSize.isNotEmpty)
-                    _buildDetailRow(
-                      textTheme,
-                      'Erf Size',
-                      '${state.erfSize} m²',
-                    ),
-                  if (state.floorArea.isNotEmpty)
-                    _buildDetailRow(
-                      textTheme,
-                      'Floor Area',
-                      '${state.floorArea} m²',
-                    ),
-                  if (state.constructionYear.isNotEmpty)
-                    _buildDetailRow(
-                      textTheme,
-                      'Construction Year',
-                      state.constructionYear,
-                    ),
-                  if (state.maxHeight.isNotEmpty)
-                    _buildDetailRow(
-                      textTheme,
-                      'Max Height',
-                      '${state.maxHeight} m',
-                    ),
-                  if (state.zoning.isNotEmpty)
-                    _buildDetailRow(textTheme, 'Zoning', state.zoning),
-                  _buildDetailRow(
-                    textTheme,
-                    'Facing',
-                    state.facingDirection.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Architecture',
-                    state.architecturalStyle.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Roof',
-                    state.roofConfiguration.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Walls',
-                    state.wallExterior.displayString,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                theme: theme,
-                textTheme: textTheme,
-                title: 'PROPERTY FEATURES',
-                children: [
-                  _buildDetailRow(
-                    textTheme,
-                    'Rooms',
-                    state.rooms.isEmpty
-                        ? 'None'
-                        : '${state.rooms.length} room(s)',
-                  ),
-                  ...state.rooms.map(
-                    (room) => Padding(
-                      padding: const EdgeInsets.only(left: 16.0, top: 4.0),
-                      child: Text(
-                        '• ${room.name} (${room.type.displayString})${room.isComplete ? '' : ' — PENDING'}',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: room.isComplete
-                              ? theme.textPrimary
-                              : theme.pendingColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    textTheme,
-                    'Outdoor Extras',
-                    state.outdoorExtras.isEmpty
-                        ? 'None'
-                        : state.outdoorExtras
-                              .map(
-                                (e) => e.quantity > 1
-                                    ? '${e.name} x${e.quantity}'
-                                    : e.name,
-                              )
-                              .join(', '),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildSectionCard(
-                theme: theme,
-                textTheme: textTheme,
-                title: 'MANDATE & CONTACTS',
-                children: [
-                  _buildDetailRow(
-                    textTheme,
-                    'Mandate Type',
-                    state.mandateType.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Lead Source',
-                    state.leadSource.displayString,
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Sync Lightstone',
-                    state.syncLightstone ? 'Yes' : 'No',
-                  ),
-                  _buildDetailRow(
-                    textTheme,
-                    'Sync Loom',
-                    state.syncLoom ? 'Yes' : 'No',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildOwnerReviewSection(
+            ),
+            const SizedBox(height: 8),
+            _buildDetailRow(
+              textTheme,
+              'Outdoor Extras',
+              state.outdoorExtras.isEmpty
+                  ? 'None'
+                  : state.outdoorExtras
+                        .map(
+                          (e) => e.quantity > 1
+                              ? '${e.name} x${e.quantity}'
+                              : e.name,
+                        )
+                        .join(', '),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'MANDATE & CONTACTS',
+          children: [
+            _buildDetailRow(
+              textTheme,
+              'Mandate Type',
+              state.mandateType.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Lead Source',
+              state.leadSource.displayString,
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Sync Lightstone',
+              state.syncLightstone ? 'Yes' : 'No',
+            ),
+            _buildDetailRow(
+              textTheme,
+              'Sync Loom',
+              state.syncLoom ? 'Yes' : 'No',
+            ),
+            const SizedBox(height: 8),
+            _buildOwnerReviewSection(
+              theme: theme,
+              textTheme: textTheme,
+              label: 'Primary Owner',
+              owner: state.primaryOwner,
+            ),
+            if (state.coOwners.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ...state.coOwners.asMap().entries.map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildOwnerReviewSection(
                     theme: theme,
                     textTheme: textTheme,
-                    label: 'Primary Owner',
-                    owner: state.primaryOwner,
+                    label: 'Co-Owner ${entry.key + 1}',
+                    owner: entry.value,
                   ),
-                  if (state.coOwners.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    ...state.coOwners.asMap().entries.map(
-                      (entry) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _buildOwnerReviewSection(
-                          theme: theme,
-                          textTheme: textTheme,
-                          label: 'Co-Owner ${entry.key + 1}',
-                          owner: entry.value,
-                        ),
-                      ),
-                    ),
-                  ],
-                  if (state.mandateStart != null ||
-                      state.mandateEnd != null) ...[
-                    const SizedBox(height: 8),
-                    if (state.mandateStart != null)
-                      _buildDetailRow(
-                        textTheme,
-                        'Mandate Start',
-                        state.mandateStart!,
-                      ),
-                    if (state.mandateEnd != null)
-                      _buildDetailRow(
-                        textTheme,
-                        'Mandate End',
-                        state.mandateEnd!,
-                      ),
-                  ],
-                ],
+                ),
               ),
-              const SizedBox(height: 32),
             ],
-          ),
+            if (state.mandateStart != null ||
+                state.mandateEnd != null) ...[
+              const SizedBox(height: 8),
+              if (state.mandateStart != null)
+                _buildDetailRow(
+                  textTheme,
+                  'Mandate Start',
+                  state.mandateStart!,
+                ),
+              if (state.mandateEnd != null)
+                _buildDetailRow(
+                  textTheme,
+                  'Mandate End',
+                  state.mandateEnd!,
+                ),
+            ],
+          ],
         ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: theme.borderLight, width: 1.0)),
-        ),
-        child: SafeArea(
-          child: SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: CustomButton(
-              theme: theme,
-              text: 'Submit Listing',
-              onTap: () {
-                viewModel.saveDraft();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text(
-                      'Property listing submitted successfully!',
-                    ),
-                    backgroundColor: theme.primaryColor,
-                  ),
-                );
-                context.go(PropertyWizardStep.propertyType.routePath);
-              },
-            ),
-          ),
-        ),
-      ),
+        const SizedBox(height: 32),
+      ],
     );
   }
 
@@ -333,14 +301,14 @@ class ReviewStep extends ConsumerWidget {
           _buildDetailRow(
             textTheme,
             'ID Number',
-            owner.idNumber.isEmpty ? '—' : owner.idNumber,
+            owner.idNumber.isEmpty ? '\u2014' : owner.idNumber,
           )
         else
           _buildDetailRow(
             textTheme,
             'Registration',
             owner.registrationNumber.isEmpty
-                ? '—'
+                ? '\u2014'
                 : owner.registrationNumber,
           ),
       ],

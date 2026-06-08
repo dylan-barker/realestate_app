@@ -7,9 +7,8 @@ import '../../providers/wizard_navigation_provider.dart';
 
 class WizardFooter extends ConsumerWidget {
   final VoidCallback? onNext;
-  final VoidCallback? onBack;
 
-  const WizardFooter({super.key, this.onNext, this.onBack});
+  const WizardFooter({super.key, this.onNext});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +25,6 @@ class WizardFooter extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left side
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,20 +45,10 @@ class WizardFooter extends ConsumerWidget {
               ),
             ],
           ),
-
-          // Right side
           CustomButton(
             text: 'Next',
-            icon: navData.currentStep.stepNumber == 2
-                ? const Icon(Icons.arrow_forward, color: Colors.white, size: 16)
-                : navData.currentStep.stepNumber == 4
-                ? const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                    size: 14,
-                  )
-                : null,
-            onTap: navData.canGoNext ? (onNext ?? () {}) : null,
+            icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+            onTap: navData.canGoNext ? onNext : null,
           ),
         ],
       ),

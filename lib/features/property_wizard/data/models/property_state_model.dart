@@ -106,28 +106,8 @@ class PropertyStateModel {
       leadSource: entity.leadSource.displayString,
       syncLightstone: entity.syncLightstone,
       syncLoom: entity.syncLoom,
-      primaryOwner: {
-        'id': entity.primaryOwner.id,
-        'entityType': entity.primaryOwner.entityType.name,
-        'firstName': entity.primaryOwner.firstName,
-        'lastName': entity.primaryOwner.lastName,
-        'companyName': entity.primaryOwner.companyName,
-        'email': entity.primaryOwner.email,
-        'phone': entity.primaryOwner.phone,
-        'idNumber': entity.primaryOwner.idNumber,
-        'registrationNumber': entity.primaryOwner.registrationNumber,
-      },
-      coOwners: entity.coOwners.map((o) => {
-        'id': o.id,
-        'entityType': o.entityType.name,
-        'firstName': o.firstName,
-        'lastName': o.lastName,
-        'companyName': o.companyName,
-        'email': o.email,
-        'phone': o.phone,
-        'idNumber': o.idNumber,
-        'registrationNumber': o.registrationNumber,
-      }).toList(),
+      primaryOwner: _toOwnerMap(entity.primaryOwner),
+      coOwners: entity.coOwners.map(_toOwnerMap).toList(),
       mandateStart: entity.mandateStart,
       mandateEnd: entity.mandateEnd,
     );
@@ -181,5 +161,19 @@ class PropertyStateModel {
       idNumber: map['idNumber'] as String? ?? '',
       registrationNumber: map['registrationNumber'] as String? ?? '',
     );
+  }
+
+  static Map<String, dynamic> _toOwnerMap(Owner owner) {
+    return {
+      'id': owner.id,
+      'entityType': owner.entityType.name,
+      'firstName': owner.firstName,
+      'lastName': owner.lastName,
+      'companyName': owner.companyName,
+      'email': owner.email,
+      'phone': owner.phone,
+      'idNumber': owner.idNumber,
+      'registrationNumber': owner.registrationNumber,
+    };
   }
 }

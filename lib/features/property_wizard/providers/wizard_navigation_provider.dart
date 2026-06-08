@@ -39,7 +39,7 @@ class WizardNavigationData {
   }
 }
 
-final wizardNavigationProvider = Provider<WizardNavigationData>((ref) {
+final wizardNavigationProvider = Provider.autoDispose<WizardNavigationData>((ref) {
   final state = ref.watch(propertyViewModelProvider);
   return WizardNavigationData.fromState(state);
 });

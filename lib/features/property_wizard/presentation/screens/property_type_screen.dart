@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
-import '../../../../core/widgets/wizard_app_bar.dart';
-import '../../../../core/widgets/wizard_header.dart';
+import '../../../../core/widgets/wizard_scaffold.dart';
 import '../../data/models/enums/property_subtype.dart';
 import '../../data/models/enums/property_type.dart';
-import '../../data/models/enums/property_wizard_step.dart';
 import '../../providers/property_provider.dart';
-import '../../providers/wizard_navigation_provider.dart';
-import '../widgets/wizard_footer.dart';
+import '../widgets/wizard_actions.dart';
 
 class PropertyTypeStep extends ConsumerWidget {
   const PropertyTypeStep({super.key});
@@ -23,7 +19,6 @@ class PropertyTypeStep extends ConsumerWidget {
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = ref.watch(themeProvider);
     final textTheme = theme.toThemeData().textTheme;
-    final navData = ref.watch(wizardNavigationProvider);
 
     final types = [
       {'type': PropertyType.house, 'icon': Icons.home_outlined},
@@ -35,106 +30,81 @@ class PropertyTypeStep extends ConsumerWidget {
 
     final subtypes = PropertySubtype.values;
 
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: WizardAppBar(
-        title: navData.headerTitle,
-        onBack: () {
-          viewModel.prevStep();
-          context.pop();
-        },
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WizardHeader(
-                progressLabel: navData.progressLabel,
-                title: 'What type of property is this?',
+    return WizardScaffold(
+      title: 'What type of property is this?',
+      onBack: () => goBackWizard(context, ref),
+      onNext: () => advanceWizard(context, ref),
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.35,
+          ),
+          itemCount: types.length,
+          itemBuilder: (context, index) {
+            final item = types[index];
+            final itemType = item['type'] as PropertyType;
+            final itemIcon = item['icon'] as IconData;
+            final isSelected = state.propertyType == itemType;
+            return CustomCard(
+              theme: theme,
+              isSelected: isSelected,
+              onTap: () => viewModel.selectPropertyType(itemType),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 16.0,
               ),
-              const SizedBox(height: 24),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.35,
-                ),
-                itemCount: types.length,
-                itemBuilder: (context, index) {
-                  final item = types[index];
-                  final itemType = item['type'] as PropertyType;
-                  final itemIcon = item['icon'] as IconData;
-                  final isSelected = state.propertyType == itemType;
-                  return CustomCard(
-                    theme: theme,
-                    isSelected: isSelected,
-                    onTap: () => viewModel.selectPropertyType(itemType),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 16.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    itemIcon,
+                    size: 26,
+                    color: isSelected
+                        ? theme.primaryColor
+                        : theme.textPrimary.withValues(alpha: 0.6),
+                  ),
+                  Text(
+                    itemType.displayString,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                      fontSize: 16,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          itemIcon,
-                          size: 26,
-                          color: isSelected
-                              ? theme.primaryColor
-                              : theme.textPrimary.withValues(alpha: 0.6),
-                        ),
-                        Text(
-                          itemType.displayString,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.textPrimary,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
-              const SizedBox(height: 32),
-              Text(
-                'Refine the subtype',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 10.0,
-                children: subtypes.map((subtype) {
-                  final isSelected = state.propertySubtype == subtype;
-                  return CustomChip(
-                    theme: theme,
-                    label: subtype.displayString,
-                    isSelected: isSelected,
-                    onTap: () => viewModel.selectPropertySubtype(subtype),
-                  );
-                }).toList(),
-              ),
-            ],
+            );
+          },
+        ),
+        const SizedBox(height: 32),
+        Text(
+          'Refine the subtype',
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.textPrimary,
           ),
         ),
-      ),
-      bottomNavigationBar: WizardFooter(
-        onNext: () {
-          viewModel.nextStep();
-          context.push(PropertyWizardStep.address.routePath);
-        },
-      ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 10.0,
+          children: subtypes.map((subtype) {
+            final isSelected = state.propertySubtype == subtype;
+            return CustomChip(
+              theme: theme,
+              label: subtype.displayString,
+              isSelected: isSelected,
+              onTap: () => viewModel.selectPropertySubtype(subtype),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

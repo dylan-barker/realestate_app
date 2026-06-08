@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'themes.dart';
-
+@Deprecated('Use ref.watch(themeProvider) instead. This extension cannot access Riverpod providers.')
 extension ThemeContext on BuildContext {
-  RealEstateTheme get realEstateTheme => RealEstateTheme.crimson();
+  @Deprecated('Use ref.watch(themeProvider) instead')
+  dynamic get realEstateTheme => null;
 
-  TextTheme get realEstateTextTheme =>
-      RealEstateTheme.crimson().toThemeData().textTheme;
+  @Deprecated('Use ref.watch(themeProvider).toThemeData().textTheme instead')
+  TextTheme? get realEstateTextTheme => null;
 }
