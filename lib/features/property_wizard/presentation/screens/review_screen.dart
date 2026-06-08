@@ -9,6 +9,7 @@ import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../../../core/widgets/wizard_header.dart';
 import '../../data/models/enums/architectural_style.dart';
+import '../../data/models/enums/entity_type.dart';
 import '../../data/models/enums/facing_direction.dart';
 import '../../data/models/enums/lead_source.dart';
 import '../../data/models/enums/mandate_type.dart';
@@ -18,6 +19,7 @@ import '../../data/models/enums/property_wizard_step.dart';
 import '../../data/models/enums/roof_configuration.dart';
 import '../../data/models/enums/room_category.dart';
 import '../../data/models/enums/wall_exterior.dart';
+import '../../data/models/owner.dart';
 import '../../providers/property_provider.dart';
 import '../../providers/wizard_navigation_provider.dart';
 
@@ -215,26 +217,26 @@ class ReviewStep extends ConsumerWidget {
                     state.syncLoom ? 'Yes' : 'No',
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Owner',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: theme.textLabel,
-                      fontWeight: FontWeight.bold,
+                  _buildOwnerReviewSection(
+                    theme: theme,
+                    textTheme: textTheme,
+                    label: 'Primary Owner',
+                    owner: state.primaryOwner,
+                  ),
+                  if (state.coOwners.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    ...state.coOwners.asMap().entries.map(
+                      (entry) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildOwnerReviewSection(
+                          theme: theme,
+                          textTheme: textTheme,
+                          label: 'Co-Owner ${entry.key + 1}',
+                          owner: entry.value,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildDetailRow(
-                    textTheme,
-                    'Name',
-                    '${state.ownerFirstName} ${state.ownerLastName}',
-                  ),
-                  _buildDetailRow(textTheme, 'Email', state.ownerEmail),
-                  _buildDetailRow(textTheme, 'Phone', state.ownerPhone),
-                  _buildDetailRow(
-                    textTheme,
-                    'ID Number',
-                    state.ownerIdNumber.isEmpty ? '—' : state.ownerIdNumber,
-                  ),
+                  ],
                   if (state.mandateStart != null ||
                       state.mandateEnd != null) ...[
                     const SizedBox(height: 8),
@@ -287,6 +289,61 @@ class ReviewStep extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOwnerReviewSection({
+    required RealEstateTheme theme,
+    required TextTheme textTheme,
+    required String label,
+    required Owner owner,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: textTheme.labelLarge?.copyWith(
+            color: theme.textLabel,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        _buildDetailRow(
+          textTheme,
+          'Type',
+          owner.entityType.displayString,
+        ),
+        if (owner.entityType == EntityType.person) ...[
+          _buildDetailRow(
+            textTheme,
+            'Name',
+            owner.displayName,
+          ),
+        ] else ...[
+          _buildDetailRow(
+            textTheme,
+            'Company',
+            owner.displayName,
+          ),
+        ],
+        _buildDetailRow(textTheme, 'Email', owner.email),
+        _buildDetailRow(textTheme, 'Phone', owner.phone),
+        if (owner.entityType == EntityType.person)
+          _buildDetailRow(
+            textTheme,
+            'ID Number',
+            owner.idNumber.isEmpty ? '—' : owner.idNumber,
+          )
+        else
+          _buildDetailRow(
+            textTheme,
+            'Registration',
+            owner.registrationNumber.isEmpty
+                ? '—'
+                : owner.registrationNumber,
+          ),
+      ],
     );
   }
 

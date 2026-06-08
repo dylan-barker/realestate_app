@@ -7,6 +7,7 @@ import 'enums/property_type.dart';
 import 'enums/roof_configuration.dart';
 import 'enums/wall_exterior.dart';
 import 'outdoor_extra_item.dart';
+import 'owner.dart';
 import 'room.dart';
 
 class PropertyState {
@@ -50,11 +51,8 @@ class PropertyState {
   final LeadSource leadSource;
   final bool syncLightstone;
   final bool syncLoom;
-  final String ownerFirstName;
-  final String ownerLastName;
-  final String ownerEmail;
-  final String ownerPhone;
-  final String ownerIdNumber;
+  final Owner primaryOwner;
+  final List<Owner> coOwners;
   final String? mandateStart;
   final String? mandateEnd;
 
@@ -85,11 +83,8 @@ class PropertyState {
     this.leadSource = LeadSource.referral,
     this.syncLightstone = true,
     this.syncLoom = false,
-    this.ownerFirstName = '',
-    this.ownerLastName = '',
-    this.ownerEmail = '',
-    this.ownerPhone = '',
-    this.ownerIdNumber = '',
+    this.primaryOwner = const Owner(),
+    this.coOwners = const [],
     this.mandateStart,
     this.mandateEnd,
   });
@@ -121,11 +116,8 @@ class PropertyState {
     LeadSource? leadSource,
     bool? syncLightstone,
     bool? syncLoom,
-    String? ownerFirstName,
-    String? ownerLastName,
-    String? ownerEmail,
-    String? ownerPhone,
-    String? ownerIdNumber,
+    Owner? primaryOwner,
+    List<Owner>? coOwners,
     String? mandateStart,
     String? mandateEnd,
   }) {
@@ -156,11 +148,8 @@ class PropertyState {
       leadSource: leadSource ?? this.leadSource,
       syncLightstone: syncLightstone ?? this.syncLightstone,
       syncLoom: syncLoom ?? this.syncLoom,
-      ownerFirstName: ownerFirstName ?? this.ownerFirstName,
-      ownerLastName: ownerLastName ?? this.ownerLastName,
-      ownerEmail: ownerEmail ?? this.ownerEmail,
-      ownerPhone: ownerPhone ?? this.ownerPhone,
-      ownerIdNumber: ownerIdNumber ?? this.ownerIdNumber,
+      primaryOwner: primaryOwner ?? this.primaryOwner,
+      coOwners: coOwners ?? this.coOwners,
       mandateStart: mandateStart ?? this.mandateStart,
       mandateEnd: mandateEnd ?? this.mandateEnd,
     );

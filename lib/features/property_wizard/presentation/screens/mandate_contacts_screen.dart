@@ -9,9 +9,11 @@ import '../../../../core/widgets/custom_date_selector.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../../../core/widgets/wizard_header.dart';
+import '../../data/models/enums/entity_type.dart';
 import '../../data/models/enums/lead_source.dart';
 import '../../data/models/enums/mandate_type.dart';
 import '../../data/models/enums/property_wizard_step.dart';
+import '../../data/models/owner.dart';
 import '../../providers/property_provider.dart';
 import '../../providers/wizard_navigation_provider.dart';
 import '../widgets/wizard_footer.dart';
@@ -152,102 +154,57 @@ class MandateContactsStep extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add_circle,
-                          color: theme.primaryColor,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Add Co-Owner',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                  TextButton.icon(
+                    onPressed: () => viewModel.addCoOwner(),
+                    icon: Icon(
+                      Icons.add_circle,
+                      color: theme.primaryColor,
+                      size: 16,
+                    ),
+                    label: Text(
+                      'Add Co-Owner',
+                      style: textTheme.labelLarge?.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      foregroundColor: theme.primaryColor,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextInput(
-                            theme: theme,
-                            label: 'FIRST NAME',
-                            placeholder: 'John',
-                            initialValue: state.ownerFirstName,
-                            style: InputStyle.cardBorder,
-                            onChanged: (val) =>
-                                viewModel.updateOwnerInfo(firstName: val),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: CustomTextInput(
-                            theme: theme,
-                            label: 'LAST NAME',
-                            placeholder: 'Doe',
-                            initialValue: state.ownerLastName,
-                            style: InputStyle.cardBorder,
-                            onChanged: (val) =>
-                                viewModel.updateOwnerInfo(lastName: val),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextInput(
-                      theme: theme,
-                      label: 'EMAIL ADDRESS',
-                      placeholder: 'john.doe@example.com',
-                      initialValue: state.ownerEmail,
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (val) => viewModel.updateOwnerInfo(email: val),
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextInput(
-                      theme: theme,
-                      label: 'PHONE NUMBER',
-                      placeholder: '+27 82 000 0000',
-                      initialValue: state.ownerPhone,
-                      keyboardType: TextInputType.phone,
-                      onChanged: (val) => viewModel.updateOwnerInfo(phone: val),
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextInput(
-                      theme: theme,
-                      label: 'ID NUMBER',
-                      placeholder: 'Optional',
-                      initialValue: state.ownerIdNumber,
-                      onChanged: (val) =>
-                          viewModel.updateOwnerInfo(idNumber: val),
-                    ),
-                  ],
-                ),
+              _buildOwnerCard(
+                theme: theme,
+                textTheme: textTheme,
+                owner: state.primaryOwner,
+                label: 'Primary Owner',
+                showRemove: false,
+                onChanged: (owner) => viewModel.updatePrimaryOwner(owner),
               ),
+              ...state.coOwners.asMap().entries.map((entry) {
+                final index = entry.key;
+                final coOwner = entry.value;
+                return Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: _buildOwnerCard(
+                    theme: theme,
+                    textTheme: textTheme,
+                    owner: coOwner,
+                    label: 'Co-Owner ${index + 1}',
+                    showRemove: true,
+                    onChanged: (owner) =>
+                        viewModel.updateCoOwner(index, owner),
+                    onRemove: () => viewModel.removeCoOwner(coOwner.id),
+                  ),
+                );
+              }),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -285,6 +242,256 @@ class MandateContactsStep extends ConsumerWidget {
           viewModel.prevStep();
           context.pop();
         },
+      ),
+    );
+  }
+
+  Widget _buildOwnerCard({
+    required RealEstateTheme theme,
+    required TextTheme textTheme,
+    required Owner owner,
+    required String label,
+    required bool showRemove,
+    required ValueChanged<Owner> onChanged,
+    VoidCallback? onRemove,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: textTheme.labelLarge?.copyWith(
+                  color: theme.textLabel,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (showRemove)
+                GestureDetector(
+                  onTap: onRemove,
+                  child: Icon(
+                    Icons.remove_circle_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildEntityTypeChip(
+                  theme: theme,
+                  textTheme: textTheme,
+                  label: 'Person',
+                  isSelected: owner.entityType == EntityType.person,
+                  onTap: () => onChanged(owner.copyWith(
+                    entityType: EntityType.person,
+                    firstName: '',
+                    lastName: '',
+                    companyName: '',
+                    idNumber: '',
+                    registrationNumber: '',
+                  )),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildEntityTypeChip(
+                  theme: theme,
+                  textTheme: textTheme,
+                  label: 'Business',
+                  isSelected: owner.entityType == EntityType.business,
+                  onTap: () => onChanged(owner.copyWith(
+                    entityType: EntityType.business,
+                    firstName: '',
+                    lastName: '',
+                    companyName: '',
+                    idNumber: '',
+                    registrationNumber: '',
+                  )),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (owner.entityType == EntityType.person)
+            _buildPersonFields(
+              theme: theme,
+              textTheme: textTheme,
+              owner: owner,
+              onChanged: onChanged,
+            )
+          else
+            _buildBusinessFields(
+              theme: theme,
+              textTheme: textTheme,
+              owner: owner,
+              onChanged: onChanged,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonFields({
+    required RealEstateTheme theme,
+    required TextTheme textTheme,
+    required Owner owner,
+    required ValueChanged<Owner> onChanged,
+  }) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: CustomTextInput(
+                theme: theme,
+                label: 'FIRST NAME',
+                placeholder: 'John',
+                initialValue: owner.firstName,
+                style: InputStyle.cardBorder,
+                onChanged: (val) =>
+                    onChanged(owner.copyWith(firstName: val)),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: CustomTextInput(
+                theme: theme,
+                label: 'LAST NAME',
+                placeholder: 'Doe',
+                initialValue: owner.lastName,
+                style: InputStyle.cardBorder,
+                onChanged: (val) =>
+                    onChanged(owner.copyWith(lastName: val)),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'EMAIL ADDRESS',
+          placeholder: 'john.doe@example.com',
+          initialValue: owner.email,
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (val) => onChanged(owner.copyWith(email: val)),
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'PHONE NUMBER',
+          placeholder: '+27 82 000 0000',
+          initialValue: owner.phone,
+          keyboardType: TextInputType.phone,
+          onChanged: (val) => onChanged(owner.copyWith(phone: val)),
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'ID NUMBER',
+          placeholder: 'Optional',
+          initialValue: owner.idNumber,
+          onChanged: (val) => onChanged(owner.copyWith(idNumber: val)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessFields({
+    required RealEstateTheme theme,
+    required TextTheme textTheme,
+    required Owner owner,
+    required ValueChanged<Owner> onChanged,
+  }) {
+    return Column(
+      children: [
+        CustomTextInput(
+          theme: theme,
+          label: 'COMPANY NAME',
+          placeholder: 'Acme Properties Pty Ltd',
+          initialValue: owner.companyName,
+          style: InputStyle.cardBorder,
+          onChanged: (val) =>
+              onChanged(owner.copyWith(companyName: val)),
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'EMAIL ADDRESS',
+          placeholder: 'info@acmeproperties.com',
+          initialValue: owner.email,
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (val) => onChanged(owner.copyWith(email: val)),
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'PHONE NUMBER',
+          placeholder: '+27 82 000 0000',
+          initialValue: owner.phone,
+          keyboardType: TextInputType.phone,
+          onChanged: (val) => onChanged(owner.copyWith(phone: val)),
+        ),
+        const SizedBox(height: 16),
+        CustomTextInput(
+          theme: theme,
+          label: 'REGISTRATION NUMBER',
+          placeholder: 'Optional',
+          initialValue: owner.registrationNumber,
+          onChanged: (val) =>
+              onChanged(owner.copyWith(registrationNumber: val)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEntityTypeChip({
+    required RealEstateTheme theme,
+    required TextTheme textTheme,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.primaryColor.withValues(alpha: 0.1) : theme.backgroundColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? theme.primaryColor : theme.borderLight,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: textTheme.labelLarge?.copyWith(
+              color: isSelected ? theme.primaryColor : theme.textSecondary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }

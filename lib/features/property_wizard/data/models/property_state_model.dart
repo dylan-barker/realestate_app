@@ -1,5 +1,6 @@
 import 'property_state.dart';
 import 'enums/architectural_style.dart';
+import 'enums/entity_type.dart';
 import 'enums/facing_direction.dart';
 import 'enums/lead_source.dart';
 import 'enums/mandate_type.dart';
@@ -8,6 +9,7 @@ import 'enums/property_type.dart';
 import 'enums/roof_configuration.dart';
 import 'enums/wall_exterior.dart';
 import 'outdoor_extra_item.dart';
+import 'owner.dart';
 import 'room_model.dart';
 
 class PropertyStateModel {
@@ -37,11 +39,8 @@ class PropertyStateModel {
   final String leadSource;
   final bool syncLightstone;
   final bool syncLoom;
-  final String ownerFirstName;
-  final String ownerLastName;
-  final String ownerEmail;
-  final String ownerPhone;
-  final String ownerIdNumber;
+  final Map<String, dynamic> primaryOwner;
+  final List<Map<String, dynamic>> coOwners;
   final String? mandateStart;
   final String? mandateEnd;
 
@@ -72,11 +71,8 @@ class PropertyStateModel {
     required this.leadSource,
     required this.syncLightstone,
     required this.syncLoom,
-    required this.ownerFirstName,
-    required this.ownerLastName,
-    required this.ownerEmail,
-    required this.ownerPhone,
-    required this.ownerIdNumber,
+    required this.primaryOwner,
+    required this.coOwners,
     this.mandateStart,
     this.mandateEnd,
   });
@@ -110,11 +106,28 @@ class PropertyStateModel {
       leadSource: entity.leadSource.displayString,
       syncLightstone: entity.syncLightstone,
       syncLoom: entity.syncLoom,
-      ownerFirstName: entity.ownerFirstName,
-      ownerLastName: entity.ownerLastName,
-      ownerEmail: entity.ownerEmail,
-      ownerPhone: entity.ownerPhone,
-      ownerIdNumber: entity.ownerIdNumber,
+      primaryOwner: {
+        'id': entity.primaryOwner.id,
+        'entityType': entity.primaryOwner.entityType.name,
+        'firstName': entity.primaryOwner.firstName,
+        'lastName': entity.primaryOwner.lastName,
+        'companyName': entity.primaryOwner.companyName,
+        'email': entity.primaryOwner.email,
+        'phone': entity.primaryOwner.phone,
+        'idNumber': entity.primaryOwner.idNumber,
+        'registrationNumber': entity.primaryOwner.registrationNumber,
+      },
+      coOwners: entity.coOwners.map((o) => {
+        'id': o.id,
+        'entityType': o.entityType.name,
+        'firstName': o.firstName,
+        'lastName': o.lastName,
+        'companyName': o.companyName,
+        'email': o.email,
+        'phone': o.phone,
+        'idNumber': o.idNumber,
+        'registrationNumber': o.registrationNumber,
+      }).toList(),
       mandateStart: entity.mandateStart,
       mandateEnd: entity.mandateEnd,
     );
@@ -149,13 +162,24 @@ class PropertyStateModel {
       leadSource: LeadSourceExtension.fromString(leadSource),
       syncLightstone: syncLightstone,
       syncLoom: syncLoom,
-      ownerFirstName: ownerFirstName,
-      ownerLastName: ownerLastName,
-      ownerEmail: ownerEmail,
-      ownerPhone: ownerPhone,
-      ownerIdNumber: ownerIdNumber,
+      primaryOwner: _ownerFromMap(primaryOwner),
+      coOwners: coOwners.map((m) => _ownerFromMap(m)).toList(),
       mandateStart: mandateStart,
       mandateEnd: mandateEnd,
+    );
+  }
+
+  static Owner _ownerFromMap(Map<String, dynamic> map) {
+    return Owner(
+      id: map['id'] as String? ?? '',
+      entityType: EntityTypeExtension.fromString(map['entityType'] as String? ?? ''),
+      firstName: map['firstName'] as String? ?? '',
+      lastName: map['lastName'] as String? ?? '',
+      companyName: map['companyName'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      phone: map['phone'] as String? ?? '',
+      idNumber: map['idNumber'] as String? ?? '',
+      registrationNumber: map['registrationNumber'] as String? ?? '',
     );
   }
 }

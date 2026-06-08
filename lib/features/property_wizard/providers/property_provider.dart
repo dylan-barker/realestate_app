@@ -13,6 +13,7 @@ import '../data/models/enums/outdoor_extra.dart';
 import '../data/models/enums/room_category.dart';
 import '../data/models/enums/wall_exterior.dart';
 import '../data/models/outdoor_extra_item.dart';
+import '../data/models/owner.dart';
 import '../data/models/property_state.dart';
 import '../data/models/room.dart';
 import '../data/repositories/property_repository.dart';
@@ -280,20 +281,28 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.copyWith(syncLoom: value);
   }
 
-  void updateOwnerInfo({
-    String? firstName,
-    String? lastName,
-    String? email,
-    String? phone,
-    String? idNumber,
-  }) {
-    state = state.copyWith(
-      ownerFirstName: firstName ?? state.ownerFirstName,
-      ownerLastName: lastName ?? state.ownerLastName,
-      ownerEmail: email ?? state.ownerEmail,
-      ownerPhone: phone ?? state.ownerPhone,
-      ownerIdNumber: idNumber ?? state.ownerIdNumber,
+  void updatePrimaryOwner(Owner owner) {
+    state = state.copyWith(primaryOwner: owner);
+  }
+
+  void addCoOwner() {
+    final newOwner = Owner(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
     );
+    state = state.copyWith(coOwners: [...state.coOwners, newOwner]);
+  }
+
+  void updateCoOwner(int index, Owner owner) {
+    final updated = List<Owner>.from(state.coOwners);
+    if (index >= 0 && index < updated.length) {
+      updated[index] = owner;
+      state = state.copyWith(coOwners: updated);
+    }
+  }
+
+  void removeCoOwner(String id) {
+    final updated = state.coOwners.where((o) => o.id != id).toList();
+    state = state.copyWith(coOwners: updated);
   }
 
   void updateMandateDates({String? start, String? end}) {
