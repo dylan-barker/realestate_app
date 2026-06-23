@@ -5,7 +5,8 @@ import '../../features/property_wizard/presentation/screens/address_screen.dart'
 import '../../features/property_wizard/presentation/screens/building_info_screen.dart';
 import '../../features/property_wizard/presentation/screens/property_features_screen.dart';
 import '../../features/property_wizard/presentation/screens/room_details_screen.dart';
-import '../../features/property_wizard/presentation/screens/mandate_contacts_screen.dart';
+import '../../features/property_wizard/presentation/screens/listing_valuation_screen.dart';
+import '../../features/property_wizard/presentation/screens/contacts_screen.dart';
 import '../../features/property_wizard/presentation/screens/review_screen.dart';
 
 final appRouter = GoRouter(
@@ -35,8 +36,12 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/wizard/mandate-contacts',
-      builder: (context, state) => const MandateContactsStep(),
+      path: '/wizard/valuation-costs',
+      builder: (context, state) => const ValuationCostsStep(),
+    ),
+    GoRoute(
+      path: '/wizard/contacts',
+      builder: (context, state) => const ContactsStep(),
     ),
     GoRoute(
       path: '/wizard/review',

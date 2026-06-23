@@ -1,49 +1,56 @@
-import 'enums/room_category.dart';
-
 class Room {
   final String id;
   final String name;
-  final RoomCategory type;
-  final String description;
-  final bool isComplete;
+  final int roomTypeId;
+  final String? roomTypeOther;
   final int? conditionRating;
   final List<String> features;
+  final List<int> featureIds;
   final String notes;
-  final String? imagePath;
+  final String? photoUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Room({
     required this.id,
     required this.name,
-    required this.type,
-    required this.description,
-    this.isComplete = false,
+    this.roomTypeId = 1,
+    this.roomTypeOther,
     this.conditionRating,
     this.features = const [],
+    this.featureIds = const [],
     this.notes = '',
-    this.imagePath,
-  });
+    this.photoUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   Room copyWith({
     String? id,
     String? name,
-    RoomCategory? type,
-    String? description,
-    bool? isComplete,
+    int? roomTypeId,
+    String? roomTypeOther,
     int? conditionRating,
     List<String>? features,
+    List<int>? featureIds,
     String? notes,
-    String? imagePath,
+    String? photoUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Room(
       id: id ?? this.id,
       name: name ?? this.name,
-      type: type ?? this.type,
-      description: description ?? this.description,
-      isComplete: isComplete ?? this.isComplete,
+      roomTypeId: roomTypeId ?? this.roomTypeId,
+      roomTypeOther: roomTypeOther ?? this.roomTypeOther,
       conditionRating: conditionRating ?? this.conditionRating,
       features: features ?? this.features,
+      featureIds: featureIds ?? this.featureIds,
       notes: notes ?? this.notes,
-      imagePath: imagePath ?? this.imagePath,
+      photoUrl: photoUrl ?? this.photoUrl,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

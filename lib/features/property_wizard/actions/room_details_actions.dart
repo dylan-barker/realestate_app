@@ -8,17 +8,18 @@ extension RoomDetailsActions on PropertyState {
     required String roomId,
     int? conditionRating,
     List<String>? features,
+    List<int>? featureIds,
     String? notes,
-    String? imagePath,
+    String? photoUrl,
   }) {
     final updatedRooms = rooms.map((room) {
       if (room.id == roomId) {
         return room.copyWith(
           conditionRating: conditionRating ?? room.conditionRating,
           features: features ?? room.features,
+          featureIds: featureIds ?? room.featureIds,
           notes: notes ?? room.notes,
-          imagePath: imagePath ?? room.imagePath,
-          isComplete: conditionRating != null,
+          photoUrl: photoUrl ?? room.photoUrl,
         );
       }
       return room;

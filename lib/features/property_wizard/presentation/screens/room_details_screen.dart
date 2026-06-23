@@ -14,8 +14,6 @@ import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/rating_slider.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../../../core/widgets/real_estate_dialog.dart';
-import '../../data/models/enums/room_category.dart';
-import '../../data/models/enums/standard_amenity.dart';
 import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
 
@@ -62,8 +60,6 @@ class RoomDetailsStep extends ConsumerWidget {
         'range': '75\u2013100%',
       },
     ];
-
-    final amenityCategories = room.type.relevantAmenityCategories;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -244,24 +240,6 @@ class RoomDetailsStep extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEE2E2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'REQUIRED',
-                      style: textTheme.labelMedium?.copyWith(
-                        color: const Color(0xFFEF4444),
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -310,11 +288,6 @@ class RoomDetailsStep extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              for (var cat in amenityCategories) ...[
-                _buildAmenityCategory(theme, textTheme, cat, room, viewModel),
-                const SizedBox(height: 16),
-              ],
-              const SizedBox(height: 8),
               Container(height: 1, color: theme.borderLight),
               const SizedBox(height: 20),
               Text(
@@ -391,75 +364,6 @@ class RoomDetailsStep extends ConsumerWidget {
     );
   }
 
-  Widget _buildAmenityCategory(
-    RealEstateTheme theme,
-    TextTheme textTheme,
-    AmenityCategory cat,
-    Room room,
-    PropertyViewModel viewModel,
-  ) {
-    final amenitiesInCategory = StandardAmenity.values
-        .where((a) => a.category == cat)
-        .toList();
-
-    final suggestedInCategory = amenitiesInCategory
-        .where((a) => !room.features.contains(a.displayString))
-        .toList();
-
-    if (suggestedInCategory.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          cat.displayString.toUpperCase(),
-          style: textTheme.labelLarge?.copyWith(
-            color: theme.textSecondary,
-            fontSize: 10,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: suggestedInCategory.map((amenity) {
-            return InkWell(
-              onTap: () =>
-                  viewModel.addFeatureToRoom(room.id, amenity.displayString),
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.borderLight),
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add, size: 12, color: theme.textSecondary),
-                    const SizedBox(width: 4),
-                    Text(
-                      amenity.displayString,
-                      style: textTheme.bodyMedium?.copyWith(
-                        fontSize: 12,
-                        color: theme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildRoomGraphic(
     BuildContext context,
     RealEstateTheme theme,
@@ -467,7 +371,7 @@ class RoomDetailsStep extends ConsumerWidget {
     Room room,
     PropertyViewModel viewModel,
   ) {
-    final hasImage = room.imagePath != null;
+    final hasImage = room.photoUrl != null;
 
     return GestureDetector(
       onTap: () => _showImagePickerOptions(
@@ -490,9 +394,36 @@ class RoomDetailsStep extends ConsumerWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (hasImage)
+              if (hasImage && room.photoUrl!.startsWith('http'))
+                Image.network(
+                  room.photoUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: const Color(0xFFE5E7EB),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.broken_image_outlined,
+                            color: Colors.grey.shade400,
+                            size: 32,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tap to retry',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else if (hasImage && !room.photoUrl!.startsWith('http'))
                 Image.file(
-                  File(room.imagePath!),
+                  File(room.photoUrl!),
                   fit: BoxFit.cover,
                   cacheWidth: 800,
                   errorBuilder: (context, error, stackTrace) => Container(
@@ -612,7 +543,7 @@ class RoomDetailsStep extends ConsumerWidget {
     );
 
     if (picked != null) {
-      viewModel.updateRoomDetails(roomId: roomId, imagePath: picked.path);
+      viewModel.updateRoomDetails(roomId: roomId, photoUrl: picked.path);
     }
   }
 

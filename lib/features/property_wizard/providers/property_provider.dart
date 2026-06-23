@@ -2,23 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../actions/address_actions.dart';
 import '../actions/building_info_actions.dart';
-import '../actions/mandate_contacts_actions.dart';
+import '../actions/contacts_actions.dart';
+import '../actions/listing_valuation_actions.dart';
 import '../actions/property_features_actions.dart';
 import '../actions/property_type_actions.dart';
 import '../actions/room_details_actions.dart';
 import '../actions/wizard_step_actions.dart';
 import '../data/data_sources/property_local_data_source.dart';
-import '../data/models/enums/architectural_style.dart';
-import '../data/models/enums/facing_direction.dart';
-import '../data/models/enums/lead_source.dart';
-import '../data/models/enums/mandate_type.dart';
-import '../data/models/enums/outdoor_extra.dart';
-import '../data/models/enums/property_subtype.dart';
-import '../data/models/enums/property_type.dart';
-import '../data/models/enums/room_category.dart';
-import '../data/models/enums/roof_configuration.dart';
-import '../data/models/enums/wall_exterior.dart';
-import '../data/models/owner.dart';
+import '../data/models/contact.dart';
 import '../data/models/property_state.dart';
 import '../data/repositories/property_repository.dart';
 import '../data/repositories/property_repository_impl.dart';
@@ -46,16 +37,15 @@ class PropertyViewModel extends Notifier<PropertyState> {
   PropertyState build() {
     _repository = ref.watch(propertyRepositoryProvider);
     _loadInitialData();
-    return PropertyState(rooms: const [], outdoorExtras: const []);
+    return PropertyState(rooms: const [], parking: const []);
   }
 
   Future<void> _loadInitialData() async {
     try {
       final rooms = await _repository.getInitialRooms();
-      final outdoorExtras = await _repository.getInitialOutdoorExtras();
-      state = state.copyWith(rooms: rooms, outdoorExtras: outdoorExtras);
+      state = state.copyWith(rooms: rooms);
     } catch (e) {
-      state = state.copyWith(rooms: const [], outdoorExtras: const []);
+      state = state.copyWith(rooms: const []);
     }
   }
 
@@ -71,34 +61,36 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.withPrevStep();
   }
 
-  void selectPropertyType(PropertyType type) {
-    state = state.withPropertyType(type);
-  }
-
-  void selectPropertySubtype(PropertySubtype subtype) {
-    state = state.withPropertySubtype(subtype);
+  void selectPropertyType(int id) {
+    state = state.withPropertyTypeId(id);
   }
 
   void updateAddress({
-    String? streetAddress,
+    String? streetNumber,
+    String? street,
+    String? unitNumber,
     String? suburb,
     String? city,
     String? province,
+    String? country,
     String? postalCode,
   }) {
     state = state.withAddress(
-      streetAddress: streetAddress,
+      streetNumber: streetNumber,
+      street: street,
+      unitNumber: unitNumber,
       suburb: suburb,
       city: city,
       province: province,
+      country: country,
       postalCode: postalCode,
     );
   }
 
-  void updateIdentifiers({String? complexName, String? erfPlotNumber}) {
+  void updateIdentifiers({String? estateName, String? erfNumber}) {
     state = state.withIdentifiers(
-      complexName: complexName,
-      erfPlotNumber: erfPlotNumber,
+      estateName: estateName,
+      erfNumber: erfNumber,
     );
   }
 
@@ -106,56 +98,36 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? erfSize,
     String? floorArea,
     String? constructionYear,
-    String? maxHeight,
-    String? zoning,
   }) {
     state = state.withTechnicalSpecs(
       erfSize: erfSize,
       floorArea: floorArea,
       constructionYear: constructionYear,
-      maxHeight: maxHeight,
-      zoning: zoning,
     );
   }
 
-  void selectFacingDirection(FacingDirection direction) {
-    state = state.withFacingDirection(direction);
+  void selectFacingId(int? id) {
+    state = state.withFacingId(id);
   }
 
-  void selectArchitecturalStyle(ArchitecturalStyle style) {
-    state = state.withArchitecturalStyle(style);
+  void selectZoningId(int? id) {
+    state = state.withZoningId(id);
   }
 
-  void selectRoofConfiguration(RoofConfiguration config) {
-    state = state.withRoofConfig(config);
-  }
-
-  void selectWallExterior(WallExterior wall) {
-    state = state.withWallExterior(wall);
-  }
-
-  void addCustomRoom(String name, RoomCategory category) {
-    state = state.withAddedRoom(name, category);
+  void addCustomRoom(String name, int roomTypeId) {
+    state = state.withAddedRoom(name, roomTypeId);
   }
 
   void removeRoom(String roomId) {
     state = state.withRemovedRoom(roomId);
   }
 
-  void addOutdoorExtra(String name, {OutdoorExtraCategory? category}) {
-    state = state.withAddedOutdoorExtra(name, category: category);
+  void addParking(int parkingTypeId) {
+    state = state.withAddedParking(parkingTypeId);
   }
 
-  void removeOutdoorExtra(String name) {
-    state = state.withRemovedOutdoorExtra(name);
-  }
-
-  void incrementOutdoorQuantity(String name) {
-    state = state.withIncrementedOutdoorQty(name);
-  }
-
-  void decrementOutdoorQuantity(String name) {
-    state = state.withDecrementedOutdoorQty(name);
+  void removeParking(int parkingTypeId) {
+    state = state.withRemovedParking(parkingTypeId);
   }
 
   void selectRoomForEditing(String? roomId) {
@@ -166,15 +138,17 @@ class PropertyViewModel extends Notifier<PropertyState> {
     required String roomId,
     int? conditionRating,
     List<String>? features,
+    List<int>? featureIds,
     String? notes,
-    String? imagePath,
+    String? photoUrl,
   }) {
     state = state.withUpdatedRoomDetails(
       roomId: roomId,
       conditionRating: conditionRating,
       features: features,
+      featureIds: featureIds,
       notes: notes,
-      imagePath: imagePath,
+      photoUrl: photoUrl,
     );
   }
 
@@ -190,40 +164,46 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.withRemovedFeature(roomId, feature);
   }
 
-  void selectMandateType(MandateType type) {
-    state = state.withMandateType(type);
+  void updateValuation({
+    String? ownersNetPrice,
+    String? agentValuation,
+    String? commissionPercent,
+  }) {
+    state = state.withValuation(
+      ownersNetPrice: ownersNetPrice,
+      agentValuation: agentValuation,
+      commissionPercent: commissionPercent,
+    );
   }
 
-  void selectLeadSource(LeadSource source) {
-    state = state.withLeadSource(source);
+  void updateRunningCosts({
+    String? monthlyLevy,
+    String? monthlyRates,
+    String? electricity,
+    String? water,
+  }) {
+    state = state.withRunningCosts(
+      monthlyLevy: monthlyLevy,
+      monthlyRates: monthlyRates,
+      electricity: electricity,
+      water: water,
+    );
   }
 
-  void toggleSyncLightstone(bool value) {
-    state = state.withSyncLightstone(value);
+  void updatePrimaryContact(Contact contact) {
+    state = state.withPrimaryContact(contact);
   }
 
-  void toggleSyncLoom(bool value) {
-    state = state.withSyncLoom(value);
+  void addCoContact() {
+    state = state.withAddedCoContact();
   }
 
-  void updatePrimaryOwner(Owner owner) {
-    state = state.withPrimaryOwner(owner);
+  void updateCoContact(int index, Contact contact) {
+    state = state.withUpdatedCoContact(index, contact);
   }
 
-  void addCoOwner() {
-    state = state.withAddedCoOwner();
-  }
-
-  void updateCoOwner(int index, Owner owner) {
-    state = state.withUpdatedCoOwner(index, owner);
-  }
-
-  void removeCoOwner(String id) {
-    state = state.withRemovedCoOwner(id);
-  }
-
-  void updateMandateDates({String? start, String? end}) {
-    state = state.withMandateDates(start: start, end: end);
+  void removeCoContact(String id) {
+    state = state.withRemovedCoContact(id);
   }
 
   Future<void> saveDraft() async {

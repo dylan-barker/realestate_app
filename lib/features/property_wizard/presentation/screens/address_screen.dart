@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_provider.dart';
-import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
@@ -21,21 +20,12 @@ class AddressStep extends ConsumerWidget {
 
     return WizardScaffold(
       title: 'Where is the property?',
-      description: 'Start typing the address to auto-populate details.',
+      description: 'Enter the property address details.',
       onBack: () => goBackWizard(context, ref),
       onNext: () => advanceWizard(context, ref),
       children: [
-        CustomTextInput(
-          theme: theme,
-          label: 'Search address',
-          placeholder: 'Search address...',
-          keyboardType: TextInputType.streetAddress,
-          prefixIcon: Icon(Icons.search, color: theme.textSecondary, size: 20),
-          onChanged: (val) => viewModel.updateAddress(streetAddress: val),
-        ),
-        const SizedBox(height: 24),
         Text(
-          'Verified Address Details',
+          'Street Address',
           style: textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.textPrimary,
@@ -49,30 +39,64 @@ class AddressStep extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildAddressField(
-                theme,
-                textTheme,
-                'Street Address',
-                state.streetAddress,
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'Street Number',
+                      placeholder: '124',
+                      initialValue: state.streetNumber,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(streetNumber: val),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 5,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'Street Name',
+                      placeholder: 'Some Street',
+                      initialValue: state.street,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(street: val),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              CustomTextInput(
+                theme: theme,
+                label: 'Unit Number (Optional)',
+                placeholder: 'e.g. 5A, Flat 12',
+                initialValue: state.unitNumber,
+                onChanged: (val) =>
+                    viewModel.updateAddress(unitNumber: val),
               ),
               const SizedBox(height: 14),
               Row(
                 children: [
                   Expanded(
-                    child: _buildAddressField(
-                      theme,
-                      textTheme,
-                      'Suburb / District',
-                      state.suburb,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'Suburb / District',
+                      placeholder: 'Strand',
+                      initialValue: state.suburb,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(suburb: val),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildAddressField(
-                      theme,
-                      textTheme,
-                      'City',
-                      state.city,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'City',
+                      placeholder: 'Cape Town',
+                      initialValue: state.city,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(city: val),
                     ),
                   ),
                 ],
@@ -81,23 +105,36 @@ class AddressStep extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildAddressField(
-                      theme,
-                      textTheme,
-                      'Province / State',
-                      state.province,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'Province / State',
+                      placeholder: 'Western Cape',
+                      initialValue: state.province,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(province: val),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildAddressField(
-                      theme,
-                      textTheme,
-                      'Postal Code',
-                      state.postalCode,
+                    child: CustomTextInput(
+                      theme: theme,
+                      label: 'Country',
+                      placeholder: 'South Africa',
+                      initialValue: state.country,
+                      onChanged: (val) =>
+                          viewModel.updateAddress(country: val),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 14),
+              CustomTextInput(
+                theme: theme,
+                label: 'Postal Code',
+                placeholder: '7140',
+                initialValue: state.postalCode,
+                onChanged: (val) =>
+                    viewModel.updateAddress(postalCode: val),
               ),
             ],
           ),
@@ -120,51 +157,23 @@ class AddressStep extends ConsumerWidget {
             children: [
               CustomTextInput(
                 theme: theme,
-                label: 'Complex / Estate Name (Optional)',
+                label: 'Estate Name (Optional)',
                 placeholder: 'e.g. Skyline Towers',
-                initialValue: state.complexName,
+                initialValue: state.estateName,
                 onChanged: (val) =>
-                    viewModel.updateIdentifiers(complexName: val),
+                    viewModel.updateIdentifiers(estateName: val),
               ),
               const SizedBox(height: 16),
               CustomTextInput(
                 theme: theme,
-                label: 'Erf / Plot Number',
+                label: 'Erf Number',
                 placeholder: 'Enter registration number',
-                initialValue: state.erfPlotNumber,
+                initialValue: state.erfNumber,
                 subtext: 'Found on municipal rates bill or property deed.',
                 onChanged: (val) =>
-                    viewModel.updateIdentifiers(erfPlotNumber: val),
+                    viewModel.updateIdentifiers(erfNumber: val),
               ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddressField(
-    RealEstateTheme theme,
-    TextTheme textTheme,
-    String label,
-    String value,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: textTheme.labelLarge?.copyWith(
-            color: theme.textLabel.withValues(alpha: 0.8),
-            fontSize: 11,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value.isEmpty ? '\u2014' : value,
-          style: textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
           ),
         ),
       ],

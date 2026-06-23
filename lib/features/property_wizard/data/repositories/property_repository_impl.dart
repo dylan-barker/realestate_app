@@ -1,4 +1,3 @@
-import '../models/outdoor_extra_item.dart';
 import '../models/property_state.dart';
 import '../models/room.dart';
 import 'property_repository.dart';
@@ -20,10 +19,5 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   Future<void> savePropertyDraft(PropertyState propertyState) async {
     final stateModel = PropertyStateModel.fromEntity(propertyState);
     await _localDataSource.savePropertyDraft(stateModel);
-  }
-
-  @override
-  Future<List<OutdoorExtraItem>> getInitialOutdoorExtras() async {
-    return _localDataSource.getInitialOutdoorExtras();
   }
 }

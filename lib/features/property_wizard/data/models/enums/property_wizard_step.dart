@@ -3,8 +3,9 @@ enum PropertyWizardStep {
   address(2, 'Address', 'Property Details', '/wizard/address'),
   buildingInfo(3, 'Building Info', 'Building Info', '/wizard/building-info'),
   propertyFeatures(4, 'Property Features', 'Property Details', '/wizard/property-features'),
-  mandateContacts(5, 'Mandate & Contacts', 'Mandate & Contacts', '/wizard/mandate-contacts'),
-  review(6, 'Review', 'Review & Submit', '/wizard/review');
+  valuationCosts(5, 'Valuation & Costs', 'Valuation & Costs', '/wizard/valuation-costs'),
+  contacts(6, 'Contacts', 'Contacts', '/wizard/contacts'),
+  review(7, 'Review', 'Review & Submit', '/wizard/review');
 
   final int stepNumber;
   final String title;

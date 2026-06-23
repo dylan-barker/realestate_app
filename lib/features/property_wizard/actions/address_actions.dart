@@ -2,28 +2,44 @@ import '../data/models/property_state.dart';
 
 extension AddressActions on PropertyState {
   PropertyState withAddress({
-    String? streetAddress,
+    String? streetNumber,
+    String? street,
+    String? unitNumber,
     String? suburb,
     String? city,
     String? province,
+    String? country,
     String? postalCode,
   }) {
     return copyWith(
-      streetAddress: streetAddress ?? this.streetAddress,
+      streetNumber: streetNumber ?? this.streetNumber,
+      street: street ?? this.street,
+      unitNumber: unitNumber ?? this.unitNumber,
       suburb: suburb ?? this.suburb,
       city: city ?? this.city,
       province: province ?? this.province,
+      country: country ?? this.country,
       postalCode: postalCode ?? this.postalCode,
     );
   }
 
   PropertyState withIdentifiers({
-    String? complexName,
-    String? erfPlotNumber,
+    String? estateName,
+    String? erfNumber,
   }) {
     return copyWith(
-      complexName: complexName ?? this.complexName,
-      erfPlotNumber: erfPlotNumber ?? this.erfPlotNumber,
+      estateName: estateName ?? this.estateName,
+      erfNumber: erfNumber ?? this.erfNumber,
+    );
+  }
+
+  PropertyState withCoordinates({
+    double? latitude,
+    double? longitude,
+  }) {
+    return copyWith(
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 }

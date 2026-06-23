@@ -55,7 +55,7 @@ class AddRoomSheet {
                       children: predefined.map((type) {
                         return InkWell(
                           onTap: () {
-                            viewModel.addCustomRoom(type, category);
+                            viewModel.addCustomRoom(type, category.index + 1);
                             Navigator.pop(context);
                           },
                           borderRadius: BorderRadius.circular(16),
@@ -119,7 +119,7 @@ class AddRoomSheet {
                           if (customName.trim().isNotEmpty) {
                             viewModel.addCustomRoom(
                               customName.trim(),
-                              category,
+                              category.index + 1,
                             );
                             Navigator.pop(context);
                           }

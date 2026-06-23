@@ -1,56 +1,61 @@
 import 'room.dart';
-import 'enums/room_category.dart';
 
 class RoomModel {
   final String id;
   final String name;
-  final String type; // String representation for serialized data
-  final String description;
-  final bool isComplete;
+  final int roomTypeId;
+  final String? roomTypeOther;
   final int? conditionRating;
   final List<String> features;
+  final List<int> featureIds;
   final String notes;
-  final String? imagePath;
+  final String? photoUrl;
+  final String createdAt;
+  final String updatedAt;
 
   RoomModel({
     required this.id,
     required this.name,
-    required this.type,
-    required this.description,
-    this.isComplete = false,
+    required this.roomTypeId,
+    this.roomTypeOther,
     this.conditionRating,
     this.features = const [],
+    this.featureIds = const [],
     this.notes = '',
-    this.imagePath,
+    this.photoUrl,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  /// Convert Room Entity to RoomModel
   factory RoomModel.fromEntity(Room entity) {
     return RoomModel(
       id: entity.id,
       name: entity.name,
-      type: entity.type.displayString,
-      description: entity.description,
-      isComplete: entity.isComplete,
+      roomTypeId: entity.roomTypeId,
+      roomTypeOther: entity.roomTypeOther,
       conditionRating: entity.conditionRating,
       features: entity.features,
+      featureIds: entity.featureIds,
       notes: entity.notes,
-      imagePath: entity.imagePath,
+      photoUrl: entity.photoUrl,
+      createdAt: entity.createdAt.toIso8601String(),
+      updatedAt: entity.updatedAt.toIso8601String(),
     );
   }
 
-  /// Convert RoomModel to pure Room Domain Entity
   Room toEntity() {
     return Room(
       id: id,
       name: name,
-      type: RoomCategoryExtension.fromString(type),
-      description: description,
-      isComplete: isComplete,
+      roomTypeId: roomTypeId,
+      roomTypeOther: roomTypeOther,
       conditionRating: conditionRating,
       features: features,
+      featureIds: featureIds,
       notes: notes,
-      imagePath: imagePath,
+      photoUrl: photoUrl,
+      createdAt: DateTime.parse(createdAt),
+      updatedAt: DateTime.parse(updatedAt),
     );
   }
 
@@ -58,13 +63,15 @@ class RoomModel {
     return {
       'id': id,
       'name': name,
-      'type': type,
-      'description': description,
-      'isComplete': isComplete,
+      'roomTypeId': roomTypeId,
+      'roomTypeOther': roomTypeOther,
       'conditionRating': conditionRating,
       'features': features,
+      'featureIds': featureIds,
       'notes': notes,
-      'imagePath': imagePath,
+      'photoUrl': photoUrl,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -72,13 +79,15 @@ class RoomModel {
     return RoomModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      type: map['type'] ?? 'Bedrooms & Bathrooms',
-      description: map['description'] ?? '',
-      isComplete: map['isComplete'] ?? false,
+      roomTypeId: map['roomTypeId'] ?? 1,
+      roomTypeOther: map['roomTypeOther'],
       conditionRating: map['conditionRating'],
       features: List<String>.from(map['features'] ?? []),
+      featureIds: List<int>.from(map['featureIds'] ?? []),
       notes: map['notes'] ?? '',
-      imagePath: map['imagePath'],
+      photoUrl: map['photoUrl'],
+      createdAt: map['createdAt'] ?? DateTime.now().toIso8601String(),
+      updatedAt: map['updatedAt'] ?? DateTime.now().toIso8601String(),
     );
   }
 }

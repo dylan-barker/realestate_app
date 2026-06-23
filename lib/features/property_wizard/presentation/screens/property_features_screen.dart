@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
-import '../../data/models/enums/outdoor_extra.dart';
 import '../../data/models/enums/room_category.dart';
 import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
-import '../widgets/add_outdoor_dialog.dart';
-import '../widgets/outdoor_subcategory.dart';
 import '../widgets/room_section.dart';
 import '../widgets/wizard_actions.dart';
 
@@ -29,17 +27,18 @@ class PropertyFeaturesStep extends ConsumerWidget {
       for (var cat in categories) cat: [],
     };
     for (var room in state.rooms) {
-      if (groupedRooms.containsKey(room.type)) {
-        groupedRooms[room.type]!.add(room);
+      final cat = RoomCategory.values.firstWhere(
+        (c) => c.index + 1 == room.roomTypeId,
+        orElse: () => RoomCategory.additional,
+      );
+      if (groupedRooms.containsKey(cat)) {
+        groupedRooms[cat]!.add(room);
       }
     }
 
-    final outdoorCategories = OutdoorExtraCategory.values;
-
     return WizardScaffold(
       title: 'Property Features',
-      description:
-          'Detail and configure every room in the residence.',
+      description: 'Detail and configure every room in the residence.',
       onBack: () => goBackWizard(context, ref),
       onNext: () => advanceWizard(context, ref),
       children: [
@@ -68,7 +67,7 @@ class PropertyFeaturesStep extends ConsumerWidget {
         Container(height: 1, color: theme.borderLight),
         const SizedBox(height: 20),
         Text(
-          'OUTDOOR & EXTRAS',
+          'PARKING',
           style: textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.textLabel,
@@ -77,41 +76,34 @@ class PropertyFeaturesStep extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        for (var outdoorCat in outdoorCategories) ...[
-          OutdoorSubcategory(
-            theme: theme,
-            textTheme: textTheme,
-            outdoorCat: outdoorCat,
-            selectedItems: state.outdoorExtras,
-            viewModel: viewModel,
-          ),
-          const SizedBox(height: 16),
-        ],
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => AddOutdoorDialog.show(
-              context,
-              viewModel,
-              theme,
-              textTheme,
-            ),
-            icon: const Icon(Icons.add_circle_outline, size: 22),
-            label: const Text('Add Custom Outdoor / Extra Item'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: theme.textLabel,
-              elevation: 0,
-              side: BorderSide(color: theme.borderLight, width: 1.5),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              textStyle: textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 10.0,
+          children: [
+            {'id': 1, 'label': 'Single Garage'},
+            {'id': 2, 'label': 'Double Garage'},
+            {'id': 3, 'label': 'Triple Garage'},
+            {'id': 4, 'label': 'Carport'},
+            {'id': 5, 'label': 'Off-Street Parking'},
+            {'id': 6, 'label': 'Undercover Parking'},
+          ].map((p) {
+            final pid = p['id'] as int;
+            final label = p['label'] as String;
+            final parkingItem = state.parking.where((p) => p.parkingTypeId == pid).firstOrNull;
+            final isSelected = parkingItem != null;
+            return CustomChip(
+              theme: theme,
+              label: isSelected ? '$label x${parkingItem.quantity}' : label,
+              isSelected: isSelected,
+              onTap: () {
+                if (isSelected) {
+                  viewModel.removeParking(pid);
+                } else {
+                  viewModel.addParking(pid);
+                }
+              },
+            );
+          }).toList(),
         ),
         const SizedBox(height: 32),
       ],

@@ -6,10 +6,7 @@ import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
-import '../../data/models/enums/architectural_style.dart';
 import '../../data/models/enums/facing_direction.dart';
-import '../../data/models/enums/roof_configuration.dart';
-import '../../data/models/enums/wall_exterior.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/wizard_actions.dart';
 
@@ -55,62 +52,51 @@ class BuildingInfoStep extends ConsumerWidget {
           keyboardType: TextInputType.number,
           onChanged: (val) => viewModel.updateTechnicalSpecs(constructionYear: val),
         ),
-        const SizedBox(height: 18),
-        CustomTextInput(
-          theme: theme,
-          label: 'Max Height (m)',
-          placeholder: '0.00',
-          initialValue: state.maxHeight,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (val) => viewModel.updateTechnicalSpecs(maxHeight: val),
-        ),
-        const SizedBox(height: 18),
-        CustomTextInput(
-          theme: theme,
-          label: 'Zoning Classification',
-          placeholder: 'e.g. Residential 1',
-          initialValue: state.zoning,
-          onChanged: (val) => viewModel.updateTechnicalSpecs(zoning: val),
-        ),
         const SizedBox(height: 28),
         _buildChipSelector<FacingDirection>(
           theme: theme,
           textTheme: textTheme,
           label: 'Facing Direction',
           options: FacingDirection.values,
-          selectedOption: state.facingDirection,
+          selectedOption: state.facingId != null ? FacingDirection.values.firstWhere(
+            (f) => f.index + 1 == state.facingId,
+            orElse: () => FacingDirection.north,
+          ) : FacingDirection.north,
           getLabel: (opt) => opt.displayString,
-          onSelected: (val) => viewModel.selectFacingDirection(val),
+          onSelected: (val) => viewModel.selectFacingId(val.index + 1),
         ),
         const SizedBox(height: 24),
-        _buildChipSelector<ArchitecturalStyle>(
-          theme: theme,
-          textTheme: textTheme,
-          label: 'Architectural Style',
-          options: ArchitecturalStyle.values,
-          selectedOption: state.architecturalStyle,
-          getLabel: (opt) => opt.displayString,
-          onSelected: (val) => viewModel.selectArchitecturalStyle(val),
+        Text(
+          'Zoning',
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.textPrimary,
+            fontSize: 15,
+          ),
         ),
-        const SizedBox(height: 24),
-        _buildChipSelector<RoofConfiguration>(
-          theme: theme,
-          textTheme: textTheme,
-          label: 'Roof Configuration',
-          options: RoofConfiguration.values,
-          selectedOption: state.roofConfiguration,
-          getLabel: (opt) => opt.displayString,
-          onSelected: (val) => viewModel.selectRoofConfiguration(val),
-        ),
-        const SizedBox(height: 24),
-        _buildChipSelector<WallExterior>(
-          theme: theme,
-          textTheme: textTheme,
-          label: 'Wall Exterior',
-          options: WallExterior.values,
-          selectedOption: state.wallExterior,
-          getLabel: (opt) => opt.displayString,
-          onSelected: (val) => viewModel.selectWallExterior(val),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 10.0,
+          children: [
+            'Residential 1',
+            'Residential 2',
+            'Commercial',
+            'Agricultural',
+            'Mixed Use',
+          ].map((zone) {
+            final isSelected = (state.zoningId != null && [
+              1, 2, 3, 4, 5
+            ][['Residential 1', 'Residential 2', 'Commercial', 'Agricultural', 'Mixed Use'].indexOf(zone)] == state.zoningId);
+            return CustomChip(
+              theme: theme,
+              label: zone,
+              isSelected: isSelected,
+              onTap: () => viewModel.selectZoningId(
+                ['Residential 1', 'Residential 2', 'Commercial', 'Agricultural', 'Mixed Use'].indexOf(zone) + 1,
+              ),
+            );
+          }).toList(),
         ),
       ],
     );

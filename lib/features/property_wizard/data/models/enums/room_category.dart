@@ -1,5 +1,3 @@
-import 'standard_amenity.dart';
-
 enum RoomCategory {
   bedroom,
   bathroom,
@@ -27,25 +25,6 @@ extension RoomCategoryExtension on RoomCategory {
         return 'Entertainment';
       case RoomCategory.additional:
         return 'Additional';
-    }
-  }
-
-  List<AmenityCategory> get relevantAmenityCategories {
-    switch (this) {
-      case RoomCategory.bedroom:
-        return [AmenityCategory.bedroom, AmenityCategory.generalInterior];
-      case RoomCategory.bathroom:
-        return [AmenityCategory.bathroom, AmenityCategory.generalInterior];
-      case RoomCategory.livingSpaces:
-        return [AmenityCategory.livingAreas, AmenityCategory.generalInterior];
-      case RoomCategory.kitchenAndUtility:
-        return [AmenityCategory.kitchen, AmenityCategory.generalInterior];
-      case RoomCategory.workAndStudy:
-        return [AmenityCategory.generalInterior];
-      case RoomCategory.entertainment:
-        return [AmenityCategory.livingAreas, AmenityCategory.generalInterior];
-      case RoomCategory.additional:
-        return [AmenityCategory.generalInterior];
     }
   }
 

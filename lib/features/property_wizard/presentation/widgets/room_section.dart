@@ -128,41 +128,16 @@ class RoomSection extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    if (room.description.isNotEmpty) ...[
-                                      Text(
-                                        room.description,
-                                        style: textTheme.bodyMedium?.copyWith(
-                                          color: theme.textSecondary,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '\u2022',
-                                        style: TextStyle(
-                                          color: theme.textSecondary.withValues(
-                                            alpha: 0.5,
-                                          ),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                    ],
-                                    Text(
-                                      room.isComplete
-                                          ? 'COMPLETE'
-                                          : 'PENDING',
-                                      style: textTheme.labelLarge?.copyWith(
-                                        color: room.isComplete
-                                            ? theme.completeColor
-                                            : theme.pendingColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  room.conditionRating != null
+                                      ? 'Condition: Level ${room.conditionRating}'
+                                      : 'Condition: Not rated',
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: room.conditionRating != null
+                                        ? theme.completeColor
+                                        : theme.pendingColor,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ],
                             ),

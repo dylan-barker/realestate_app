@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
-import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
-import '../../data/models/enums/property_subtype.dart';
 import '../../data/models/enums/property_type.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/wizard_actions.dart';
@@ -21,14 +19,12 @@ class PropertyTypeStep extends ConsumerWidget {
     final textTheme = theme.toThemeData().textTheme;
 
     final types = [
-      {'type': PropertyType.house, 'icon': Icons.home_outlined},
-      {'type': PropertyType.townhouse, 'icon': Icons.business_outlined},
-      {'type': PropertyType.apartment, 'icon': Icons.corporate_fare_outlined},
-      {'type': PropertyType.vacantLand, 'icon': Icons.terrain_outlined},
-      {'type': PropertyType.plot, 'icon': Icons.grid_view_outlined},
+      {'type': PropertyType.house, 'icon': Icons.home_outlined, 'id': 1},
+      {'type': PropertyType.townhouse, 'icon': Icons.business_outlined, 'id': 2},
+      {'type': PropertyType.apartment, 'icon': Icons.corporate_fare_outlined, 'id': 3},
+      {'type': PropertyType.vacantLand, 'icon': Icons.terrain_outlined, 'id': 4},
+      {'type': PropertyType.plot, 'icon': Icons.grid_view_outlined, 'id': 5},
     ];
-
-    final subtypes = PropertySubtype.values;
 
     return WizardScaffold(
       title: 'What type of property is this?',
@@ -49,11 +45,12 @@ class PropertyTypeStep extends ConsumerWidget {
             final item = types[index];
             final itemType = item['type'] as PropertyType;
             final itemIcon = item['icon'] as IconData;
-            final isSelected = state.propertyType == itemType;
+            final itemId = item['id'] as int;
+            final isSelected = state.propertyTypeId == itemId;
             return CustomCard(
               theme: theme,
               isSelected: isSelected,
-              onTap: () => viewModel.selectPropertyType(itemType),
+              onTap: () => viewModel.selectPropertyType(itemId),
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
                 vertical: 16.0,
@@ -81,28 +78,6 @@ class PropertyTypeStep extends ConsumerWidget {
               ),
             );
           },
-        ),
-        const SizedBox(height: 32),
-        Text(
-          'Refine the subtype',
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 10.0,
-          children: subtypes.map((subtype) {
-            final isSelected = state.propertySubtype == subtype;
-            return CustomChip(
-              theme: theme,
-              label: subtype.displayString,
-              isSelected: isSelected,
-              onTap: () => viewModel.selectPropertySubtype(subtype),
-            );
-          }).toList(),
         ),
       ],
     );

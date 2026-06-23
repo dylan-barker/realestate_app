@@ -7,18 +7,7 @@ import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
-import '../../data/models/enums/architectural_style.dart';
-import '../../data/models/enums/entity_type.dart';
-import '../../data/models/enums/facing_direction.dart';
-import '../../data/models/enums/lead_source.dart';
-import '../../data/models/enums/mandate_type.dart';
-import '../../data/models/enums/property_subtype.dart';
-import '../../data/models/enums/property_type.dart';
 import '../../data/models/enums/property_wizard_step.dart';
-import '../../data/models/enums/roof_configuration.dart';
-import '../../data/models/enums/room_category.dart';
-import '../../data/models/enums/wall_exterior.dart';
-import '../../data/models/owner.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/wizard_actions.dart';
 
@@ -75,13 +64,8 @@ class ReviewStep extends ConsumerWidget {
           children: [
             _buildDetailRow(
               textTheme,
-              'Type',
-              state.propertyType.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Subtype',
-              state.propertySubtype.displayString,
+              'Type ID',
+              state.propertyTypeId.toString(),
             ),
           ],
         ),
@@ -91,19 +75,19 @@ class ReviewStep extends ConsumerWidget {
           textTheme: textTheme,
           title: 'ADDRESS',
           children: [
-            _buildDetailRow(textTheme, 'Street', state.streetAddress),
+            _buildDetailRow(textTheme, 'Street Number', state.streetNumber),
+            _buildDetailRow(textTheme, 'Street', state.street),
+            if (state.unitNumber.isNotEmpty)
+              _buildDetailRow(textTheme, 'Unit', state.unitNumber),
             _buildDetailRow(textTheme, 'Suburb', state.suburb),
             _buildDetailRow(textTheme, 'City', state.city),
             _buildDetailRow(textTheme, 'Province', state.province),
+            _buildDetailRow(textTheme, 'Country', state.country),
             _buildDetailRow(textTheme, 'Postal Code', state.postalCode),
-            if (state.complexName.isNotEmpty)
-              _buildDetailRow(textTheme, 'Complex', state.complexName),
-            if (state.erfPlotNumber.isNotEmpty)
-              _buildDetailRow(
-                textTheme,
-                'Erf / Plot',
-                state.erfPlotNumber,
-              ),
+            if (state.estateName.isNotEmpty)
+              _buildDetailRow(textTheme, 'Estate', state.estateName),
+            if (state.erfNumber.isNotEmpty)
+              _buildDetailRow(textTheme, 'Erf', state.erfNumber),
           ],
         ),
         const SizedBox(height: 16),
@@ -122,30 +106,10 @@ class ReviewStep extends ConsumerWidget {
                 'Construction Year',
                 state.constructionYear,
               ),
-            if (state.maxHeight.isNotEmpty)
-              _buildDetailRow(textTheme, 'Max Height', '${state.maxHeight} m'),
-            if (state.zoning.isNotEmpty)
-              _buildDetailRow(textTheme, 'Zoning', state.zoning),
-            _buildDetailRow(
-              textTheme,
-              'Facing',
-              state.facingDirection.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Architecture',
-              state.architecturalStyle.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Roof',
-              state.roofConfiguration.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Walls',
-              state.wallExterior.displayString,
-            ),
+            if (state.facingId != null)
+              _buildDetailRow(textTheme, 'Facing ID', state.facingId.toString()),
+            if (state.zoningId != null)
+              _buildDetailRow(textTheme, 'Zoning ID', state.zoningId.toString()),
           ],
         ),
         const SizedBox(height: 16),
@@ -165,93 +129,88 @@ class ReviewStep extends ConsumerWidget {
               (room) => Padding(
                 padding: const EdgeInsets.only(left: 16.0, top: 4.0),
                 child: Text(
-                  '\u2022 ${room.name} (${room.type.displayString})${room.isComplete ? '' : ' \u2014 PENDING'}',
+                  '\u2022 ${room.name} (Condition: ${room.conditionRating ?? "Not rated"})',
                   style: textTheme.bodyMedium?.copyWith(
-                    color: room.isComplete
-                        ? theme.textPrimary
-                        : theme.pendingColor,
+                    color: theme.textPrimary,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            _buildDetailRow(
-              textTheme,
-              'Outdoor Extras',
-              state.outdoorExtras.isEmpty
-                  ? 'None'
-                  : state.outdoorExtras
-                        .map(
-                          (e) => e.quantity > 1
-                              ? '${e.name} x${e.quantity}'
-                              : e.name,
-                        )
-                        .join(', '),
-            ),
+            if (state.parking.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                textTheme,
+                'Parking',
+                state.parking
+                    .map((p) => 'Type ${p.parkingTypeId} x${p.quantity}')
+                    .join(', '),
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 16),
         _buildSectionCard(
           theme: theme,
           textTheme: textTheme,
-          title: 'MANDATE & CONTACTS',
+          title: 'VALUATION & COSTS',
           children: [
-            _buildDetailRow(
-              textTheme,
-              'Mandate Type',
-              state.mandateType.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Lead Source',
-              state.leadSource.displayString,
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Sync Lightstone',
-              state.syncLightstone ? 'Yes' : 'No',
-            ),
-            _buildDetailRow(
-              textTheme,
-              'Sync Loom',
-              state.syncLoom ? 'Yes' : 'No',
-            ),
-            const SizedBox(height: 8),
-            _buildOwnerReviewSection(
+            if (state.listingValuation.ownersNetPrice.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                "Owner's Price",
+                'R ${state.listingValuation.ownersNetPrice}',
+              ),
+            if (state.listingValuation.agentValuation.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Agent Valuation',
+                'R ${state.listingValuation.agentValuation}',
+              ),
+            if (state.listingValuation.commissionPercent.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Commission',
+                '${state.listingValuation.commissionPercent}%',
+              ),
+            if (state.propertyRunningCosts.monthlyLevy.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Monthly Levy',
+                'R ${state.propertyRunningCosts.monthlyLevy}',
+              ),
+            if (state.propertyRunningCosts.monthlyRates.isNotEmpty)
+              _buildDetailRow(
+                textTheme,
+                'Monthly Rates',
+                'R ${state.propertyRunningCosts.monthlyRates}',
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildSectionCard(
+          theme: theme,
+          textTheme: textTheme,
+          title: 'CONTACTS',
+          children: [
+            _buildContactReviewSection(
               theme: theme,
               textTheme: textTheme,
-              label: 'Primary Owner',
-              owner: state.primaryOwner,
+              label: 'Primary Contact',
+              contact: state.primaryContact,
             ),
-            if (state.coOwners.isNotEmpty) ...[
+            if (state.coContacts.isNotEmpty) ...[
               const SizedBox(height: 12),
-              ...state.coOwners.asMap().entries.map(
+              ...state.coContacts.asMap().entries.map(
                 (entry) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: _buildOwnerReviewSection(
+                  child: _buildContactReviewSection(
                     theme: theme,
                     textTheme: textTheme,
-                    label: 'Co-Owner ${entry.key + 1}',
-                    owner: entry.value,
+                    label: 'Co-Contact ${entry.key + 1}',
+                    contact: entry.value,
                   ),
                 ),
               ),
-            ],
-            if (state.mandateStart != null ||
-                state.mandateEnd != null) ...[
-              const SizedBox(height: 8),
-              if (state.mandateStart != null)
-                _buildDetailRow(
-                  textTheme,
-                  'Mandate Start',
-                  state.mandateStart!,
-                ),
-              if (state.mandateEnd != null)
-                _buildDetailRow(
-                  textTheme,
-                  'Mandate End',
-                  state.mandateEnd!,
-                ),
             ],
           ],
         ),
@@ -260,11 +219,11 @@ class ReviewStep extends ConsumerWidget {
     );
   }
 
-  Widget _buildOwnerReviewSection({
+  Widget _buildContactReviewSection({
     required RealEstateTheme theme,
     required TextTheme textTheme,
     required String label,
-    required Owner owner,
+    required dynamic contact,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,40 +236,13 @@ class ReviewStep extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 4),
-        _buildDetailRow(
-          textTheme,
-          'Type',
-          owner.entityType.displayString,
-        ),
-        if (owner.entityType == EntityType.person) ...[
-          _buildDetailRow(
-            textTheme,
-            'Name',
-            owner.displayName,
-          ),
-        ] else ...[
-          _buildDetailRow(
-            textTheme,
-            'Company',
-            owner.displayName,
-          ),
-        ],
-        _buildDetailRow(textTheme, 'Email', owner.email),
-        _buildDetailRow(textTheme, 'Phone', owner.phone),
-        if (owner.entityType == EntityType.person)
-          _buildDetailRow(
-            textTheme,
-            'ID Number',
-            owner.idNumber.isEmpty ? '\u2014' : owner.idNumber,
-          )
-        else
-          _buildDetailRow(
-            textTheme,
-            'Registration',
-            owner.registrationNumber.isEmpty
-                ? '\u2014'
-                : owner.registrationNumber,
-          ),
+        _buildDetailRow(textTheme, 'Name', contact.fullName),
+        _buildDetailRow(textTheme, 'Email', contact.emailAddress),
+        _buildDetailRow(textTheme, 'Phone', contact.mobilePhone),
+        if (contact.idNumber.isNotEmpty)
+          _buildDetailRow(textTheme, 'ID Number', contact.idNumber),
+        if (contact.role.isNotEmpty)
+          _buildDetailRow(textTheme, 'Role', contact.role),
       ],
     );
   }
