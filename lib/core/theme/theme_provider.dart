@@ -1,7 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'themes.dart';
 
-final themeProvider = Provider.autoDispose<RealEstateTheme>((ref) {
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() => ThemeMode.light;
+
+  void setThemeMode(ThemeMode mode) {
+    state = mode;
+  }
+}
+
+final themeModeProvider =
+    NotifierProvider<ThemeModeNotifier, ThemeMode>(ThemeModeNotifier.new);
+
+final themeConfigProvider = Provider<RealEstateTheme>((ref) {
   return RealEstateTheme.crimson();
 });

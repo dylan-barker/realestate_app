@@ -17,7 +17,7 @@ class BuildingInfoStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(propertyViewModelProvider);
     final viewModel = ref.read(propertyViewModelProvider.notifier);
-    final theme = ref.watch(themeProvider);
+    final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
 
     return WizardScaffold(

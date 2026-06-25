@@ -32,6 +32,7 @@ class PropertyStateModel {
   final Map<String, dynamic> propertyRunningCosts;
   final Map<String, dynamic> primaryContact;
   final List<Map<String, dynamic>> coContacts;
+  final int? listingId;
   final String referenceNumber;
   final String status;
   final String? p24Ref;
@@ -63,6 +64,7 @@ class PropertyStateModel {
     required this.propertyRunningCosts,
     required this.primaryContact,
     required this.coContacts,
+    this.listingId,
     required this.referenceNumber,
     required this.status,
     this.p24Ref,
@@ -90,6 +92,7 @@ class PropertyStateModel {
       constructionYear: entity.constructionYear,
       facingId: entity.facingId,
       zoningId: entity.zoningId,
+      listingId: entity.listingId,
       rooms: entity.rooms.map((r) => RoomModel.fromEntity(r)).toList(),
       parking: entity.parking.map(_parkingToMap).toList(),
       listingValuation: _valuationToMap(entity.listingValuation),
@@ -124,6 +127,7 @@ class PropertyStateModel {
       constructionYear: constructionYear,
       facingId: facingId,
       zoningId: zoningId,
+      listingId: listingId,
       rooms: rooms.map((m) => m.toEntity()).toList(),
       parking: parking.map(_parkingFromMap).toList(),
       listingValuation: _valuationFromMap(listingValuation),

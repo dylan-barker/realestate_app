@@ -11,7 +11,7 @@ class WizardScaffold extends ConsumerWidget {
   final String title;
   final String? description;
   final List<Widget> children;
-  final VoidCallback? onNext;
+  final Future<void> Function()? onNext;
   final VoidCallback? onBack;
   final Widget? bottomWidget;
 
@@ -27,7 +27,7 @@ class WizardScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeProvider);
+    final theme = ref.watch(themeConfigProvider);
     final navData = ref.watch(wizardNavigationProvider);
 
     return Scaffold(

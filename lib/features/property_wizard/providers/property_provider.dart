@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/providers/api_providers.dart';
 import '../actions/address_actions.dart';
 import '../actions/building_info_actions.dart';
 import '../actions/contacts_actions.dart';
@@ -8,21 +9,22 @@ import '../actions/property_features_actions.dart';
 import '../actions/property_type_actions.dart';
 import '../actions/room_details_actions.dart';
 import '../actions/wizard_step_actions.dart';
-import '../data/data_sources/property_local_data_source.dart';
 import '../data/models/contact.dart';
 import '../data/models/property_state.dart';
 import '../data/repositories/property_repository.dart';
 import '../data/repositories/property_repository_impl.dart';
 
-final propertyLocalDataSourceProvider =
-    Provider.autoDispose<PropertyLocalDataSource>((ref) {
-  return PropertyLocalDataSource();
-});
-
-final propertyRepositoryProvider =
-    Provider.autoDispose<IPropertyRepository>((ref) {
-  final dataSource = ref.watch(propertyLocalDataSourceProvider);
-  return PropertyRepositoryImpl(dataSource);
+final propertyRepositoryProvider = Provider.autoDispose<IPropertyRepository>((ref) {
+  final listingApi = ref.watch(listingApiServiceProvider);
+  final roomApi = ref.watch(roomApiServiceProvider);
+  final contactApi = ref.watch(contactApiServiceProvider);
+  final parkingApi = ref.watch(parkingApiServiceProvider);
+  return PropertyRepositoryImpl(
+    listingApi: listingApi,
+    roomApi: roomApi,
+    contactApi: contactApi,
+    parkingApi: parkingApi,
+  );
 });
 
 final propertyViewModelProvider =
@@ -36,16 +38,15 @@ class PropertyViewModel extends Notifier<PropertyState> {
   @override
   PropertyState build() {
     _repository = ref.watch(propertyRepositoryProvider);
-    _loadInitialData();
     return PropertyState(rooms: const [], parking: const []);
   }
 
-  Future<void> _loadInitialData() async {
+  Future<void> startWizard() async {
     try {
-      final rooms = await _repository.getInitialRooms();
-      state = state.copyWith(rooms: rooms);
+      final listingId = await _repository.createListing(state.propertyTypeId);
+      state = state.copyWith(listingId: listingId, referenceNumber: '');
     } catch (e) {
-      state = state.copyWith(rooms: const []);
+      // If API is unavailable, continue in local mode
     }
   }
 
@@ -53,7 +54,44 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.withStep(step);
   }
 
-  void nextStep() {
+  Future<void> nextStep() async {
+    final currentStep = state.currentStep;
+
+    try {
+      if (currentStep == 1 && state.listingId == null) {
+        await startWizard();
+      }
+
+      final listingId = state.listingId;
+      if (listingId != null) {
+        switch (currentStep) {
+          case 2:
+            await _repository.upsertAddress(listingId, state);
+            break;
+          case 3:
+            await _repository.upsertBuildingInfo(listingId, state);
+            break;
+          case 4:
+            await _repository.upsertRooms(listingId, state.rooms);
+            await _repository.upsertParking(listingId, state.parking);
+            break;
+          case 5:
+            await _repository.upsertValuation(listingId, state);
+            await _repository.upsertRunningCosts(listingId, state);
+            break;
+          case 6:
+            await _repository.upsertContacts(
+              listingId,
+              state.primaryContact,
+              state.coContacts,
+            );
+            break;
+        }
+      }
+    } catch (e) {
+      // Silently continue - saves are opportunistic
+    }
+
     state = state.withNextStep();
   }
 
@@ -208,5 +246,33 @@ class PropertyViewModel extends Notifier<PropertyState> {
 
   Future<void> saveDraft() async {
     await _repository.savePropertyDraft(state);
+  }
+
+  Future<void> submitAndSave() async {
+    final listingId = state.listingId;
+
+    try {
+      if (listingId != null) {
+        await _repository.upsertAddress(listingId, state);
+        await _repository.upsertBuildingInfo(listingId, state);
+        await _repository.upsertRooms(listingId, state.rooms);
+        await _repository.upsertParking(listingId, state.parking);
+        await _repository.upsertValuation(listingId, state);
+        await _repository.upsertRunningCosts(listingId, state);
+        await _repository.upsertContacts(
+          listingId,
+          state.primaryContact,
+          state.coContacts,
+        );
+        await _repository.submitListing(listingId);
+      }
+    } catch (e) {
+      // Fall back to local save
+      await _repository.savePropertyDraft(state);
+    }
+  }
+
+  void reset() {
+    state = PropertyState(rooms: const [], parking: const []);
   }
 }

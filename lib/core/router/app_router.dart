@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/property_wizard/presentation/screens/property_type_screen.dart';
 import '../../features/property_wizard/presentation/screens/address_screen.dart';
 import '../../features/property_wizard/presentation/screens/building_info_screen.dart';
@@ -8,28 +10,60 @@ import '../../features/property_wizard/presentation/screens/room_details_screen.
 import '../../features/property_wizard/presentation/screens/listing_valuation_screen.dart';
 import '../../features/property_wizard/presentation/screens/contacts_screen.dart';
 import '../../features/property_wizard/presentation/screens/review_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouter = GoRouter(
-  initialLocation: '/wizard/property-type',
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: '/home',
   routes: [
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return ScaffoldWithNavBar(navigationShell: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsScreen(),
+            ),
+          ],
+        ),
+      ],
+    ),
     GoRoute(
       path: '/wizard/property-type',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const PropertyTypeStep(),
     ),
     GoRoute(
       path: '/wizard/address',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const AddressStep(),
     ),
     GoRoute(
       path: '/wizard/building-info',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const BuildingInfoStep(),
     ),
     GoRoute(
       path: '/wizard/property-features',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const PropertyFeaturesStep(),
     ),
     GoRoute(
       path: '/wizard/room-details/:roomId',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) {
         final roomId = state.pathParameters['roomId']!;
         return RoomDetailsStep(roomId: roomId);
@@ -37,15 +71,49 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/wizard/valuation-costs',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const ValuationCostsStep(),
     ),
     GoRoute(
       path: '/wizard/contacts',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const ContactsStep(),
     ),
     GoRoute(
       path: '/wizard/review',
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const ReviewStep(),
     ),
   ],
 );
+
+class ScaffoldWithNavBar extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
+
+  const ScaffoldWithNavBar({super.key, required this.navigationShell});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(index),
+        selectedItemColor: const Color(0xFFCC0000),
+        unselectedItemColor: const Color(0xFF71717A),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}

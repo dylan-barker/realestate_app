@@ -7,7 +7,6 @@ import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/wizard_scaffold.dart';
-import '../../data/models/enums/property_wizard_step.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/wizard_actions.dart';
 
@@ -18,7 +17,7 @@ class ReviewStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(propertyViewModelProvider);
     final viewModel = ref.read(propertyViewModelProvider.notifier);
-    final theme = ref.watch(themeProvider);
+    final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
 
     final bottomWidget = Container(
@@ -34,17 +33,21 @@ class ReviewStep extends ConsumerWidget {
           child: CustomButton(
             theme: theme,
             text: 'Submit Listing',
-            onTap: () {
-              viewModel.saveDraft();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text(
-                    'Property listing submitted successfully!',
+            onTap: () async {
+              await viewModel.saveDraft();
+              await viewModel.submitAndSave();
+              viewModel.reset();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'Property listing submitted successfully!',
+                    ),
+                    backgroundColor: theme.primaryColor,
                   ),
-                  backgroundColor: theme.primaryColor,
-                ),
-              );
-              context.go(PropertyWizardStep.propertyType.routePath);
+                );
+                context.go('/home');
+              }
             },
           ),
         ),

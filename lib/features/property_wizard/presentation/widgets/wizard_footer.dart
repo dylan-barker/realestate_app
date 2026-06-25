@@ -6,14 +6,14 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../providers/wizard_navigation_provider.dart';
 
 class WizardFooter extends ConsumerWidget {
-  final VoidCallback? onNext;
+  final Future<void> Function()? onNext;
 
   const WizardFooter({super.key, this.onNext});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navData = ref.watch(wizardNavigationProvider);
-    final theme = ref.watch(themeProvider);
+    final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
 
     return Container(
@@ -48,7 +48,11 @@ class WizardFooter extends ConsumerWidget {
           CustomButton(
             text: 'Next',
             icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
-            onTap: navData.canGoNext ? onNext : null,
+            onTap: navData.canGoNext
+                ? () async {
+                    await onNext?.call();
+                  }
+                : null,
           ),
         ],
       ),

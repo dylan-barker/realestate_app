@@ -5,13 +5,15 @@ import 'package:go_router/go_router.dart';
 import '../../data/models/enums/property_wizard_step.dart';
 import '../../providers/property_provider.dart';
 
-void advanceWizard(BuildContext context, WidgetRef ref) {
+Future<void> advanceWizard(BuildContext context, WidgetRef ref) async {
   final viewModel = ref.read(propertyViewModelProvider.notifier);
-  viewModel.nextStep();
+  await viewModel.nextStep();
   final step = PropertyWizardStep.fromStepNumber(
     ref.read(propertyViewModelProvider).currentStep,
   );
-  context.push(step.routePath);
+  if (context.mounted) {
+    context.push(step.routePath);
+  }
 }
 
 void goBackWizard(BuildContext context, WidgetRef ref) {

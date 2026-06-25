@@ -44,6 +44,9 @@ class PropertyState {
   final Contact primaryContact;
   final List<Contact> coContacts;
 
+  // API metadata
+  final int? listingId;
+
   // Listing metadata
   final String referenceNumber;
   final String status;
@@ -70,6 +73,7 @@ class PropertyState {
     this.constructionYear = '',
     this.facingId,
     this.zoningId,
+    this.listingId,
     this.rooms = const [],
     this.parking = const [],
     this.listingValuation = const ListingValuation(),
@@ -108,6 +112,7 @@ class PropertyState {
     PropertyRunningCosts? propertyRunningCosts,
     Contact? primaryContact,
     List<Contact>? coContacts,
+    int? listingId,
     String? referenceNumber,
     String? status,
     String? p24Ref,
@@ -133,6 +138,7 @@ class PropertyState {
       constructionYear: constructionYear ?? this.constructionYear,
       facingId: facingId ?? this.facingId,
       zoningId: zoningId ?? this.zoningId,
+      listingId: listingId ?? this.listingId,
       rooms: rooms ?? this.rooms,
       parking: parking ?? this.parking,
       listingValuation: listingValuation ?? this.listingValuation,

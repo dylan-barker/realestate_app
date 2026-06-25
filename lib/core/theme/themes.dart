@@ -79,54 +79,78 @@ class RealEstateTheme {
         secondary: secondaryColor,
         surface: cardBackgroundColor,
       ),
-      textTheme: TextTheme(
-        // Modern typography using Google Fonts Inter with tight tracking
-        displayLarge: GoogleFonts.inter(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-          letterSpacing: -1.0,
+      textTheme: _textTheme(),
+    );
+  }
+
+  ThemeData toDarkThemeData() {
+    return ThemeData(
+      useMaterial3: true,
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      primaryColor: primaryColor,
+      colorScheme: ColorScheme.dark(
+        primary: primaryColor,
+        secondary: secondaryColor,
+        surface: const Color(0xFF1E1E1E),
+      ),
+      textTheme: _textTheme().copyWith(
+        bodyMedium: _textTheme().bodyMedium?.copyWith(
+          color: const Color(0xFFA1A1AA),
         ),
-        displayMedium: GoogleFonts.inter(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-          letterSpacing: -0.5,
+        labelMedium: _textTheme().labelMedium?.copyWith(
+          color: const Color(0xFFA1A1AA),
         ),
-        titleLarge: GoogleFonts.inter(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-          letterSpacing: -0.5,
-        ),
-        titleMedium: GoogleFonts.inter(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
-        bodyLarge: GoogleFonts.inter(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          color: textPrimary,
-          height: 1.4,
-        ),
-        bodyMedium: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-          color: textSecondary,
-          height: 1.4,
-        ),
-        labelLarge: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: textLabel,
-          letterSpacing: 0.5,
-        ),
-        labelMedium: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: textSecondary,
-        ),
+      ),
+    );
+  }
+
+  TextTheme _textTheme() {
+    return TextTheme(
+      displayLarge: GoogleFonts.inter(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: textPrimary,
+        letterSpacing: -1.0,
+      ),
+      displayMedium: GoogleFonts.inter(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: textPrimary,
+        letterSpacing: -0.5,
+      ),
+      titleLarge: GoogleFonts.inter(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: textPrimary,
+        letterSpacing: -0.5,
+      ),
+      titleMedium: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: textPrimary,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: textPrimary,
+        height: 1.4,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+        color: textSecondary,
+        height: 1.4,
+      ),
+      labelLarge: GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: textLabel,
+        letterSpacing: 0.5,
+      ),
+      labelMedium: GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: textSecondary,
       ),
     );
   }
