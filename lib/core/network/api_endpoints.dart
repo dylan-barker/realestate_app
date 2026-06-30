@@ -10,6 +10,9 @@ class ApiEndpoints {
   static const String facing = '/api/facing';
   static const String zoning = '/api/zoning';
 
+  // Auth
+  static const String login = '/api/auth/login';
+
   // Listings
   static const String listings = '/api/listings';
 

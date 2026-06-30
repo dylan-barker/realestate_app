@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  late final Dio _dio;
+  final Dio _dio;
+  String? _token;
+  void Function()? _onUnauthorized;
 
-  ApiClient({String? baseUrl}) {
-    _dio = Dio(BaseOptions(
+  ApiClient({String? baseUrl}) : _dio = Dio(BaseOptions(
       baseUrl: baseUrl ?? 'http://localhost:5169',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
@@ -12,13 +13,31 @@ class ApiClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-    ));
-
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-    ));
+    )) {
+    _dio.interceptors.addAll([
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+      ),
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (_token != null) {
+            options.headers['Authorization'] = 'Bearer $_token';
+          }
+          handler.next(options);
+        },
+        onError: (error, handler) {
+          if (error.response?.statusCode == 401) {
+            _onUnauthorized?.call();
+          }
+          handler.next(error);
+        },
+      ),
+    ]);
   }
+
+  void setToken(String? token) => _token = token;
+  void setOnUnauthorized(void Function()? callback) => _onUnauthorized = callback;
 
   Future<Response<T>> get<T>(
     String path, {

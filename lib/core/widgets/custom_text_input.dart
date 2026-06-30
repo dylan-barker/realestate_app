@@ -14,6 +14,7 @@ class CustomTextInput extends StatefulWidget {
   final InputStyle style;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final bool obscureText;
   final bool isRequired;
   final int maxLines;
   final String? subtext;
@@ -27,6 +28,7 @@ class CustomTextInput extends StatefulWidget {
     this.controller,
     this.onChanged,
     this.keyboardType = TextInputType.text,
+    this.obscureText = false,
     this.style = InputStyle.cardBorder,
     this.prefixIcon,
     this.suffixIcon,
@@ -76,6 +78,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
       onChanged: widget.onChanged,
       focusNode: _focusNode,
       keyboardType: widget.keyboardType,
+      obscureText: widget.obscureText,
       maxLines: widget.maxLines,
       style: textTheme.bodyLarge?.copyWith(
         fontWeight: FontWeight.w600,

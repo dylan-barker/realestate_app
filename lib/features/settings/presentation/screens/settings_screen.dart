@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref.read(authProvider.notifier).logout();
+      if (context.mounted) {
+        context.go('/login');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
     final themeMode = ref.watch(themeModeProvider);
+    final authState = ref.watch(authProvider);
 
     final isDark = themeMode == ThemeMode.dark;
 
@@ -53,6 +83,71 @@ class SettingsScreen extends ConsumerWidget {
                       value ? ThemeMode.dark : ThemeMode.light,
                     );
               },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            decoration: BoxDecoration(
+              color: theme.cardBackgroundColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.borderLight),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (authState.displayName != null)
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: theme.borderLight),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: theme.primaryColor,
+                          child: Text(
+                            authState.displayName![0].toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              authState.displayName!,
+                              style: textTheme.titleMedium,
+                            ),
+                            Text(
+                              authState.role ?? '',
+                              style: textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ListTile(
+                  title: Text(
+                    'Sign Out',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                  leading: Icon(
+                    Icons.logout,
+                    color: theme.primaryColor,
+                  ),
+                  onTap: () => _handleLogout(context, ref),
+                ),
+              ],
             ),
           ),
         ],
