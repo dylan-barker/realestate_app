@@ -8,6 +8,7 @@ class WizardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final List<Widget>? actions;
   final double bottomBorderHeight;
+  final RealEstateTheme theme;
 
   const WizardAppBar({
     super.key,
@@ -15,6 +16,7 @@ class WizardAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.actions,
     this.bottomBorderHeight = 1.0,
+    required this.theme,
   });
 
   @override
@@ -22,11 +24,10 @@ class WizardAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.cardBackgroundColor,
       elevation: 0,
       scrolledUnderElevation: 0,
       leading: onBack != null

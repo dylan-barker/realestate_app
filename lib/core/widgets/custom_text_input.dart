@@ -128,7 +128,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardBackgroundColor,
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
             color: resolvedBorderColor,

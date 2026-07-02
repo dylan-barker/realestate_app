@@ -122,8 +122,8 @@ class ScaffoldWithNavBar extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(index),
-        selectedItemColor: const Color(0xFFCC0000),
-        unselectedItemColor: const Color(0xFF71717A),
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

@@ -1,4 +1,7 @@
+import 'dart:io' show Platform, HttpClient;
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -6,14 +9,22 @@ class ApiClient {
   void Function()? _onUnauthorized;
 
   ApiClient({String? baseUrl}) : _dio = Dio(BaseOptions(
-      baseUrl: baseUrl ?? 'http://localhost:5169',
+      baseUrl: baseUrl ?? (Platform.isAndroid ? 'https://10.0.2.2:7063' : 'https://localhost:7063'),
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      followRedirects: true,
     )) {
+    _dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback = (cert, host, port) => true;
+        return client;
+      },
+    );
     _dio.interceptors.addAll([
       LogInterceptor(
         requestBody: true,

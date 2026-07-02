@@ -30,7 +30,7 @@ class RoomSection extends StatelessWidget {
     final hasRooms = rooms.isNotEmpty;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardBackgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.borderLight),
       ),
@@ -208,6 +208,7 @@ class RoomSection extends StatelessWidget {
     showRealEstateDialog(
       context: context,
       title: 'Remove Room',
+      theme: theme,
       content: Text(
         'Are you sure you want to remove "${room.name}"?',
         style: textTheme.bodyLarge,

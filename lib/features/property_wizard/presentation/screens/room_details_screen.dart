@@ -69,6 +69,7 @@ class RoomDetailsStep extends ConsumerWidget {
           viewModel.selectRoomForEditing(null);
           context.pop();
         },
+        theme: theme,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -93,7 +94,6 @@ class RoomDetailsStep extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               CustomCard(
-                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20.0,
                   vertical: 16.0,
@@ -270,7 +270,7 @@ class RoomDetailsStep extends ConsumerWidget {
                   icon: const Icon(Icons.add, size: 22),
                   label: const Text('ADD CUSTOM FEATURE'),
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: theme.cardBackgroundColor,
                     foregroundColor: theme.primaryColor,
                     side: BorderSide(
                       color: theme.primaryColor.withValues(alpha: 0.4),
@@ -301,7 +301,6 @@ class RoomDetailsStep extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               CustomCard(
-                backgroundColor: Colors.white,
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,6 +498,7 @@ class RoomDetailsStep extends ConsumerWidget {
   ) async {
     final result = await showRealEstateBottomSheet<String>(
       context: context,
+      theme: theme,
       builder: (context) {
         return SafeArea(
           child: Padding(
@@ -560,6 +560,7 @@ class RoomDetailsStep extends ConsumerWidget {
     showRealEstateDialog(
       context: context,
       title: 'Rename Room',
+      theme: theme,
       content: CustomTextInput(
         theme: theme,
         label: 'Room Name',
@@ -595,6 +596,7 @@ class RoomDetailsStep extends ConsumerWidget {
     showRealEstateDialog(
       context: context,
       title: 'Add Amenity / Feature',
+      theme: theme,
       content: CustomTextInput(
         theme: theme,
         label: 'Feature Name',

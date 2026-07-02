@@ -6,17 +6,18 @@ class WizardHeader extends StatelessWidget {
   final String progressLabel;
   final String title;
   final String? description;
+  final RealEstateTheme theme;
 
   const WizardHeader({
     super.key,
     required this.progressLabel,
     required this.title,
     this.description,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
     return Column(

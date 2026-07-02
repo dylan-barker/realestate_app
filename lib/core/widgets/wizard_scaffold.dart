@@ -35,6 +35,7 @@ class WizardScaffold extends ConsumerWidget {
       appBar: WizardAppBar(
         title: navData.headerTitle,
         onBack: onBack,
+        theme: theme,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -47,6 +48,7 @@ class WizardScaffold extends ConsumerWidget {
                 progressLabel: navData.progressLabel,
                 title: title,
                 description: description,
+                theme: theme,
               ),
               const SizedBox(height: 24),
               ...children,

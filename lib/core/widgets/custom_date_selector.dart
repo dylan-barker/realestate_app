@@ -60,7 +60,7 @@ class CustomDateSelector extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardBackgroundColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: theme.borderLight),
             ),

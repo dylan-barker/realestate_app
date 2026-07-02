@@ -18,6 +18,7 @@ class AddRoomSheet {
 
     showRealEstateBottomSheet(
       context: context,
+      theme: theme,
       builder: (context) {
         String customName = '';
 
@@ -67,7 +68,7 @@ class AddRoomSheet {
                             decoration: BoxDecoration(
                               border: Border.all(color: theme.borderLight),
                               borderRadius: BorderRadius.circular(16),
-                              color: Colors.white,
+                              color: theme.cardBackgroundColor,
                             ),
                             child: Text(
                               type,

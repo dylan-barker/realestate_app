@@ -47,8 +47,8 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: theme.cardBackgroundColor,
+        surfaceTintColor: theme.cardBackgroundColor,
         title: Text(
           'Settings',
           style: textTheme.titleLarge,
@@ -110,8 +110,8 @@ class SettingsScreen extends ConsumerWidget {
                           backgroundColor: theme.primaryColor,
                           child: Text(
                             authState.displayName![0].toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: theme.cardBackgroundColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),

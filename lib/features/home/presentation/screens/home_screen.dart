@@ -17,8 +17,8 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: theme.cardBackgroundColor,
+        surfaceTintColor: theme.cardBackgroundColor,
         title: Text(
           'My Properties',
           style: textTheme.titleLarge,

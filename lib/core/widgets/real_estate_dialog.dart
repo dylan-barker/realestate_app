@@ -7,15 +7,16 @@ Future<T?> showRealEstateDialog<T>({
   required String title,
   Widget? content,
   List<Widget>? actions,
+  RealEstateTheme? theme,
 }) {
-  final theme = RealEstateTheme.crimson();
-  final textTheme = theme.toThemeData().textTheme;
+  final resolvedTheme = theme ?? RealEstateTheme.crimson();
+  final textTheme = resolvedTheme.toThemeData().textTheme;
 
   return showDialog<T>(
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: resolvedTheme.cardBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
@@ -62,11 +63,13 @@ Widget dialogActionButton({
 Future<T?> showRealEstateBottomSheet<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
+  RealEstateTheme? theme,
 }) {
+  final resolvedTheme = theme ?? RealEstateTheme.crimson();
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: resolvedTheme.cardBackgroundColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
     ),

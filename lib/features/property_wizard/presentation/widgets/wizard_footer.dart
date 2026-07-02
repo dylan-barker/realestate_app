@@ -19,7 +19,7 @@ class WizardFooter extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardBackgroundColor,
         border: Border(top: BorderSide(color: theme.borderLight, width: 1.0)),
       ),
       child: Row(

@@ -35,7 +35,7 @@ class CustomChip extends StatelessWidget {
         color: isSelectedState
             ? theme.primaryColor
             : (onDelete != null
-                  ? Colors.white
+                  ? theme.cardBackgroundColor
                   : theme.borderLight.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(20.0),
         border: Border.all(

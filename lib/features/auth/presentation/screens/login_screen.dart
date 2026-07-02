@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/theme/themes.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../providers/auth_provider.dart';
@@ -28,6 +28,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    final theme = ref.read(themeConfigProvider);
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
@@ -44,7 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authState.errorMessage!),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: theme.primaryColor,
           ),
         );
       }
@@ -53,7 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = RealEstateTheme.crimson();
+    final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
 
     return Scaffold(

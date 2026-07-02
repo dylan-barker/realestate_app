@@ -23,7 +23,7 @@ class ReviewStep extends ConsumerWidget {
     final bottomWidget = Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardBackgroundColor,
         border: Border(top: BorderSide(color: theme.borderLight, width: 1.0)),
       ),
       child: SafeArea(
@@ -258,7 +258,7 @@ class ReviewStep extends ConsumerWidget {
   }) {
     return CustomCard(
       theme: theme,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.cardBackgroundColor,
       padding: const EdgeInsets.all(18.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -115,7 +115,7 @@ class _RatingSliderState extends State<RatingSlider> {
                         child: Container(
                           color: isActive
                               ? widget.theme.primaryColor.withValues(alpha: 0.12)
-                              : Colors.white,
+                              : widget.theme.cardBackgroundColor,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

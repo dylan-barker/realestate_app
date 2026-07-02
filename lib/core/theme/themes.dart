@@ -69,6 +69,24 @@ class RealEstateTheme {
     );
   }
 
+  /// Dark variant of the default Editorial Crimson theme
+  factory RealEstateTheme.crimsonDark() {
+    return RealEstateTheme(
+      brandName: 'Editorial Crimson Dark',
+      primaryColor: const Color(0xFFE53935),
+      secondaryColor: const Color(0xFF3A3A3A),
+      backgroundColor: const Color(0xFF121212),
+      cardBackgroundColor: const Color(0xFF1E1E1E),
+      textPrimary: const Color(0xFFE4E4E7),
+      textSecondary: const Color(0xFFA1A1AA),
+      textLabel: const Color(0xFFD4B5A0),
+      completeColor: const Color(0xFF4ADE80),
+      pendingColor: const Color(0xFFFBBF24),
+      borderLight: const Color(0xFF333333),
+      borderSelected: const Color(0xFFE53935),
+    );
+  }
+
   ThemeData toThemeData() {
     return ThemeData(
       useMaterial3: true,
@@ -84,21 +102,63 @@ class RealEstateTheme {
   }
 
   ThemeData toDarkThemeData() {
+    final dark = RealEstateTheme.crimsonDark();
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      primaryColor: primaryColor,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: dark.backgroundColor,
+      primaryColor: dark.primaryColor,
       colorScheme: ColorScheme.dark(
-        primary: primaryColor,
-        secondary: secondaryColor,
-        surface: const Color(0xFF1E1E1E),
+        primary: dark.primaryColor,
+        secondary: dark.secondaryColor,
+        surface: dark.cardBackgroundColor,
       ),
-      textTheme: _textTheme().copyWith(
-        bodyMedium: _textTheme().bodyMedium?.copyWith(
-          color: const Color(0xFFA1A1AA),
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.inter(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: dark.textPrimary,
+          letterSpacing: -1.0,
         ),
-        labelMedium: _textTheme().labelMedium?.copyWith(
-          color: const Color(0xFFA1A1AA),
+        displayMedium: GoogleFonts.inter(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: dark.textPrimary,
+          letterSpacing: -0.5,
+        ),
+        titleLarge: GoogleFonts.inter(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: dark.textPrimary,
+          letterSpacing: -0.5,
+        ),
+        titleMedium: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: dark.textPrimary,
+        ),
+        bodyLarge: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: dark.textPrimary,
+          height: 1.4,
+        ),
+        bodyMedium: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: dark.textSecondary,
+          height: 1.4,
+        ),
+        labelLarge: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: dark.textLabel,
+          letterSpacing: 0.5,
+        ),
+        labelMedium: GoogleFonts.inter(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: dark.textSecondary,
         ),
       ),
     );

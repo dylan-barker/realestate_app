@@ -39,7 +39,7 @@ class CustomCard extends StatelessWidget {
     final resolvedBg =
         backgroundColor ??
         (isSelected
-            ? Colors.white
+            ? theme.cardBackgroundColor
             : theme.backgroundColor.withValues(alpha: 0.4));
     final resolvedBorderColor = isSelected
         ? theme.borderSelected
