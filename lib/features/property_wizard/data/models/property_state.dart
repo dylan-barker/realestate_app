@@ -51,19 +51,20 @@ class PropertyState {
   final String referenceNumber;
   final String status;
   final String? p24Ref;
+  final String? errorMessage;
 
   PropertyState({
     this.currentStep = 1,
     this.selectedRoomId,
     this.propertyTypeId = 1,
     this.streetNumber = '',
-    this.street = '124 Some Street',
+    this.street = '',
     this.unitNumber = '',
-    this.suburb = 'Strand',
-    this.city = 'Cape Town',
-    this.province = 'Western Cape',
-    this.country = 'South Africa',
-    this.postalCode = '7140',
+    this.suburb = '',
+    this.city = '',
+    this.province = '',
+    this.country = '',
+    this.postalCode = '',
     this.estateName = '',
     this.erfNumber = '',
     this.latitude,
@@ -83,6 +84,7 @@ class PropertyState {
     this.referenceNumber = '',
     this.status = 'draft',
     this.p24Ref,
+    this.errorMessage,
   });
 
   PropertyState copyWith({
@@ -116,6 +118,7 @@ class PropertyState {
     String? referenceNumber,
     String? status,
     String? p24Ref,
+    String? errorMessage,
   }) {
     return PropertyState(
       currentStep: currentStep ?? this.currentStep,
@@ -148,6 +151,7 @@ class PropertyState {
       referenceNumber: referenceNumber ?? this.referenceNumber,
       status: status ?? this.status,
       p24Ref: p24Ref ?? this.p24Ref,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }

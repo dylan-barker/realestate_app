@@ -36,6 +36,7 @@ class PropertyStateModel {
   final String referenceNumber;
   final String status;
   final String? p24Ref;
+  final String? errorMessage;
 
   PropertyStateModel({
     required this.currentStep,
@@ -68,6 +69,7 @@ class PropertyStateModel {
     required this.referenceNumber,
     required this.status,
     this.p24Ref,
+    this.errorMessage,
   });
 
   factory PropertyStateModel.fromEntity(PropertyState entity) {
@@ -102,6 +104,7 @@ class PropertyStateModel {
       referenceNumber: entity.referenceNumber,
       status: entity.status,
       p24Ref: entity.p24Ref,
+      errorMessage: entity.errorMessage,
     );
   }
 
@@ -137,6 +140,7 @@ class PropertyStateModel {
       referenceNumber: referenceNumber,
       status: status,
       p24Ref: p24Ref,
+      errorMessage: errorMessage,
     );
   }
 

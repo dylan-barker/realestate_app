@@ -28,10 +28,10 @@ class PropertyRepositoryImpl implements IPropertyRepository {
     required RoomApiService roomApi,
     required ContactApiService contactApi,
     required ParkingApiService parkingApi,
-  })  : _listingApi = listingApi,
-        _roomApi = roomApi,
-        _contactApi = contactApi,
-        _parkingApi = parkingApi;
+  }) : _listingApi = listingApi,
+       _roomApi = roomApi,
+       _contactApi = contactApi,
+       _parkingApi = parkingApi;
 
   @override
   Future<List<Room>> getInitialRooms() async {
@@ -40,14 +40,18 @@ class PropertyRepositoryImpl implements IPropertyRepository {
 
   @override
   Future<void> savePropertyDraft(PropertyState propertyState) async {
-    developer.log('Draft saved: Step ${propertyState.currentStep}, Property Type ID: ${propertyState.propertyTypeId}');
+    developer.log(
+      'Draft saved: Step ${propertyState.currentStep}, Property Type ID: ${propertyState.propertyTypeId}',
+    );
   }
 
   @override
   Future<int> createListing(int propertyTypeId) async {
     final request = CreateListingRequest(propertyTypeId: propertyTypeId);
     final response = await _listingApi.create(request);
-    developer.log('Listing created: ID=${response.id}, Ref=${response.referenceNumber}');
+    developer.log(
+      'Listing created: ID=${response.id}, Ref=${response.referenceNumber}',
+    );
     return response.id;
   }
 
@@ -72,8 +76,12 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   Future<void> upsertBuildingInfo(int listingId, PropertyState state) async {
     final request = UpsertBuildingInfoRequest(
       erfSize: state.erfSize.isNotEmpty ? num.tryParse(state.erfSize) : null,
-      floorArea: state.floorArea.isNotEmpty ? num.tryParse(state.floorArea) : null,
-      constructionYear: state.constructionYear.isNotEmpty ? int.tryParse(state.constructionYear) : null,
+      floorArea: state.floorArea.isNotEmpty
+          ? num.tryParse(state.floorArea)
+          : null,
+      constructionYear: state.constructionYear.isNotEmpty
+          ? int.tryParse(state.constructionYear)
+          : null,
       facingId: state.facingId,
       zoningId: state.zoningId,
     );
@@ -85,7 +93,9 @@ class PropertyRepositoryImpl implements IPropertyRepository {
     final request = UpsertValuationRequest(
       ownersNetPrice: _parseDecimal(state.listingValuation.ownersNetPrice),
       agentValuation: _parseDecimal(state.listingValuation.agentValuation),
-      commissionPercent: _parseDecimal(state.listingValuation.commissionPercent),
+      commissionPercent: _parseDecimal(
+        state.listingValuation.commissionPercent,
+      ),
     );
     await _listingApi.upsertValuation(listingId, request);
   }
@@ -103,42 +113,125 @@ class PropertyRepositoryImpl implements IPropertyRepository {
 
   @override
   Future<void> upsertRooms(int listingId, List<Room> rooms) async {
-    for (final room in rooms) {
-      final existingRooms = await _roomApi.getRooms(listingId);
-      final existing = existingRooms.where((r) => r.name == room.name).toList();
+    final existingRooms = await _roomApi.getRooms(listingId);
+    final existingMap = {for (final r in existingRooms) r.id: r};
 
-      if (existing.isEmpty) {
-        final request = CreateRoomRequest(
-          name: room.name,
+    final roomLocalIds = rooms.map((r) => r.id).toSet();
+    final roomApiIds = existingRooms.map((r) => r.id).toSet();
+
+    final toDelete = roomApiIds
+        .where((id) => !roomLocalIds.contains(id.toString()))
+        .toList();
+    final toCreate = <Room>[];
+    final toUpdate = <MapEntry<int, Room>>[];
+
+    for (final room in rooms) {
+      final apiId = int.tryParse(room.id);
+      if (apiId != null && existingMap.containsKey(apiId)) {
+        toUpdate.add(MapEntry(apiId, room));
+      } else if (apiId == null ||
+          (!existingMap.containsKey(apiId) &&
+              existingRooms.every((e) => e.name != room.name))) {
+        toCreate.add(room);
+      }
+    }
+
+    for (final apiId in toDelete) {
+      await _roomApi.deleteRoom(listingId, apiId);
+    }
+
+    for (final room in toCreate) {
+      final request = CreateRoomRequest(
+        name: room.name,
+        roomTypeId: room.roomTypeId,
+        roomTypeOther: room.roomTypeOther,
+        photoUrl: room.photoUrl,
+      );
+      final created = await _roomApi.createRoom(listingId, request);
+
+      if (room.photoUrl != null && !room.photoUrl!.startsWith('http')) {
+        try {
+          await _roomApi.uploadPhoto(listingId, created.id, room.photoUrl!);
+        } catch (_) {}
+      }
+
+      if (room.conditionRating != null) {
+        await _roomApi.upsertCondition(
+          listingId,
+          created.id,
+          UpsertRoomConditionRequest(
+            conditionRating: room.conditionRating,
+            notes: room.notes.isNotEmpty ? room.notes : null,
+            conditionCategoryId: 1,
+          ),
+        );
+      }
+
+      for (final featureId in room.featureIds) {
+        await _roomApi.linkFeature(listingId, created.id, featureId);
+      }
+    }
+
+    for (final entry in toUpdate) {
+      final apiId = entry.key;
+      final room = entry.value;
+      final existing = existingMap[apiId]!;
+
+      await _roomApi.updateRoom(
+        listingId,
+        apiId,
+        UpdateRoomRequest(
+          name: room.name.isNotEmpty ? room.name : null,
           roomTypeId: room.roomTypeId,
           roomTypeOther: room.roomTypeOther,
           photoUrl: room.photoUrl,
-        );
-        final created = await _roomApi.createRoom(listingId, request);
+        ),
+      );
 
-        if (room.conditionRating != null) {
-          await _roomApi.upsertCondition(
-            listingId,
-            created.id,
-            UpsertRoomConditionRequest(
-              conditionRating: room.conditionRating,
-              notes: room.notes.isNotEmpty ? room.notes : null,
-              conditionCategoryId: 1,
-            ),
-          );
-        }
+      if (room.photoUrl != null && !room.photoUrl!.startsWith('http')) {
+        try {
+          await _roomApi.uploadPhoto(listingId, apiId, room.photoUrl!);
+        } catch (_) {}
+      }
+
+      if (room.conditionRating != existing.condition?.conditionRating ||
+          room.notes != (existing.condition?.notes ?? '')) {
+        await _roomApi.upsertCondition(
+          listingId,
+          apiId,
+          UpsertRoomConditionRequest(
+            conditionRating: room.conditionRating,
+            notes: room.notes.isNotEmpty ? room.notes : null,
+            conditionCategoryId: 1,
+          ),
+        );
+      }
+
+      final existingFeatureIds = existing.features.map((f) => f.id).toSet();
+      final desiredFeatureIds = room.featureIds.toSet();
+
+      for (final fid in desiredFeatureIds.difference(existingFeatureIds)) {
+        await _roomApi.linkFeature(listingId, apiId, fid);
+      }
+      for (final fid in existingFeatureIds.difference(desiredFeatureIds)) {
+        await _roomApi.unlinkFeature(listingId, apiId, fid);
       }
     }
   }
 
   @override
-  Future<void> upsertParking(int listingId, List<ListingParking> parking) async {
+  Future<void> upsertParking(
+    int listingId,
+    List<ListingParking> parking,
+  ) async {
     final existingParking = await _parkingApi.getParking(listingId);
     final existingTypeIds = existingParking.map((p) => p.parkingTypeId).toSet();
 
     for (final p in parking) {
       if (existingTypeIds.contains(p.parkingTypeId)) {
-        final existing = existingParking.firstWhere((ep) => ep.parkingTypeId == p.parkingTypeId);
+        final existing = existingParking.firstWhere(
+          (ep) => ep.parkingTypeId == p.parkingTypeId,
+        );
         await _parkingApi.updateParking(
           listingId,
           existing.id,
@@ -147,15 +240,25 @@ class PropertyRepositoryImpl implements IPropertyRepository {
       } else {
         await _parkingApi.addParking(
           listingId,
-          AddParkingRequest(parkingTypeId: p.parkingTypeId, quantity: p.quantity),
+          AddParkingRequest(
+            parkingTypeId: p.parkingTypeId,
+            quantity: p.quantity,
+          ),
         );
       }
     }
   }
 
   @override
-  Future<void> upsertContacts(int listingId, Contact primaryContact, List<Contact> coContacts) async {
-    final allContacts = [if (primaryContact.fullName.isNotEmpty) primaryContact, ...coContacts];
+  Future<void> upsertContacts(
+    int listingId,
+    Contact primaryContact,
+    List<Contact> coContacts,
+  ) async {
+    final allContacts = [
+      if (primaryContact.fullName.isNotEmpty) primaryContact,
+      ...coContacts,
+    ];
     final existingContacts = await _contactApi.getContacts(listingId);
 
     for (int i = 0; i < allContacts.length; i++) {
@@ -165,25 +268,43 @@ class PropertyRepositoryImpl implements IPropertyRepository {
         final request = UpdateContactRequest(
           fullName: contact.fullName.isNotEmpty ? contact.fullName : null,
           idNumber: contact.idNumber.isNotEmpty ? contact.idNumber : null,
-          companyName: contact.companyName.isNotEmpty ? contact.companyName : null,
-          companyRegistrationNumber: contact.companyRegistrationNumber.isNotEmpty
+          companyName: contact.companyName.isNotEmpty
+              ? contact.companyName
+              : null,
+          companyRegistrationNumber:
+              contact.companyRegistrationNumber.isNotEmpty
               ? contact.companyRegistrationNumber
               : null,
-          mobilePhone: contact.mobilePhone.isNotEmpty ? contact.mobilePhone : null,
-          emailAddress: contact.emailAddress.isNotEmpty ? contact.emailAddress : null,
+          mobilePhone: contact.mobilePhone.isNotEmpty
+              ? contact.mobilePhone
+              : null,
+          emailAddress: contact.emailAddress.isNotEmpty
+              ? contact.emailAddress
+              : null,
           role: contact.role.isNotEmpty ? contact.role : null,
         );
-        await _contactApi.updateContact(listingId, existingContacts[i].id, request);
+        await _contactApi.updateContact(
+          listingId,
+          existingContacts[i].id,
+          request,
+        );
       } else {
         final request = AddContactRequest(
           fullName: contact.fullName.isNotEmpty ? contact.fullName : null,
           idNumber: contact.idNumber.isNotEmpty ? contact.idNumber : null,
-          companyName: contact.companyName.isNotEmpty ? contact.companyName : null,
-          companyRegistrationNumber: contact.companyRegistrationNumber.isNotEmpty
+          companyName: contact.companyName.isNotEmpty
+              ? contact.companyName
+              : null,
+          companyRegistrationNumber:
+              contact.companyRegistrationNumber.isNotEmpty
               ? contact.companyRegistrationNumber
               : null,
-          mobilePhone: contact.mobilePhone.isNotEmpty ? contact.mobilePhone : null,
-          emailAddress: contact.emailAddress.isNotEmpty ? contact.emailAddress : null,
+          mobilePhone: contact.mobilePhone.isNotEmpty
+              ? contact.mobilePhone
+              : null,
+          emailAddress: contact.emailAddress.isNotEmpty
+              ? contact.emailAddress
+              : null,
           role: contact.role.isNotEmpty ? contact.role : null,
         );
         await _contactApi.addContact(listingId, request);
@@ -195,6 +316,15 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   Future<void> submitListing(int listingId) async {
     await _listingApi.submit(listingId);
     developer.log('Listing submitted: ID=$listingId');
+  }
+
+  @override
+  Future<void> uploadRoomPhoto(
+    int listingId,
+    int roomId,
+    String filePath,
+  ) async {
+    await _roomApi.uploadPhoto(listingId, roomId, filePath);
   }
 
   num? _parseDecimal(String value) {

@@ -19,9 +19,13 @@ class ApiEndpoints {
   static String listing(int id) => '/api/listings/$id';
   static String listingSubmit(int id) => '/api/listings/$id/submit';
   static String listingAddress(int id) => '/api/listings/$id/address';
-  static String listingBuildingInfo(int id) => '/api/listings/$id/building-info';
+
+  static String listingBuildingInfo(int id) =>
+      '/api/listings/$id/building-info';
   static String listingValuation(int id) => '/api/listings/$id/valuation';
-  static String listingRunningCosts(int id) => '/api/listings/$id/running-costs';
+
+  static String listingRunningCosts(int id) =>
+      '/api/listings/$id/running-costs';
   static String listingRooms(int id) => '/api/listings/$id/rooms';
   static String listingRoom(int listingId, int roomId) =>
       '/api/listings/$listingId/rooms/$roomId';
@@ -34,8 +38,14 @@ class ApiEndpoints {
   static String listingRoomCustomFeatures(int listingId, int roomId) =>
       '/api/listings/$listingId/rooms/$roomId/custom-features';
   static String listingRoomCustomFeature(
-          int listingId, int roomId, int customFeatureId) =>
+    int listingId,
+    int roomId,
+    int customFeatureId,
+  ) =>
       '/api/listings/$listingId/rooms/$roomId/custom-features/$customFeatureId';
+
+  static String listingRoomPhoto(int listingId, int roomId) =>
+      '/api/listings/$listingId/rooms/$roomId/photo';
   static String listingParking(int id) => '/api/listings/$id/parking';
   static String listingSingleParking(int listingId, int parkingId) =>
       '/api/listings/$listingId/parking/$parkingId';

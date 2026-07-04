@@ -34,10 +34,10 @@ class ReviewStep extends ConsumerWidget {
             theme: theme,
             text: 'Submit Listing',
             onTap: () async {
-              await viewModel.saveDraft();
-              await viewModel.submitAndSave();
-              viewModel.reset();
-              if (context.mounted) {
+              final success = await viewModel.submitAndSave();
+              if (!context.mounted) return;
+              if (success) {
+                viewModel.reset();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: const Text(
@@ -47,6 +47,15 @@ class ReviewStep extends ConsumerWidget {
                   ),
                 );
                 context.go('/home');
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      state.errorMessage ?? 'Failed to submit listing',
+                    ),
+                    backgroundColor: Colors.red.shade700,
+                  ),
+                );
               }
             },
           ),

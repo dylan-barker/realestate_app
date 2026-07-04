@@ -14,6 +14,13 @@ abstract class IPropertyRepository {
   Future<void> upsertRunningCosts(int listingId, PropertyState state);
   Future<void> upsertRooms(int listingId, List<Room> rooms);
   Future<void> upsertParking(int listingId, List<ListingParking> parking);
-  Future<void> upsertContacts(int listingId, Contact primaryContact, List<Contact> coContacts);
+
+  Future<void> upsertContacts(
+    int listingId,
+    Contact primaryContact,
+    List<Contact> coContacts,
+  );
   Future<void> submitListing(int listingId);
+
+  Future<void> uploadRoomPhoto(int listingId, int roomId, String filePath);
 }

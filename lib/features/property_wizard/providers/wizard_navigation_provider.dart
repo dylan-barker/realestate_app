@@ -35,7 +35,22 @@ class WizardNavigationData {
   }
 
   static bool _isStepValid(PropertyState state, PropertyWizardStep step) {
-    return true;
+    switch (step) {
+      case PropertyWizardStep.propertyType:
+        return state.propertyTypeId > 0;
+      case PropertyWizardStep.address:
+        return state.street.isNotEmpty && state.city.isNotEmpty;
+      case PropertyWizardStep.buildingInfo:
+        return true;
+      case PropertyWizardStep.propertyFeatures:
+        return state.rooms.isNotEmpty;
+      case PropertyWizardStep.valuationCosts:
+        return state.listingValuation.ownersNetPrice.isNotEmpty;
+      case PropertyWizardStep.contacts:
+        return state.primaryContact.fullName.isNotEmpty;
+      case PropertyWizardStep.review:
+        return true;
+    }
   }
 }
 

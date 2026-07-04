@@ -14,7 +14,9 @@ import '../data/models/property_state.dart';
 import '../data/repositories/property_repository.dart';
 import '../data/repositories/property_repository_impl.dart';
 
-final propertyRepositoryProvider = Provider.autoDispose<IPropertyRepository>((ref) {
+final propertyRepositoryProvider = Provider.autoDispose<IPropertyRepository>((
+  ref,
+) {
   final listingApi = ref.watch(listingApiServiceProvider);
   final roomApi = ref.watch(roomApiServiceProvider);
   final contactApi = ref.watch(contactApiServiceProvider);
@@ -29,8 +31,8 @@ final propertyRepositoryProvider = Provider.autoDispose<IPropertyRepository>((re
 
 final propertyViewModelProvider =
     NotifierProvider.autoDispose<PropertyViewModel, PropertyState>(() {
-  return PropertyViewModel();
-});
+      return PropertyViewModel();
+    });
 
 class PropertyViewModel extends Notifier<PropertyState> {
   late final IPropertyRepository _repository;
@@ -57,6 +59,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   Future<void> nextStep() async {
     final currentStep = state.currentStep;
 
+    state = state.copyWith(errorMessage: null);
     try {
       if (currentStep == 1 && state.listingId == null) {
         await startWizard();
@@ -89,7 +92,8 @@ class PropertyViewModel extends Notifier<PropertyState> {
         }
       }
     } catch (e) {
-      // Silently continue - saves are opportunistic
+      state = state.copyWith(errorMessage: 'Failed to save: $e');
+      return;
     }
 
     state = state.withNextStep();
@@ -126,10 +130,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void updateIdentifiers({String? estateName, String? erfNumber}) {
-    state = state.withIdentifiers(
-      estateName: estateName,
-      erfNumber: erfNumber,
-    );
+    state = state.withIdentifiers(estateName: estateName, erfNumber: erfNumber);
   }
 
   void updateTechnicalSpecs({
@@ -248,8 +249,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
     await _repository.savePropertyDraft(state);
   }
 
-  Future<void> submitAndSave() async {
+  Future<bool> submitAndSave() async {
     final listingId = state.listingId;
+    state = state.copyWith(errorMessage: null);
 
     try {
       if (listingId != null) {
@@ -266,9 +268,11 @@ class PropertyViewModel extends Notifier<PropertyState> {
         );
         await _repository.submitListing(listingId);
       }
+      return true;
     } catch (e) {
-      // Fall back to local save
+      state = state.copyWith(errorMessage: 'Failed to submit: $e');
       await _repository.savePropertyDraft(state);
+      return false;
     }
   }
 
