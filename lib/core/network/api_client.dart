@@ -2,6 +2,7 @@ import 'dart:io' show Platform, HttpClient;
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -27,8 +28,8 @@ class ApiClient {
     );
     _dio.interceptors.addAll([
       LogInterceptor(
-        requestBody: true,
-        responseBody: true,
+        requestBody: kDebugMode,
+        responseBody: kDebugMode,
       ),
       InterceptorsWrapper(
         onRequest: (options, handler) {
