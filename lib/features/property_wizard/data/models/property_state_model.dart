@@ -28,6 +28,7 @@ class PropertyStateModel {
   final int? zoningId;
   final List<RoomModel> rooms;
   final List<Map<String, dynamic>> parking;
+  final List<String> outdoorFeatures;
   final Map<String, dynamic> listingValuation;
   final Map<String, dynamic> propertyRunningCosts;
   final Map<String, dynamic> primaryContact;
@@ -61,6 +62,7 @@ class PropertyStateModel {
     this.zoningId,
     required this.rooms,
     required this.parking,
+    required this.outdoorFeatures,
     required this.listingValuation,
     required this.propertyRunningCosts,
     required this.primaryContact,
@@ -97,6 +99,7 @@ class PropertyStateModel {
       listingId: entity.listingId,
       rooms: entity.rooms.map((r) => RoomModel.fromEntity(r)).toList(),
       parking: entity.parking.map(_parkingToMap).toList(),
+      outdoorFeatures: List<String>.from(entity.outdoorFeatures),
       listingValuation: _valuationToMap(entity.listingValuation),
       propertyRunningCosts: _costsToMap(entity.propertyRunningCosts),
       primaryContact: _contactToMap(entity.primaryContact),
@@ -133,6 +136,7 @@ class PropertyStateModel {
       listingId: listingId,
       rooms: rooms.map((m) => m.toEntity()).toList(),
       parking: parking.map(_parkingFromMap).toList(),
+      outdoorFeatures: List<String>.from(outdoorFeatures),
       listingValuation: _valuationFromMap(listingValuation),
       propertyRunningCosts: _costsFromMap(propertyRunningCosts),
       primaryContact: _contactFromMap(primaryContact),

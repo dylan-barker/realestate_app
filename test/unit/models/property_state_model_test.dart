@@ -52,6 +52,7 @@ void main() {
         zoningId: null,
         rooms: [],
         parking: [],
+        outdoorFeatures: [],
         listingValuation: {
           'ownersNetPrice': '',
           'agentValuation': '',

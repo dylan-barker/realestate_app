@@ -38,4 +38,18 @@ extension PropertyFeaturesActions on PropertyState {
     current.removeWhere((p) => p.parkingTypeId == parkingTypeId);
     return copyWith(parking: current);
   }
+
+  PropertyState withAddedOutdoorFeature(String feature) {
+    final current = List<String>.from(outdoorFeatures);
+    if (!current.contains(feature)) {
+      current.add(feature);
+    }
+    return copyWith(outdoorFeatures: current);
+  }
+
+  PropertyState withRemovedOutdoorFeature(String feature) {
+    final current = List<String>.from(outdoorFeatures);
+    current.remove(feature);
+    return copyWith(outdoorFeatures: current);
+  }
 }

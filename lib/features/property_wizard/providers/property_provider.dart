@@ -165,6 +165,14 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.withRemovedParking(parkingTypeId);
   }
 
+  void addOutdoorFeature(String feature) {
+    state = state.withAddedOutdoorFeature(feature);
+  }
+
+  void removeOutdoorFeature(String feature) {
+    state = state.withRemovedOutdoorFeature(feature);
+  }
+
   void selectRoomForEditing(String? roomId) {
     state = state.withSelectedRoom(roomId);
   }

@@ -12,8 +12,9 @@ import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/rating_slider.dart';
-import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../../../core/widgets/real_estate_dialog.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
+import '../../data/models/enums/standard_amenity.dart';
 import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
 
@@ -192,7 +193,9 @@ class RoomDetailsStep extends ConsumerWidget {
                                 fontWeight: FontWeight.bold,
                                 color: isSelected
                                     ? theme.primaryColor
-                                    : theme.textSecondary.withValues(alpha: 0.6),
+                                    : theme.textSecondary.withValues(
+                                        alpha: 0.6,
+                                      ),
                               ),
                             ),
                           ],
@@ -243,29 +246,102 @@ class RoomDetailsStep extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              if (room.features.isNotEmpty)
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: room.features.length,
-                  itemBuilder: (context, index) {
-                    final feature = room.features[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      child: CustomChip(
-                        label: feature,
-                        onDelete: () =>
-                            viewModel.removeFeatureFromRoom(room.id, feature),
+              ...AmenityCategory.values.map((category) {
+                final amenities = StandardAmenity.values
+                    .where((a) => a.category == category)
+                    .toList();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category.displayString,
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textPrimary,
+                          fontSize: 14,
+                        ),
                       ),
-                    );
-                  },
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 10.0,
+                        children: amenities.map((amenity) {
+                          final isSelected = room.features.contains(
+                            amenity.displayString,
+                          );
+                          return CustomChip(
+                            theme: theme,
+                            label: amenity.displayString,
+                            isSelected: isSelected,
+                            onTap: () {
+                              if (isSelected) {
+                                viewModel.removeFeatureFromRoom(
+                                  room.id,
+                                  amenity.displayString,
+                                );
+                              } else {
+                                viewModel.addFeatureToRoom(
+                                  room.id,
+                                  amenity.displayString,
+                                );
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              if (room.features
+                  .where((f) => StandardAmenity.fromString(f) == null)
+                  .isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Custom',
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textPrimary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 10.0,
+                        children: room.features
+                            .where((f) => StandardAmenity.fromString(f) == null)
+                            .map(
+                              (feature) => CustomChip(
+                                theme: theme,
+                                label: feature,
+                                onDelete: () => viewModel.removeFeatureFromRoom(
+                                  room.id,
+                                  feature,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
                 ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => _showAddFeatureDialog(
-                    context, viewModel, room.id, theme, textTheme,
+                    context,
+                    viewModel,
+                    room.id,
+                    theme,
+                    textTheme,
                   ),
                   icon: const Icon(Icons.add, size: 22),
                   label: const Text('ADD CUSTOM FEATURE'),
