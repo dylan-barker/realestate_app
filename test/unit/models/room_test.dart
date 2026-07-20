@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:realestate_app/features/property_wizard/data/models/room.dart';
+import 'package:realestate_app/features/property_overview/data/models/room.dart';
 
 void main() {
   group('Room', () {

@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:realestate_app/features/property_wizard/data/models/contact.dart';
-import 'package:realestate_app/features/property_wizard/data/models/listing_parking.dart';
-import 'package:realestate_app/features/property_wizard/data/models/listing_valuation.dart';
-import 'package:realestate_app/features/property_wizard/data/models/property_running_costs.dart';
-import 'package:realestate_app/features/property_wizard/data/models/property_state.dart';
-import 'package:realestate_app/features/property_wizard/data/models/room.dart';
+import 'package:realestate_app/features/property_overview/data/models/contact.dart';
+import 'package:realestate_app/features/property_overview/data/models/listing_parking.dart';
+import 'package:realestate_app/features/property_overview/data/models/listing_valuation.dart';
+import 'package:realestate_app/features/property_overview/data/models/property_running_costs.dart';
+import 'package:realestate_app/features/property_overview/data/models/property_state.dart';
+import 'package:realestate_app/features/property_overview/data/models/room.dart';
 
 void main() {
   group('PropertyState', () {
@@ -27,10 +27,7 @@ void main() {
     test('copyWith() overrides specified fields', () {
       final state = PropertyState();
 
-      final updated = state.copyWith(
-        city: 'Johannesburg',
-        street: 'Main St',
-      );
+      final updated = state.copyWith(city: 'Johannesburg', street: 'Main St');
 
       expect(updated.city, 'Johannesburg');
       expect(updated.street, 'Main St');
@@ -75,10 +72,7 @@ void main() {
     });
 
     test('copyWith() preserves fields not specified', () {
-      final state = PropertyState(
-        propertyTypeId: 3,
-        street: 'Oak Ave',
-      );
+      final state = PropertyState(propertyTypeId: 3, street: 'Oak Ave');
 
       final updated = state.copyWith(city: 'Durban');
 

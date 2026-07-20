@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:realestate_app/features/property_wizard/data/models/listing_valuation.dart';
+import 'package:realestate_app/features/property_overview/data/models/listing_valuation.dart';
 
 void main() {
   group('ListingValuation', () {

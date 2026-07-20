@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:realestate_app/features/property_wizard/data/models/room.dart';
-import 'package:realestate_app/features/property_wizard/data/models/room_model.dart';
+import 'package:realestate_app/features/property_overview/data/models/room.dart';
+import 'package:realestate_app/features/property_overview/data/models/room_model.dart';
 
 void main() {
   group('RoomModel', () {
