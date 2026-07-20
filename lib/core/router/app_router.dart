@@ -36,8 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-          ppath: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -46,7 +45,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                ppath: '/home',
+                path: '/home',
                 builder: (context, state) => const HomeScreen(),
               ),
             ],
@@ -54,7 +53,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                ppath: '/settings',
+                path: '/settings',
                 builder: (context, state) => const SettingsScreen(),
               ),
             ],
@@ -70,7 +69,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        ppath: '/property/:id/property-type',
+        path: '/property/:id/property-type',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyTypeStep(),
       ),
