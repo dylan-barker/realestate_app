@@ -8,6 +8,10 @@ abstract class IPropertyRepository {
   Future<void> savePropertyDraft(PropertyState propertyState);
 
   Future<int> createListing(int propertyTypeId);
+
+  Future<PropertyState> loadListing(int listingId);
+
+  Future<void> updatePropertyType(int listingId, int propertyTypeId);
   Future<void> upsertAddress(int listingId, PropertyState state);
   Future<void> upsertBuildingInfo(int listingId, PropertyState state);
   Future<void> upsertValuation(int listingId, PropertyState state);

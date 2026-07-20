@@ -46,9 +46,13 @@ class HomeScreen extends ConsumerWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        onPressed: () {
-          ref.read(propertyViewModelProvider.notifier).reset();
-          context.push('/wizard/property-type');
+        onPressed: () async {
+          final viewModel = ref.read(propertyViewModelProvider.notifier);
+          viewModel.reset();
+          final listingId = await viewModel.createNewListing();
+          if (context.mounted) {
+            context.push('/property/$listingId');
+          }
         },
       ),
       body: listingsAsync.when(
@@ -62,7 +66,7 @@ class HomeScreen extends ConsumerWidget {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final listing = listings[index];
-                return _buildListingCard(listing, theme, textTheme);
+                return _buildListingCard(listing, theme, textTheme, context);
               },
             ),
           );
@@ -77,56 +81,61 @@ class HomeScreen extends ConsumerWidget {
     ListingSummaryDto listing,
     RealEstateTheme theme,
     TextTheme textTheme,
+    BuildContext context,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.borderLight),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  listing.referenceNumber,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.textPrimary,
+    return InkWell(
+      onTap: () => context.push('/property/${listing.id}'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardBackgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: theme.borderLight),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listing.referenceNumber,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Status: ${listing.status}',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: theme.textSecondary,
+                  const SizedBox(height: 4),
+                  Text(
+                    'Status: ${listing.status}',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: theme.textSecondary,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: listing.status == 'draft'
-                  ? theme.pendingColor.withValues(alpha: 0.15)
-                  : theme.completeColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              listing.status.toUpperCase(),
-              style: textTheme.labelLarge?.copyWith(
-                color: listing.status == 'draft'
-                    ? theme.pendingColor
-                    : theme.completeColor,
-                fontWeight: FontWeight.bold,
+                ],
               ),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: listing.status == 'draft'
+                    ? theme.pendingColor.withValues(alpha: 0.15)
+                    : theme.completeColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                listing.status.toUpperCase(),
+                style: textTheme.labelLarge?.copyWith(
+                  color: listing.status == 'draft'
+                      ? theme.pendingColor
+                      : theme.completeColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,9 +1,10 @@
 import 'address_dtos.dart';
 import 'building_info_dtos.dart';
-import 'valuation_dtos.dart';
-import 'room_dtos.dart';
-import 'parking_dtos.dart';
 import 'contact_dtos.dart';
+import 'outdoor_feature_dtos.dart';
+import 'parking_dtos.dart';
+import 'room_dtos.dart';
+import 'valuation_dtos.dart';
 
 class CreateListingRequest {
   final int propertyTypeId;
@@ -12,9 +13,9 @@ class CreateListingRequest {
   const CreateListingRequest({required this.propertyTypeId, this.p24Ref});
 
   Map<String, dynamic> toJson() => {
-        'propertyTypeId': propertyTypeId,
-        if (p24Ref != null) 'p24Ref': p24Ref,
-      };
+    'propertyTypeId': propertyTypeId,
+    if (p24Ref != null) 'p24Ref': p24Ref,
+  };
 }
 
 class UpdateListingRequest {
@@ -25,10 +26,10 @@ class UpdateListingRequest {
   const UpdateListingRequest({this.status, this.p24Ref, this.propertyTypeId});
 
   Map<String, dynamic> toJson() => {
-        if (status != null) 'status': status,
-        if (p24Ref != null) 'p24Ref': p24Ref,
-        if (propertyTypeId != null) 'propertyTypeId': propertyTypeId,
-      };
+    if (status != null) 'status': status,
+    if (p24Ref != null) 'p24Ref': p24Ref,
+    if (propertyTypeId != null) 'propertyTypeId': propertyTypeId,
+  };
 }
 
 class ListingSummaryDto {
@@ -88,6 +89,7 @@ class ListingResponse {
   final List<RoomDto> rooms;
   final List<ParkingDto> parking;
   final List<ContactDto> contacts;
+  final List<OutdoorFeatureDto> outdoorFeatures;
 
   const ListingResponse({
     required this.id,
@@ -106,6 +108,7 @@ class ListingResponse {
     this.rooms = const [],
     this.parking = const [],
     this.contacts = const [],
+    this.outdoorFeatures = const [],
   });
 
   factory ListingResponse.fromJson(Map<String, dynamic> json) {
@@ -125,24 +128,38 @@ class ListingResponse {
           ? ListingAddressDto.fromJson(json['address'] as Map<String, dynamic>)
           : null,
       buildingInfo: json['buildingInfo'] != null
-          ? BuildingInfoDto.fromJson(json['buildingInfo'] as Map<String, dynamic>)
+          ? BuildingInfoDto.fromJson(
+              json['buildingInfo'] as Map<String, dynamic>,
+            )
           : null,
       valuation: json['valuation'] != null
           ? ValuationDto.fromJson(json['valuation'] as Map<String, dynamic>)
           : null,
       runningCosts: json['runningCosts'] != null
-          ? RunningCostsDto.fromJson(json['runningCosts'] as Map<String, dynamic>)
+          ? RunningCostsDto.fromJson(
+              json['runningCosts'] as Map<String, dynamic>,
+            )
           : null,
-      rooms: (json['rooms'] as List<dynamic>?)
+      rooms:
+          (json['rooms'] as List<dynamic>?)
               ?.map((e) => RoomDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      parking: (json['parking'] as List<dynamic>?)
+      parking:
+          (json['parking'] as List<dynamic>?)
               ?.map((e) => ParkingDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      contacts: (json['contacts'] as List<dynamic>?)
+      contacts:
+          (json['contacts'] as List<dynamic>?)
               ?.map((e) => ContactDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      outdoorFeatures:
+          (json['outdoorFeatures'] as List<dynamic>?)
+              ?.map(
+                (e) => OutdoorFeatureDto.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
     );

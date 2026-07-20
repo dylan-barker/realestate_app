@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
-import '../../../../core/widgets/wizard_scaffold.dart';
+import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../data/models/enums/property_type.dart';
 import '../../providers/property_provider.dart';
-import '../widgets/wizard_actions.dart';
 
 class PropertyTypeStep extends ConsumerWidget {
   const PropertyTypeStep({super.key});
+
+  Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
+    final viewModel = ref.read(propertyViewModelProvider.notifier);
+    await viewModel.savePropertyType();
+    if (context.mounted) context.pop();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,60 +32,80 @@ class PropertyTypeStep extends ConsumerWidget {
       {'type': PropertyType.plot, 'icon': Icons.grid_view_outlined, 'id': 5},
     ];
 
-    return WizardScaffold(
-      title: 'What type of property is this?',
-      onBack: () => goBackWizard(context, ref),
-      onNext: () => advanceWizard(context, ref),
-      children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.35,
-          ),
-          itemCount: types.length,
-          itemBuilder: (context, index) {
-            final item = types[index];
-            final itemType = item['type'] as PropertyType;
-            final itemIcon = item['icon'] as IconData;
-            final itemId = item['id'] as int;
-            final isSelected = state.propertyTypeId == itemId;
-            return CustomCard(
-              theme: theme,
-              isSelected: isSelected,
-              onTap: () => viewModel.selectPropertyType(itemId),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 16.0,
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: WizardAppBar(
+        title: 'Property Type',
+        onBack: () => _saveAndPop(context, ref),
+        theme: theme,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'What type of property is this?',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.textPrimary,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    itemIcon,
-                    size: 26,
-                    color: isSelected
-                        ? theme.primaryColor
-                        : theme.textPrimary.withValues(alpha: 0.6),
-                  ),
-                  Text(
-                    itemType.displayString,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.textPrimary,
-                      fontSize: 16,
+              const SizedBox(height: 24),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.35,
+                ),
+                itemCount: types.length,
+                itemBuilder: (context, index) {
+                  final item = types[index];
+                  final itemType = item['type'] as PropertyType;
+                  final itemIcon = item['icon'] as IconData;
+                  final itemId = item['id'] as int;
+                  final isSelected = state.propertyTypeId == itemId;
+                  return CustomCard(
+                    theme: theme,
+                    isSelected: isSelected,
+                    onTap: () => viewModel.selectPropertyType(itemId),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 16.0,
                     ),
-                  ),
-                ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(
+                          itemIcon,
+                          size: 26,
+                          color: isSelected
+                              ? theme.primaryColor
+                              : theme.textPrimary.withValues(alpha: 0.6),
+                        ),
+                        Text(
+                          itemType.displayString,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.textPrimary,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }

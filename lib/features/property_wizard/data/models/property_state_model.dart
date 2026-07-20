@@ -6,7 +6,6 @@ import 'property_state.dart';
 import 'room_model.dart';
 
 class PropertyStateModel {
-  final int currentStep;
   final String? selectedRoomId;
   final int propertyTypeId;
   final String streetNumber;
@@ -40,7 +39,6 @@ class PropertyStateModel {
   final String? errorMessage;
 
   PropertyStateModel({
-    required this.currentStep,
     this.selectedRoomId,
     required this.propertyTypeId,
     required this.streetNumber,
@@ -76,7 +74,6 @@ class PropertyStateModel {
 
   factory PropertyStateModel.fromEntity(PropertyState entity) {
     return PropertyStateModel(
-      currentStep: entity.currentStep,
       selectedRoomId: entity.selectedRoomId,
       propertyTypeId: entity.propertyTypeId,
       streetNumber: entity.streetNumber,
@@ -113,7 +110,6 @@ class PropertyStateModel {
 
   PropertyState toEntity() {
     return PropertyState(
-      currentStep: currentStep,
       selectedRoomId: selectedRoomId,
       propertyTypeId: propertyTypeId,
       streetNumber: streetNumber,

@@ -5,13 +5,12 @@ import 'property_running_costs.dart';
 import 'room.dart';
 
 class PropertyState {
-  final int currentStep;
   final String? selectedRoomId;
 
-  // Step 1: Property Type
+  // Property Type
   final int propertyTypeId;
 
-  // Step 2: Address & Identification
+  // Address & Identification
   final String streetNumber;
   final String street;
   final String unitNumber;
@@ -55,7 +54,6 @@ class PropertyState {
   final String? errorMessage;
 
   PropertyState({
-    this.currentStep = 1,
     this.selectedRoomId,
     this.propertyTypeId = 1,
     this.streetNumber = '',
@@ -90,7 +88,6 @@ class PropertyState {
   });
 
   PropertyState copyWith({
-    int? currentStep,
     String? selectedRoomId,
     int? propertyTypeId,
     String? streetNumber,
@@ -124,7 +121,6 @@ class PropertyState {
     String? errorMessage,
   }) {
     return PropertyState(
-      currentStep: currentStep ?? this.currentStep,
       selectedRoomId: selectedRoomId ?? this.selectedRoomId,
       propertyTypeId: propertyTypeId ?? this.propertyTypeId,
       streetNumber: streetNumber ?? this.streetNumber,

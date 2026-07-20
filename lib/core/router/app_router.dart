@@ -5,14 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/property_wizard/presentation/screens/property_type_screen.dart';
 import '../../features/property_wizard/presentation/screens/address_screen.dart';
 import '../../features/property_wizard/presentation/screens/building_info_screen.dart';
-import '../../features/property_wizard/presentation/screens/property_features_screen.dart';
-import '../../features/property_wizard/presentation/screens/room_details_screen.dart';
-import '../../features/property_wizard/presentation/screens/listing_valuation_screen.dart';
 import '../../features/property_wizard/presentation/screens/contacts_screen.dart';
-import '../../features/property_wizard/presentation/screens/review_screen.dart';
+import '../../features/property_wizard/presentation/screens/listing_valuation_screen.dart';
+import '../../features/property_wizard/presentation/screens/property_features_screen.dart';
+import '../../features/property_wizard/presentation/screens/property_overview_screen.dart';
+import '../../features/property_wizard/presentation/screens/property_type_screen.dart';
+import '../../features/property_wizard/presentation/screens/room_details_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -36,10 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -64,47 +61,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: '/wizard/property-type',
+        ath: '/property/:id',
         parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return PropertyOverviewScreen(propertyId: id);
+        },
+      ),
+      GoRoute(
+        path: '/property/:id/property-type',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyTypeStep(),
       ),
       GoRoute(
-        path: '/wizard/address',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/address',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AddressStep(),
       ),
       GoRoute(
-        path: '/wizard/building-info',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/building-info',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const BuildingInfoStep(),
       ),
       GoRoute(
-        path: '/wizard/property-features',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/property-features',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyFeaturesStep(),
       ),
       GoRoute(
-        path: '/wizard/room-details/:roomId',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/room-details/:roomId',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final roomId = state.pathParameters['roomId']!;
           return RoomDetailsStep(roomId: roomId);
         },
       ),
       GoRoute(
-        path: '/wizard/valuation-costs',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/valuation-costs',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ValuationCostsStep(),
       ),
       GoRoute(
-        path: '/wizard/contacts',
-        parentNavigatorKey: _rootNavigatorKey,
+        ath: '/property/:id/contacts',
+        pparentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ContactsStep(),
-      ),
-      GoRoute(
-        path: '/wizard/review',
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ReviewStep(),
       ),
     ],
   );
@@ -123,7 +123,9 @@ class ScaffoldWithNavBar extends StatelessWidget {
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(index),
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+        unselectedItemColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withValues(alpha: 0.5),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

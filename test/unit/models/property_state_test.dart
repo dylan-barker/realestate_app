@@ -11,7 +11,6 @@ void main() {
     test('constructor sets default values', () {
       final state = PropertyState();
 
-      expect(state.currentStep, 1);
       expect(state.propertyTypeId, 1);
       expect(state.street, '');
       expect(state.suburb, '');
@@ -29,12 +28,10 @@ void main() {
       final state = PropertyState();
 
       final updated = state.copyWith(
-        currentStep: 3,
         city: 'Johannesburg',
         street: 'Main St',
       );
 
-      expect(updated.currentStep, 3);
       expect(updated.city, 'Johannesburg');
       expect(updated.street, 'Main St');
       expect(updated.propertyTypeId, 1);
@@ -79,14 +76,12 @@ void main() {
 
     test('copyWith() preserves fields not specified', () {
       final state = PropertyState(
-        currentStep: 5,
         propertyTypeId: 3,
         street: 'Oak Ave',
       );
 
       final updated = state.copyWith(city: 'Durban');
 
-      expect(updated.currentStep, 5);
       expect(updated.propertyTypeId, 3);
       expect(updated.street, 'Oak Ave');
       expect(updated.city, 'Durban');

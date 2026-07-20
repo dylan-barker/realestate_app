@@ -10,7 +10,6 @@ void main() {
   group('PropertyStateModel', () {
     test('fromEntity() converts PropertyState to PropertyStateModel', () {
       final state = PropertyState(
-        currentStep: 3,
         propertyTypeId: 2,
         street: 'Main St',
         city: 'Cape Town',
@@ -20,7 +19,6 @@ void main() {
 
       final model = PropertyStateModel.fromEntity(state);
 
-      expect(model.currentStep, 3);
       expect(model.propertyTypeId, 2);
       expect(model.street, 'Main St');
       expect(model.city, 'Cape Town');
@@ -30,7 +28,6 @@ void main() {
 
     test('toEntity() converts PropertyStateModel back to PropertyState', () {
       final model = PropertyStateModel(
-        currentStep: 5,
         selectedRoomId: null,
         propertyTypeId: 1,
         streetNumber: '',
@@ -84,7 +81,6 @@ void main() {
 
       final state = model.toEntity();
 
-      expect(state.currentStep, 5);
       expect(state.street, 'Oak Ave');
       expect(state.city, 'Durban');
       expect(state.rooms, isEmpty);
@@ -92,7 +88,6 @@ void main() {
 
     test('round-trip fromEntity -> toEntity preserves data', () {
       final original = PropertyState(
-        currentStep: 4,
         propertyTypeId: 3,
         street: '123 Main',
         city: 'Johannesburg',
@@ -108,7 +103,6 @@ void main() {
       final model = PropertyStateModel.fromEntity(original);
       final restored = model.toEntity();
 
-      expect(restored.currentStep, original.currentStep);
       expect(restored.propertyTypeId, original.propertyTypeId);
       expect(restored.street, original.street);
       expect(restored.city, original.city);

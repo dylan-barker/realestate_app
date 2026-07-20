@@ -13,6 +13,8 @@ import '../../../../core/network/services/parking_api_service.dart';
 import '../../../../core/network/services/room_api_service.dart';
 import '../models/contact.dart';
 import '../models/listing_parking.dart';
+import '../models/listing_valuation.dart';
+import '../models/property_running_costs.dart';
 import '../models/property_state.dart';
 import '../models/room.dart';
 import 'property_repository.dart';
@@ -41,7 +43,7 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   @override
   Future<void> savePropertyDraft(PropertyState propertyState) async {
     developer.log(
-      'Draft saved: Step ${propertyState.currentStep}, Property Type ID: ${propertyState.propertyTypeId}',
+      'Draft saved: Property Type ID: ${propertyState.propertyTypeId}',
     );
   }
 
@@ -53,6 +55,104 @@ class PropertyRepositoryImpl implements IPropertyRepository {
       'Listing created: ID=${response.id}, Ref=${response.referenceNumber}',
     );
     return response.id;
+  }
+
+  @override
+  Future<PropertyState> loadListing(int listingId) async {
+    final response = await _listingApi.getById(listingId);
+
+    final contacts = response.contacts
+        .map(
+          (c) => Contact(
+            id: c.id.toString(),
+            fullName: c.fullName ?? '',
+            idNumber: c.idNumber ?? '',
+            companyName: c.companyName ?? '',
+            companyRegistrationNumber: c.companyRegistrationNumber ?? '',
+            mobilePhone: c.mobilePhone ?? '',
+            emailAddress: c.emailAddress ?? '',
+            role: c.role ?? '',
+          ),
+        )
+        .toList();
+
+    return PropertyState(
+      listingId: response.id,
+      propertyTypeId: response.propertyTypeId,
+      referenceNumber: response.referenceNumber,
+      status: response.status,
+      p24Ref: response.p24Ref,
+      streetNumber: response.address?.streetNumber ?? '',
+      street: response.address?.street ?? '',
+      unitNumber: response.address?.unitNumber ?? '',
+      suburb: response.address?.suburb ?? '',
+      city: response.address?.city ?? '',
+      province: response.address?.province ?? '',
+      country: response.address?.country ?? '',
+      postalCode: response.address?.postalCode ?? '',
+      estateName: response.address?.estateName ?? '',
+      erfNumber: response.address?.erfNumber ?? '',
+      latitude: response.address?.latitude?.toDouble(),
+      longitude: response.address?.longitude?.toDouble(),
+      erfSize: response.buildingInfo?.erfSize?.toString() ?? '',
+      floorArea: response.buildingInfo?.floorArea?.toString() ?? '',
+      constructionYear:
+          response.buildingInfo?.constructionYear?.toString() ?? '',
+      facingId: response.buildingInfo?.facingId,
+      zoningId: response.buildingInfo?.zoningId,
+      rooms: response.rooms
+          .map(
+            (r) => Room(
+              id: r.id.toString(),
+              name: r.name,
+              roomTypeId: r.roomTypeId,
+              roomTypeOther: r.roomTypeOther,
+              conditionRating: r.condition?.conditionRating,
+              features: [
+                ...r.features.map((f) => f.description),
+                ...r.customFeatures.map((f) => f.description),
+              ],
+              featureIds: r.features.map((f) => f.id).toList(),
+              notes: r.condition?.notes ?? '',
+              photoUrl: r.photoUrl,
+              createdAt: r.createdAt,
+              updatedAt: r.updatedAt,
+            ),
+          )
+          .toList(),
+      parking: response.parking
+          .map(
+            (p) => ListingParking(
+              id: p.id.toString(),
+              parkingTypeId: p.parkingTypeId,
+              quantity: p.quantity,
+            ),
+          )
+          .toList(),
+      outdoorFeatures: response.outdoorFeatures
+          .map((f) => f.description)
+          .toList(),
+      listingValuation: ListingValuation(
+        ownersNetPrice: response.valuation?.ownersNetPrice?.toString() ?? '',
+        agentValuation: response.valuation?.agentValuation?.toString() ?? '',
+        commissionPercent:
+            response.valuation?.commissionPercent?.toString() ?? '',
+      ),
+      propertyRunningCosts: PropertyRunningCosts(
+        monthlyLevy: response.runningCosts?.monthlyLevy?.toString() ?? '',
+        monthlyRates: response.runningCosts?.monthlyRates?.toString() ?? '',
+        electricity: response.runningCosts?.electricity?.toString() ?? '',
+        water: response.runningCosts?.water?.toString() ?? '',
+      ),
+      primaryContact: contacts.isNotEmpty ? contacts.first : const Contact(),
+      coContacts: contacts.length > 1 ? contacts.sublist(1) : [],
+    );
+  }
+
+  @override
+  Future<void> updatePropertyType(int listingId, int propertyTypeId) async {
+    final request = UpdateListingRequest(propertyTypeId: propertyTypeId);
+    await _listingApi.update(listingId, request);
   }
 
   @override
@@ -68,6 +168,8 @@ class PropertyRepositoryImpl implements IPropertyRepository {
       postalCode: state.postalCode.isNotEmpty ? state.postalCode : null,
       estateName: state.estateName.isNotEmpty ? state.estateName : null,
       erfNumber: state.erfNumber.isNotEmpty ? state.erfNumber : null,
+      latitude: state.latitude,
+      longitude: state.longitude,
     );
     await _listingApi.upsertAddress(listingId, request);
   }

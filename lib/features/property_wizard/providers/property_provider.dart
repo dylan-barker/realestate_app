@@ -8,7 +8,6 @@ import '../actions/listing_valuation_actions.dart';
 import '../actions/property_features_actions.dart';
 import '../actions/property_type_actions.dart';
 import '../actions/room_details_actions.dart';
-import '../actions/wizard_step_actions.dart';
 import '../data/models/contact.dart';
 import '../data/models/property_state.dart';
 import '../data/repositories/property_repository.dart';
@@ -43,60 +42,88 @@ class PropertyViewModel extends Notifier<PropertyState> {
     return PropertyState(rooms: const [], parking: const []);
   }
 
-  Future<void> startWizard() async {
+  Future<int> createNewListing() async {
     final listingId = await _repository.createListing(state.propertyTypeId);
     state = state.copyWith(listingId: listingId, referenceNumber: '');
+    return listingId;
   }
 
-  void setStep(int step) {
-    state = state.withStep(step);
+  Future<void> loadListing(int id) async {
+    state = await _repository.loadListing(id);
   }
 
-  Future<void> nextStep() async {
-    final currentStep = state.currentStep;
-
+  Future<void> savePropertyType() async {
+    final id = state.listingId;
+    if (id == null) return;
     state = state.copyWith(errorMessage: null);
     try {
-      if (currentStep == 1 && state.listingId == null) {
-        await startWizard();
-      }
-
-      final listingId = state.listingId;
-      if (listingId != null) {
-        switch (currentStep) {
-          case 2:
-            await _repository.upsertAddress(listingId, state);
-            break;
-          case 3:
-            await _repository.upsertBuildingInfo(listingId, state);
-            break;
-          case 4:
-            await _repository.upsertRooms(listingId, state.rooms);
-            await _repository.upsertParking(listingId, state.parking);
-            break;
-          case 5:
-            await _repository.upsertValuation(listingId, state);
-            await _repository.upsertRunningCosts(listingId, state);
-            break;
-          case 6:
-            await _repository.upsertContacts(
-              listingId,
-              state.primaryContact,
-              state.coContacts,
-            );
-            break;
-        }
-      }
+      await _repository.updatePropertyType(id, state.propertyTypeId);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save: $e');
-      return;
+      state = state.copyWith(errorMessage: 'Failed to save property type: $e');
     }
-
-    state = state.withNextStep();
   }
 
-  void prevStep() {
-    state = state.withPrevStep();
+  Future<void> saveAddress() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.upsertAddress(id, state);
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to save address: $e');
+    }
+  }
+
+  Future<void> saveBuildingInfo() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.upsertBuildingInfo(id, state);
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to save building info: $e');
+    }
+  }
+
+  Future<void> savePropertyFeatures() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.upsertRooms(id, state.rooms);
+      await _repository.upsertParking(id, state.parking);
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: 'Failed to save property features: $e',
+      );
+    }
+  }
+
+  Future<void> saveValuation() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.upsertValuation(id, state);
+      await _repository.upsertRunningCosts(id, state);
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to save valuation: $e');
+    }
+  }
+
+  Future<void> saveContacts() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.upsertContacts(
+        id,
+        state.primaryContact,
+        state.coContacts,
+      );
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to save contacts: $e');
+    }
   }
 
   void selectPropertyType(int id) {
