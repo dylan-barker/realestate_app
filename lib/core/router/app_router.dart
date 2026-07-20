@@ -36,7 +36,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+          ppath: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -45,7 +46,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/home',
+                ppath: '/home',
                 builder: (context, state) => const HomeScreen(),
               ),
             ],
@@ -53,7 +54,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/settings',
+                ppath: '/settings',
                 builder: (context, state) => const SettingsScreen(),
               ),
             ],
@@ -61,7 +62,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        ath: '/property/:id',
+        path: '/property/:id',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
@@ -69,41 +70,41 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/property/:id/property-type',
-        pparentNavigatorKey: _rootNavigatorKey,
+        ppath: '/property/:id/property-type',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyTypeStep(),
       ),
       GoRoute(
-        ath: '/property/:id/address',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/address',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AddressStep(),
       ),
       GoRoute(
-        ath: '/property/:id/building-info',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/building-info',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const BuildingInfoStep(),
       ),
       GoRoute(
-        ath: '/property/:id/property-features',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/property-features',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyFeaturesStep(),
       ),
       GoRoute(
-        ath: '/property/:id/room-details/:roomId',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/room-details/:roomId',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final roomId = state.pathParameters['roomId']!;
           return RoomDetailsStep(roomId: roomId);
         },
       ),
       GoRoute(
-        ath: '/property/:id/valuation-costs',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/valuation-costs',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ValuationCostsStep(),
       ),
       GoRoute(
-        ath: '/property/:id/contacts',
-        pparentNavigatorKey: _rootNavigatorKey,
+        path: '/property/:id/contacts',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ContactsStep(),
       ),
     ],
