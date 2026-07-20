@@ -71,40 +71,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/property/:id/property-type',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const PropertyTypeStep(),
+        builder: (context, state) => const PropertyTypeScreen(),
       ),
       GoRoute(
         path: '/property/:id/address',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const AddressStep(),
+        builder: (context, state) => const AddressScreen(),
       ),
       GoRoute(
         path: '/property/:id/building-info',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const BuildingInfoStep(),
+        builder: (context, state) => const BuildingInfoScreen(),
       ),
       GoRoute(
         path: '/property/:id/property-features',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const PropertyFeaturesStep(),
+        builder: (context, state) => const PropertyFeaturesScreen(),
       ),
       GoRoute(
         path: '/property/:id/room-details/:roomId',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final roomId = state.pathParameters['roomId']!;
-          return RoomDetailsStep(roomId: roomId);
+          return RoomDetailsScreen(roomId: roomId);
         },
       ),
       GoRoute(
         path: '/property/:id/valuation-costs',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ValuationCostsStep(),
+        builder: (context, state) => const ListingValuationScreen(),
       ),
       GoRoute(
         path: '/property/:id/contacts',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ContactsStep(),
+        builder: (context, state) => const ContactsScreen(),
       ),
     ],
   );

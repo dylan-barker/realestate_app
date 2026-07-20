@@ -10,8 +10,8 @@ import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../data/models/enums/facing_direction.dart';
 import '../../providers/property_provider.dart';
 
-class BuildingInfoStep extends ConsumerWidget {
-  const BuildingInfoStep({super.key});
+class BuildingInfoScreen extends ConsumerWidget {
+  const BuildingInfoScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
     final viewModel = ref.read(propertyViewModelProvider.notifier);

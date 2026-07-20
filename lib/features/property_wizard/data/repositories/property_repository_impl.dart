@@ -4,6 +4,7 @@ import '../../../../core/network/dto/address_dtos.dart';
 import '../../../../core/network/dto/building_info_dtos.dart';
 import '../../../../core/network/dto/contact_dtos.dart';
 import '../../../../core/network/dto/listing_dtos.dart';
+import '../../../../core/network/dto/outdoor_feature_dtos.dart';
 import '../../../../core/network/dto/parking_dtos.dart';
 import '../../../../core/network/dto/room_dtos.dart';
 import '../../../../core/network/dto/valuation_dtos.dart';
@@ -412,6 +413,17 @@ class PropertyRepositoryImpl implements IPropertyRepository {
         await _contactApi.addContact(listingId, request);
       }
     }
+  }
+
+  @override
+  Future<void> upsertOutdoorFeatures(
+    int listingId,
+    List<String> outdoorFeatures,
+  ) async {
+    await _listingApi.upsertOutdoorFeatures(
+      listingId,
+      UpsertOutdoorFeaturesRequest(descriptions: outdoorFeatures),
+    );
   }
 
   @override

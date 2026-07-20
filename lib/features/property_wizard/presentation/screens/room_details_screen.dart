@@ -18,10 +18,10 @@ import '../../data/models/enums/standard_amenity.dart';
 import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
 
-class RoomDetailsStep extends ConsumerWidget {
+class RoomDetailsScreen extends ConsumerWidget {
   final String roomId;
 
-  const RoomDetailsStep({super.key, required this.roomId});
+  const RoomDetailsScreen({super.key, required this.roomId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

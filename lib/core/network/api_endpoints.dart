@@ -49,6 +49,9 @@ class ApiEndpoints {
   static String listingParking(int id) => '/api/listings/$id/parking';
   static String listingSingleParking(int listingId, int parkingId) =>
       '/api/listings/$listingId/parking/$parkingId';
+
+  static String listingOutdoorFeatures(int id) =>
+      '/api/listings/$id/outdoor-features';
   static String listingContacts(int id) => '/api/listings/$id/contacts';
   static String listingSingleContact(int listingId, int contactId) =>
       '/api/listings/$listingId/contacts/$contactId';

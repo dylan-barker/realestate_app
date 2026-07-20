@@ -8,8 +8,8 @@ import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../data/models/enums/property_type.dart';
 import '../../providers/property_provider.dart';
 
-class PropertyTypeStep extends ConsumerWidget {
-  const PropertyTypeStep({super.key});
+class PropertyTypeScreen extends ConsumerWidget {
+  const PropertyTypeScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
     final viewModel = ref.read(propertyViewModelProvider.notifier);

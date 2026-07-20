@@ -8,8 +8,8 @@ import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../providers/property_provider.dart';
 
-class ValuationCostsStep extends ConsumerWidget {
-  const ValuationCostsStep({super.key});
+class ListingValuationScreen extends ConsumerWidget {
+  const ListingValuationScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
     final viewModel = ref.read(propertyViewModelProvider.notifier);

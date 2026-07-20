@@ -32,14 +32,4 @@ extension AddressActions on PropertyState {
       erfNumber: erfNumber ?? this.erfNumber,
     );
   }
-
-  PropertyState withCoordinates({
-    double? latitude,
-    double? longitude,
-  }) {
-    return copyWith(
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-    );
-  }
 }

@@ -19,6 +19,11 @@ abstract class IPropertyRepository {
   Future<void> upsertRooms(int listingId, List<Room> rooms);
   Future<void> upsertParking(int listingId, List<ListingParking> parking);
 
+  Future<void> upsertOutdoorFeatures(
+    int listingId,
+    List<String> outdoorFeatures,
+  );
+
   Future<void> upsertContacts(
     int listingId,
     Contact primaryContact,

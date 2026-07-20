@@ -7,8 +7,8 @@ import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/contact_card.dart';
 
-class ContactsStep extends ConsumerWidget {
-  const ContactsStep({super.key});
+class ContactsScreen extends ConsumerWidget {
+  const ContactsScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
     final viewModel = ref.read(propertyViewModelProvider.notifier);

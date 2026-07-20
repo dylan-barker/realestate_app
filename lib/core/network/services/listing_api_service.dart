@@ -1,8 +1,9 @@
 import '../api_client.dart';
 import '../api_endpoints.dart';
-import '../dto/listing_dtos.dart';
 import '../dto/address_dtos.dart';
 import '../dto/building_info_dtos.dart';
+import '../dto/listing_dtos.dart';
+import '../dto/outdoor_feature_dtos.dart';
 import '../dto/valuation_dtos.dart';
 
 class ListingApiService {
@@ -11,8 +12,10 @@ class ListingApiService {
   ListingApiService(this._client);
 
   Future<ListingResponse> create(CreateListingRequest request) async {
-    final response =
-        await _client.post(ApiEndpoints.listings, data: request.toJson());
+    final response = await _client.post(
+      ApiEndpoints.listings,
+      data: request.toJson(),
+    );
     return ListingResponse.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -26,8 +29,10 @@ class ListingApiService {
     if (dateFrom != null) params['dateFrom'] = dateFrom.toIso8601String();
     if (dateTo != null) params['dateTo'] = dateTo.toIso8601String();
 
-    final response =
-        await _client.get(ApiEndpoints.listings, queryParameters: params.isNotEmpty ? params : null);
+    final response = await _client.get(
+      ApiEndpoints.listings,
+      queryParameters: params.isNotEmpty ? params : null,
+    );
     return (response.data as List)
         .map((e) => ListingSummaryDto.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -39,8 +44,10 @@ class ListingApiService {
   }
 
   Future<ListingResponse> update(int id, UpdateListingRequest request) async {
-    final response =
-        await _client.put(ApiEndpoints.listing(id), data: request.toJson());
+    final response = await _client.put(
+      ApiEndpoints.listing(id),
+      data: request.toJson(),
+    );
     return ListingResponse.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -61,57 +68,84 @@ class ListingApiService {
   }
 
   Future<ListingAddressDto> upsertAddress(
-      int listingId, UpsertAddressRequest request) async {
-    final response = await _client.put(ApiEndpoints.listingAddress(listingId),
-        data: request.toJson());
+    int listingId,
+    UpsertAddressRequest request,
+  ) async {
+    final response = await _client.put(
+      ApiEndpoints.listingAddress(listingId),
+      data: request.toJson(),
+    );
     return ListingAddressDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   // Building Info
   Future<BuildingInfoDto?> getBuildingInfo(int listingId) async {
-    final response =
-        await _client.get(ApiEndpoints.listingBuildingInfo(listingId));
+    final response = await _client.get(
+      ApiEndpoints.listingBuildingInfo(listingId),
+    );
     if (response.statusCode == 404) return null;
     return BuildingInfoDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   Future<BuildingInfoDto> upsertBuildingInfo(
-      int listingId, UpsertBuildingInfoRequest request) async {
+    int listingId,
+    UpsertBuildingInfoRequest request,
+  ) async {
     final response = await _client.put(
-        ApiEndpoints.listingBuildingInfo(listingId),
-        data: request.toJson());
+      ApiEndpoints.listingBuildingInfo(listingId),
+      data: request.toJson(),
+    );
     return BuildingInfoDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   // Valuation
   Future<ValuationDto?> getValuation(int listingId) async {
-    final response =
-        await _client.get(ApiEndpoints.listingValuation(listingId));
+    final response = await _client.get(
+      ApiEndpoints.listingValuation(listingId),
+    );
     if (response.statusCode == 404) return null;
     return ValuationDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   Future<ValuationDto> upsertValuation(
-      int listingId, UpsertValuationRequest request) async {
+    int listingId,
+    UpsertValuationRequest request,
+  ) async {
     final response = await _client.put(
-        ApiEndpoints.listingValuation(listingId),
-        data: request.toJson());
+      ApiEndpoints.listingValuation(listingId),
+      data: request.toJson(),
+    );
     return ValuationDto.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  // Outdoor Features
+  Future<void> upsertOutdoorFeatures(
+    int listingId,
+    UpsertOutdoorFeaturesRequest request,
+  ) async {
+    await _client.put(
+      ApiEndpoints.listingOutdoorFeatures(listingId),
+      data: request.toJson(),
+    );
   }
 
   // Running Costs
   Future<RunningCostsDto?> getRunningCosts(int listingId) async {
-    final response =
-        await _client.get(ApiEndpoints.listingRunningCosts(listingId));
+    final response = await _client.get(
+      ApiEndpoints.listingRunningCosts(listingId),
+    );
     if (response.statusCode == 404) return null;
     return RunningCostsDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   Future<RunningCostsDto> upsertRunningCosts(
-      int listingId, UpsertRunningCostsRequest request) async {
+    int listingId,
+    UpsertRunningCostsRequest request,
+  ) async {
     final response = await _client.put(
-        ApiEndpoints.listingRunningCosts(listingId),
-        data: request.toJson());
+      ApiEndpoints.listingRunningCosts(listingId),
+      data: request.toJson(),
+    );
     return RunningCostsDto.fromJson(response.data as Map<String, dynamic>);
   }
 }

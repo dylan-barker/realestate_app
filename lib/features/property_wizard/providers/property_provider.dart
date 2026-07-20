@@ -92,6 +92,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.upsertRooms(id, state.rooms);
       await _repository.upsertParking(id, state.parking);
+      await _repository.upsertOutdoorFeatures(id, state.outdoorFeatures);
     } catch (e) {
       state = state.copyWith(
         errorMessage: 'Failed to save property features: $e',
@@ -297,6 +298,10 @@ class PropertyViewModel extends Notifier<PropertyState> {
       await _repository.upsertBuildingInfo(listingId, state);
       await _repository.upsertRooms(listingId, state.rooms);
       await _repository.upsertParking(listingId, state.parking);
+      await _repository.upsertOutdoorFeatures(
+        listingId,
+        state.outdoorFeatures,
+      );
       await _repository.upsertValuation(listingId, state);
       await _repository.upsertRunningCosts(listingId, state);
       await _repository.upsertContacts(

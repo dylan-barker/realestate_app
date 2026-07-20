@@ -1,3 +1,11 @@
+class UpsertOutdoorFeaturesRequest {
+  final List<String> descriptions;
+
+  const UpsertOutdoorFeaturesRequest({required this.descriptions});
+
+  Map<String, dynamic> toJson() => {'descriptions': descriptions};
+}
+
 class OutdoorFeatureDto {
   final int id;
   final int listingId;

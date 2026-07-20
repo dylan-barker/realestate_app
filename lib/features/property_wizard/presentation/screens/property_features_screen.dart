@@ -14,8 +14,8 @@ import '../../data/models/room.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/room_section.dart';
 
-class PropertyFeaturesStep extends ConsumerWidget {
-  const PropertyFeaturesStep({super.key});
+class PropertyFeaturesScreen extends ConsumerWidget {
+  const PropertyFeaturesScreen({super.key});
 
   void _showAddOutdoorFeatureDialog(
     BuildContext context,

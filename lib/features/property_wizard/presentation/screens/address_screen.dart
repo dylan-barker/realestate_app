@@ -8,8 +8,8 @@ import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../providers/property_provider.dart';
 
-class AddressStep extends ConsumerWidget {
-  const AddressStep({super.key});
+class AddressScreen extends ConsumerWidget {
+  const AddressScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
     final viewModel = ref.read(propertyViewModelProvider.notifier);
