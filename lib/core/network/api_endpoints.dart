@@ -12,6 +12,7 @@ class ApiEndpoints {
 
   // Auth
   static const String login = '/api/auth/login';
+  static const String refresh = '/api/auth/refresh';
 
   // Listings
   static const String listings = '/api/listings';

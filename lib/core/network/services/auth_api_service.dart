@@ -14,4 +14,12 @@ class AuthApiService {
     );
     return LoginResponse.fromJson(response.data as Map<String, dynamic>);
   }
+
+  Future<RefreshTokenResponse> refreshToken(RefreshTokenRequest request) async {
+    final response = await _client.post(
+      ApiEndpoints.refresh,
+      data: request.toJson(),
+    );
+    return RefreshTokenResponse.fromJson(response.data as Map<String, dynamic>);
+  }
 }

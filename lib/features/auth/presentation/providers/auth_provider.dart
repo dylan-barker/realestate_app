@@ -20,21 +20,19 @@ class AuthState {
   });
 
   const AuthState.uninitialized()
-      : status = AuthStatus.uninitialized,
-        displayName = null,
-        role = null,
-        errorMessage = null;
+    : status = AuthStatus.uninitialized,
+      displayName = null,
+      role = null,
+      errorMessage = null;
 
-  const AuthState.authenticated({
-    required this.displayName,
-    required this.role,
-  })  : status = AuthStatus.authenticated,
-        errorMessage = null;
+  const AuthState.authenticated({required this.displayName, required this.role})
+    : status = AuthStatus.authenticated,
+      errorMessage = null;
 
   const AuthState.unauthenticated({this.errorMessage})
-      : status = AuthStatus.unauthenticated,
-        displayName = null,
-        role = null;
+    : status = AuthStatus.unauthenticated,
+      displayName = null,
+      role = null;
 
   AuthState copyWith({String? errorMessage}) {
     return AuthState(
@@ -64,6 +62,7 @@ class AuthNotifier extends Notifier<AuthState> {
         final apiClient = ref.read(apiClientProvider);
         apiClient.setToken(token);
         apiClient.setOnUnauthorized(() => logout());
+        apiClient.setOnRefreshToken(() => refreshAuth());
         state = AuthState.authenticated(displayName: displayName, role: role);
       } else {
         state = const AuthState.unauthenticated();
@@ -83,21 +82,54 @@ class AuthNotifier extends Notifier<AuthState> {
       );
 
       await _storage.write(key: 'auth_token', value: response.token);
-      await _storage.write(key: 'auth_display_name', value: response.displayName);
+      await _storage.write(
+        key: 'auth_refresh_token',
+        value: response.refreshToken,
+      );
+      await _storage.write(
+        key: 'auth_display_name',
+        value: response.displayName,
+      );
       await _storage.write(key: 'auth_role', value: response.role);
 
       final apiClient = ref.read(apiClientProvider);
       apiClient.setToken(response.token);
       apiClient.setOnUnauthorized(() => logout());
+      apiClient.setOnRefreshToken(() => refreshAuth());
 
       state = AuthState.authenticated(
         displayName: response.displayName,
         role: response.role,
       );
     } catch (e) {
-      state = AuthState.unauthenticated(
-        errorMessage: e.toString(),
+      state = AuthState.unauthenticated(errorMessage: e.toString());
+    }
+  }
+
+  Future<bool> refreshAuth() async {
+    try {
+      final currentRefreshToken = await _storage.read(
+        key: 'auth_refresh_token',
       );
+      if (currentRefreshToken == null) return false;
+
+      final authService = ref.read(authApiServiceProvider);
+      final response = await authService.refreshToken(
+        RefreshTokenRequest(refreshToken: currentRefreshToken),
+      );
+
+      await _storage.write(key: 'auth_token', value: response.token);
+      await _storage.write(
+        key: 'auth_refresh_token',
+        value: response.refreshToken,
+      );
+
+      final apiClient = ref.read(apiClientProvider);
+      apiClient.setToken(response.token);
+
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 

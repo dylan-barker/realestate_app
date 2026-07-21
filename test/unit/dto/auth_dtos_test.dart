@@ -20,6 +20,7 @@ void main() {
         'expiresAt': '2026-12-31T23:59:59.000',
         'displayName': 'John Agent',
         'role': 'agent',
+        'refreshToken': 'refresh-xyz',
       };
 
       final response = LoginResponse.fromJson(json);
@@ -28,6 +29,32 @@ void main() {
       expect(response.expiresAt.year, 2026);
       expect(response.displayName, 'John Agent');
       expect(response.role, 'agent');
+      expect(response.refreshToken, 'refresh-xyz');
+    });
+  });
+
+  group('RefreshTokenResponse', () {
+    test('fromJson() parses response correctly', () {
+      final json = {
+        'token': 'new-access-token',
+        'expiresAt': '2026-12-31T23:59:59.000',
+        'refreshToken': 'new-refresh-token',
+      };
+
+      final response = RefreshTokenResponse.fromJson(json);
+
+      expect(response.token, 'new-access-token');
+      expect(response.refreshToken, 'new-refresh-token');
+    });
+  });
+
+  group('RefreshTokenRequest', () {
+    test('toJson() returns correct map', () {
+      final request = RefreshTokenRequest(refreshToken: 'some-token');
+
+      final json = request.toJson();
+
+      expect(json['refreshToken'], 'some-token');
     });
   });
 }
