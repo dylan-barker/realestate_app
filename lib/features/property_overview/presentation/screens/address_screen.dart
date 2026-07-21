@@ -23,6 +23,9 @@ class AddressScreen extends ConsumerWidget {
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
+    debugPrint(
+      'AddressScreen state: streetNumber="${state.streetNumber}" street="${state.street}" suburb="${state.suburb}" city="${state.city}" province="${state.province}" country="${state.country}" postalCode="${state.postalCode}" estateName="${state.estateName}" erfNumber="${state.erfNumber}"',
+    );
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -69,13 +72,13 @@ class AddressScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex: 2,
                           child: CustomTextInput(
                             theme: theme,
                             label: 'Street Number',
-                            placeholder: '124',
+                            placeholder: '',
                             initialValue: state.streetNumber,
                             onChanged: (val) =>
                                 viewModel.updateAddress(streetNumber: val),
@@ -83,14 +86,13 @@ class AddressScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          flex: 5,
                           child: CustomTextInput(
                             theme: theme,
-                            label: 'Street Name',
-                            placeholder: 'Some Street',
-                            initialValue: state.street,
+                            label: 'Unit Number (Optional)',
+                            placeholder: '',
+                            initialValue: state.unitNumber,
                             onChanged: (val) =>
-                                viewModel.updateAddress(street: val),
+                                viewModel.updateAddress(unitNumber: val),
                           ),
                         ),
                       ],
@@ -98,20 +100,20 @@ class AddressScreen extends ConsumerWidget {
                     const SizedBox(height: 14),
                     CustomTextInput(
                       theme: theme,
-                      label: 'Unit Number (Optional)',
-                      placeholder: 'e.g. 5A, Flat 12',
-                      initialValue: state.unitNumber,
-                      onChanged: (val) =>
-                          viewModel.updateAddress(unitNumber: val),
+                      label: 'Street Name',
+                      placeholder: '',
+                      initialValue: state.street,
+                      onChanged: (val) => viewModel.updateAddress(street: val),
                     ),
                     const SizedBox(height: 14),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: CustomTextInput(
                             theme: theme,
                             label: 'Suburb / District',
-                            placeholder: 'Strand',
+                            placeholder: '',
                             initialValue: state.suburb,
                             onChanged: (val) =>
                                 viewModel.updateAddress(suburb: val),
@@ -122,7 +124,7 @@ class AddressScreen extends ConsumerWidget {
                           child: CustomTextInput(
                             theme: theme,
                             label: 'City',
-                            placeholder: 'Cape Town',
+                            placeholder: '',
                             initialValue: state.city,
                             onChanged: (val) =>
                                 viewModel.updateAddress(city: val),
@@ -132,12 +134,13 @@ class AddressScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 14),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: CustomTextInput(
                             theme: theme,
                             label: 'Province / State',
-                            placeholder: 'Western Cape',
+                            placeholder: '',
                             initialValue: state.province,
                             onChanged: (val) =>
                                 viewModel.updateAddress(province: val),
@@ -148,7 +151,7 @@ class AddressScreen extends ConsumerWidget {
                           child: CustomTextInput(
                             theme: theme,
                             label: 'Country',
-                            placeholder: 'South Africa',
+                            placeholder: '',
                             initialValue: state.country,
                             onChanged: (val) =>
                                 viewModel.updateAddress(country: val),
@@ -160,7 +163,7 @@ class AddressScreen extends ConsumerWidget {
                     CustomTextInput(
                       theme: theme,
                       label: 'Postal Code',
-                      placeholder: '7140',
+                      placeholder: '',
                       initialValue: state.postalCode,
                       onChanged: (val) =>
                           viewModel.updateAddress(postalCode: val),
@@ -187,7 +190,7 @@ class AddressScreen extends ConsumerWidget {
                     CustomTextInput(
                       theme: theme,
                       label: 'Estate Name (Optional)',
-                      placeholder: 'e.g. Skyline Towers',
+                      placeholder: '',
                       initialValue: state.estateName,
                       onChanged: (val) =>
                           viewModel.updateIdentifiers(estateName: val),
@@ -196,7 +199,7 @@ class AddressScreen extends ConsumerWidget {
                     CustomTextInput(
                       theme: theme,
                       label: 'Erf Number',
-                      placeholder: 'Enter registration number',
+                      placeholder: '',
                       initialValue: state.erfNumber,
                       subtext:
                           'Found on municipal rates bill or property deed.',

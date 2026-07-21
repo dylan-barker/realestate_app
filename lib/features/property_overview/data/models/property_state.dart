@@ -55,7 +55,7 @@ class PropertyState {
 
   PropertyState({
     this.selectedRoomId,
-    this.propertyTypeId = 1,
+    this.propertyTypeId = 0,
     this.streetNumber = '',
     this.street = '',
     this.unitNumber = '',

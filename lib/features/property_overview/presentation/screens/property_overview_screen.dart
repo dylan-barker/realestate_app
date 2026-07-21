@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../home/presentation/screens/home_screen.dart'
+    show listingsProvider;
 import '../../providers/property_provider.dart';
 import '../widgets/section_card.dart';
 
@@ -47,7 +49,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             : 'Not provided',
         icon: Icons.architecture_outlined,
         route: '/property/$propertyId/building-info',
-        isComplete: true,
+        isComplete: state.erfSize.isNotEmpty || state.floorArea.isNotEmpty,
       ),
       _SectionData(
         title: 'Property Features',
@@ -100,6 +102,13 @@ class PropertyOverviewScreen extends ConsumerWidget {
           ),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+            onPressed: () =>
+                _confirmDelete(context, ref, viewModel, propertyId),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(color: theme.borderLight, height: 1),
@@ -211,6 +220,53 @@ class PropertyOverviewScreen extends ConsumerWidget {
         return 'Plot';
       default:
         return 'Not selected';
+    }
+  }
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    PropertyViewModel viewModel,
+    int propertyId,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Property'),
+        content: const Text(
+          'Are you sure you want to delete this property? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => ctx.pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => ctx.pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await viewModel.deleteListing();
+      if (context.mounted) {
+        ref.invalidate(listingsProvider);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Property deleted')));
+        context.go('/home');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete property: $e')),
+        );
+      }
     }
   }
 }

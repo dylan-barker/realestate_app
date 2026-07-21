@@ -43,8 +43,12 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   Future<int> createNewListing() async {
-    final listingId = await _repository.createListing(state.propertyTypeId);
-    state = state.copyWith(listingId: listingId, referenceNumber: '');
+    final listingId = await _repository.createListing(
+      state.propertyTypeId > 0 ? state.propertyTypeId : 1,
+    );
+    if (ref.mounted) {
+      state = state.copyWith(listingId: listingId, referenceNumber: '');
+    }
     return listingId;
   }
 
@@ -318,7 +322,23 @@ class PropertyViewModel extends Notifier<PropertyState> {
     }
   }
 
+  Future<void> deleteListing() async {
+    final id = state.listingId;
+    if (id == null) return;
+    state = state.copyWith(errorMessage: null);
+    try {
+      await _repository.deleteListing(id);
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to delete listing: $e');
+      rethrow;
+    }
+  }
+
   void reset() {
-    state = PropertyState(rooms: const [], parking: const []);
+    state = PropertyState(
+      rooms: const [],
+      parking: const [],
+      propertyTypeId: 0,
+    );
   }
 }

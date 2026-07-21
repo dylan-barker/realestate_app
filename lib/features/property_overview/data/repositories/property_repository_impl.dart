@@ -433,6 +433,12 @@ class PropertyRepositoryImpl implements IPropertyRepository {
   }
 
   @override
+  Future<void> deleteListing(int listingId) async {
+    await _listingApi.delete(listingId);
+    developer.log('Listing deleted: ID=$listingId');
+  }
+
+  @override
   Future<void> uploadRoomPhoto(
     int listingId,
     int roomId,

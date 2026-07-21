@@ -143,13 +143,14 @@ class _CustomTextInputState extends State<CustomTextInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              widget.label,
-              style: textTheme.labelLarge?.copyWith(
-                color: theme.textLabel,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                widget.label,
+                style: textTheme.labelLarge?.copyWith(
+                  color: theme.textLabel,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             if (widget.isRequired)

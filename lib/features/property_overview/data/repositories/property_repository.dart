@@ -31,5 +31,7 @@ abstract class IPropertyRepository {
   );
   Future<void> submitListing(int listingId);
 
+  Future<void> deleteListing(int listingId);
+
   Future<void> uploadRoomPhoto(int listingId, int roomId, String filePath);
 }

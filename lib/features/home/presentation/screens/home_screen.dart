@@ -47,11 +47,21 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         onPressed: () async {
-          final viewModel = ref.read(propertyViewModelProvider.notifier);
-          viewModel.reset();
-          final listingId = await viewModel.createNewListing();
-          if (context.mounted) {
-            context.push('/property/$listingId');
+          try {
+            final viewModel = ref.read(propertyViewModelProvider.notifier);
+            viewModel.reset();
+            final listingId = await viewModel.createNewListing();
+            if (context.mounted) {
+              await context.push('/property/$listingId');
+              ref.invalidate(listingsProvider);
+            }
+          } catch (e, st) {
+            debugPrint('Add Property error: $e\n$st');
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to create property: $e')),
+              );
+            }
           }
         },
       ),
@@ -66,7 +76,13 @@ class HomeScreen extends ConsumerWidget {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final listing = listings[index];
-                return _buildListingCard(listing, theme, textTheme, context);
+                return _buildListingCard(
+                  listing,
+                  theme,
+                  textTheme,
+                  context,
+                  ref,
+                );
               },
             ),
           );
@@ -82,9 +98,13 @@ class HomeScreen extends ConsumerWidget {
     RealEstateTheme theme,
     TextTheme textTheme,
     BuildContext context,
+    WidgetRef ref,
   ) {
     return InkWell(
-      onTap: () => context.push('/property/${listing.id}'),
+      onTap: () async {
+        await context.push('/property/${listing.id}');
+        ref.invalidate(listingsProvider);
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
