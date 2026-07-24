@@ -10,15 +10,6 @@ class PropertyTypeDto {
     required this.sortOrder,
     required this.isActive,
   });
-
-  factory PropertyTypeDto.fromJson(Map<String, dynamic> json) {
-    return PropertyTypeDto(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      sortOrder: json['sortOrder'] as int,
-      isActive: json['isActive'] as bool,
-    );
-  }
 }
 
 class RoomTypeDto {
@@ -26,13 +17,6 @@ class RoomTypeDto {
   final String description;
 
   const RoomTypeDto({required this.id, required this.description});
-
-  factory RoomTypeDto.fromJson(Map<String, dynamic> json) {
-    return RoomTypeDto(
-      id: json['id'] as int,
-      description: json['description'] as String,
-    );
-  }
 }
 
 class FeatureDto {
@@ -45,14 +29,6 @@ class FeatureDto {
     required this.category,
     required this.description,
   });
-
-  factory FeatureDto.fromJson(Map<String, dynamic> json) {
-    return FeatureDto(
-      id: json['id'] as int,
-      category: json['category'] as String,
-      description: json['description'] as String,
-    );
-  }
 }
 
 class ConditionCategoryDto {
@@ -60,13 +36,6 @@ class ConditionCategoryDto {
   final String description;
 
   const ConditionCategoryDto({required this.id, required this.description});
-
-  factory ConditionCategoryDto.fromJson(Map<String, dynamic> json) {
-    return ConditionCategoryDto(
-      id: json['id'] as int,
-      description: json['description'] as String,
-    );
-  }
 }
 
 class ParkingTypeDto {
@@ -74,13 +43,6 @@ class ParkingTypeDto {
   final String description;
 
   const ParkingTypeDto({required this.id, required this.description});
-
-  factory ParkingTypeDto.fromJson(Map<String, dynamic> json) {
-    return ParkingTypeDto(
-      id: json['id'] as int,
-      description: json['description'] as String,
-    );
-  }
 }
 
 class FacingDto {
@@ -88,13 +50,6 @@ class FacingDto {
   final String description;
 
   const FacingDto({required this.id, required this.description});
-
-  factory FacingDto.fromJson(Map<String, dynamic> json) {
-    return FacingDto(
-      id: json['id'] as int,
-      description: json['description'] as String,
-    );
-  }
 }
 
 class ZoningDto {
@@ -102,11 +57,4 @@ class ZoningDto {
   final String description;
 
   const ZoningDto({required this.id, required this.description});
-
-  factory ZoningDto.fromJson(Map<String, dynamic> json) {
-    return ZoningDto(
-      id: json['id'] as int,
-      description: json['description'] as String,
-    );
-  }
 }

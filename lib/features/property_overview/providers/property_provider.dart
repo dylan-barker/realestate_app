@@ -1,31 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/providers/api_providers.dart';
-import '../actions/address_actions.dart';
-import '../actions/building_info_actions.dart';
-import '../actions/contacts_actions.dart';
-import '../actions/listing_valuation_actions.dart';
-import '../actions/property_features_actions.dart';
-import '../actions/property_type_actions.dart';
-import '../actions/room_details_actions.dart';
 import '../data/models/contact.dart';
+import '../data/models/listing_parking.dart';
 import '../data/models/property_state.dart';
+import '../data/models/room.dart';
 import '../data/repositories/property_repository.dart';
-import '../data/repositories/property_repository_impl.dart';
 
-final propertyRepositoryProvider = Provider.autoDispose<IPropertyRepository>((
+final propertyRepositoryProvider = Provider.autoDispose<PropertyRepository>((
   ref,
 ) {
-  final listingApi = ref.watch(listingApiServiceProvider);
-  final roomApi = ref.watch(roomApiServiceProvider);
-  final contactApi = ref.watch(contactApiServiceProvider);
-  final parkingApi = ref.watch(parkingApiServiceProvider);
-  return PropertyRepositoryImpl(
-    listingApi: listingApi,
-    roomApi: roomApi,
-    contactApi: contactApi,
-    parkingApi: parkingApi,
-  );
+  return PropertyRepository(ref.watch(apiClientProvider));
 });
 
 final propertyViewModelProvider =
@@ -34,7 +19,7 @@ final propertyViewModelProvider =
     });
 
 class PropertyViewModel extends Notifier<PropertyState> {
-  late final IPropertyRepository _repository;
+  late final PropertyRepository _repository;
 
   @override
   PropertyState build() {
@@ -132,7 +117,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void selectPropertyType(int id) {
-    state = state.withPropertyTypeId(id);
+    state = state.copyWith(propertyTypeId: id);
   }
 
   void updateAddress({
@@ -145,7 +130,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? country,
     String? postalCode,
   }) {
-    state = state.withAddress(
+    state = state.copyWith(
       streetNumber: streetNumber,
       street: street,
       unitNumber: unitNumber,
@@ -158,7 +143,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void updateIdentifiers({String? estateName, String? erfNumber}) {
-    state = state.withIdentifiers(estateName: estateName, erfNumber: erfNumber);
+    state = state.copyWith(estateName: estateName, erfNumber: erfNumber);
   }
 
   void updateTechnicalSpecs({
@@ -166,7 +151,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? floorArea,
     String? constructionYear,
   }) {
-    state = state.withTechnicalSpecs(
+    state = state.copyWith(
       erfSize: erfSize,
       floorArea: floorArea,
       constructionYear: constructionYear,
@@ -174,39 +159,71 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void selectFacingId(int? id) {
-    state = state.withFacingId(id);
+    state = state.copyWith(facingId: id);
   }
 
   void selectZoningId(int? id) {
-    state = state.withZoningId(id);
+    state = state.copyWith(zoningId: id);
   }
 
   void addCustomRoom(String name, int roomTypeId) {
-    state = state.withAddedRoom(name, roomTypeId);
+    final newRoom = Room(
+      id: 'custom-${DateTime.now().millisecondsSinceEpoch}',
+      name: name,
+      roomTypeId: roomTypeId,
+    );
+    state = state.copyWith(rooms: [...state.rooms, newRoom]);
   }
 
   void removeRoom(String roomId) {
-    state = state.withRemovedRoom(roomId);
+    state = state.copyWith(
+      rooms: state.rooms.where((r) => r.id != roomId).toList(),
+    );
   }
 
   void addParking(int parkingTypeId) {
-    state = state.withAddedParking(parkingTypeId);
+    final current = List<ListingParking>.from(state.parking);
+    final existingIdx = current.indexWhere(
+      (p) => p.parkingTypeId == parkingTypeId,
+    );
+    if (existingIdx >= 0) {
+      current[existingIdx] = current[existingIdx].copyWith(
+        quantity: current[existingIdx].quantity + 1,
+      );
+    } else {
+      current.add(
+        ListingParking(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          parkingTypeId: parkingTypeId,
+          quantity: 1,
+        ),
+      );
+    }
+    state = state.copyWith(parking: current);
   }
 
   void removeParking(int parkingTypeId) {
-    state = state.withRemovedParking(parkingTypeId);
+    final current = List<ListingParking>.from(state.parking);
+    current.removeWhere((p) => p.parkingTypeId == parkingTypeId);
+    state = state.copyWith(parking: current);
   }
 
   void addOutdoorFeature(String feature) {
-    state = state.withAddedOutdoorFeature(feature);
+    final current = List<String>.from(state.outdoorFeatures);
+    if (!current.contains(feature)) {
+      current.add(feature);
+    }
+    state = state.copyWith(outdoorFeatures: current);
   }
 
   void removeOutdoorFeature(String feature) {
-    state = state.withRemovedOutdoorFeature(feature);
+    final current = List<String>.from(state.outdoorFeatures);
+    current.remove(feature);
+    state = state.copyWith(outdoorFeatures: current);
   }
 
   void selectRoomForEditing(String? roomId) {
-    state = state.withSelectedRoom(roomId);
+    state = state.copyWith(selectedRoomId: roomId);
   }
 
   void updateRoomDetails({
@@ -217,26 +234,53 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? notes,
     String? photoUrl,
   }) {
-    state = state.withUpdatedRoomDetails(
-      roomId: roomId,
-      conditionRating: conditionRating,
-      features: features,
-      featureIds: featureIds,
-      notes: notes,
-      photoUrl: photoUrl,
-    );
+    final updatedRooms = state.rooms.map((room) {
+      if (room.id == roomId) {
+        return room.copyWith(
+          conditionRating: conditionRating,
+          features: features,
+          featureIds: featureIds,
+          notes: notes,
+          photoUrl: photoUrl,
+        );
+      }
+      return room;
+    }).toList();
+    state = state.copyWith(rooms: updatedRooms);
   }
 
   void renameRoom(String roomId, String newName) {
-    state = state.withRenamedRoom(roomId, newName);
+    final updatedRooms = state.rooms.map((room) {
+      if (room.id == roomId) return room.copyWith(name: newName);
+      return room;
+    }).toList();
+    state = state.copyWith(rooms: updatedRooms);
   }
 
   void addFeatureToRoom(String roomId, String feature) {
-    state = state.withAddedFeature(roomId, feature);
+    final updatedRooms = state.rooms.map((room) {
+      if (room.id == roomId) {
+        final currentFeatures = List<String>.from(room.features);
+        if (!currentFeatures.contains(feature)) {
+          currentFeatures.add(feature);
+        }
+        return room.copyWith(features: currentFeatures);
+      }
+      return room;
+    }).toList();
+    state = state.copyWith(rooms: updatedRooms);
   }
 
   void removeFeatureFromRoom(String roomId, String feature) {
-    state = state.withRemovedFeature(roomId, feature);
+    final updatedRooms = state.rooms.map((room) {
+      if (room.id == roomId) {
+        final currentFeatures = List<String>.from(room.features);
+        currentFeatures.remove(feature);
+        return room.copyWith(features: currentFeatures);
+      }
+      return room;
+    }).toList();
+    state = state.copyWith(rooms: updatedRooms);
   }
 
   void updateValuation({
@@ -244,10 +288,12 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? agentValuation,
     String? commissionPercent,
   }) {
-    state = state.withValuation(
-      ownersNetPrice: ownersNetPrice,
-      agentValuation: agentValuation,
-      commissionPercent: commissionPercent,
+    state = state.copyWith(
+      listingValuation: state.listingValuation.copyWith(
+        ownersNetPrice: ownersNetPrice,
+        agentValuation: agentValuation,
+        commissionPercent: commissionPercent,
+      ),
     );
   }
 
@@ -257,28 +303,39 @@ class PropertyViewModel extends Notifier<PropertyState> {
     String? electricity,
     String? water,
   }) {
-    state = state.withRunningCosts(
-      monthlyLevy: monthlyLevy,
-      monthlyRates: monthlyRates,
-      electricity: electricity,
-      water: water,
+    state = state.copyWith(
+      propertyRunningCosts: state.propertyRunningCosts.copyWith(
+        monthlyLevy: monthlyLevy,
+        monthlyRates: monthlyRates,
+        electricity: electricity,
+        water: water,
+      ),
     );
   }
 
   void updatePrimaryContact(Contact contact) {
-    state = state.withPrimaryContact(contact);
+    state = state.copyWith(primaryContact: contact);
   }
 
   void addCoContact() {
-    state = state.withAddedCoContact();
+    final newContact = Contact(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+    state = state.copyWith(coContacts: [...state.coContacts, newContact]);
   }
 
   void updateCoContact(int index, Contact contact) {
-    state = state.withUpdatedCoContact(index, contact);
+    final updated = List<Contact>.from(state.coContacts);
+    if (index >= 0 && index < updated.length) {
+      updated[index] = contact;
+      state = state.copyWith(coContacts: updated);
+    }
   }
 
   void removeCoContact(String id) {
-    state = state.withRemovedCoContact(id);
+    state = state.copyWith(
+      coContacts: state.coContacts.where((c) => c.id != id).toList(),
+    );
   }
 
   Future<void> saveDraft() async {
@@ -302,10 +359,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
       await _repository.upsertBuildingInfo(listingId, state);
       await _repository.upsertRooms(listingId, state.rooms);
       await _repository.upsertParking(listingId, state.parking);
-      await _repository.upsertOutdoorFeatures(
-        listingId,
-        state.outdoorFeatures,
-      );
+      await _repository.upsertOutdoorFeatures(listingId, state.outdoorFeatures);
       await _repository.upsertValuation(listingId, state);
       await _repository.upsertRunningCosts(listingId, state);
       await _repository.upsertContacts(

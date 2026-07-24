@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../../../../core/network/dto/auth_dtos.dart';
 import '../../../../core/network/providers/api_providers.dart';
 
 enum AuthStatus { uninitialized, authenticated, unauthenticated }
@@ -54,16 +55,22 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> init() async {
     try {
-      final token = await _storage.read(key: 'auth_token');
-      final displayName = await _storage.read(key: 'auth_display_name');
-      final role = await _storage.read(key: 'auth_role');
+      final raw = await _storage.read(key: 'auth');
+      if (raw != null) {
+        final data = jsonDecode(raw) as Map<String, dynamic>;
+        final token = data['token'] as String?;
+        final displayName = data['displayName'] as String?;
+        final role = data['role'] as String?;
 
-      if (token != null && displayName != null && role != null) {
-        final apiClient = ref.read(apiClientProvider);
-        apiClient.setToken(token);
-        apiClient.setOnUnauthorized(() => logout());
-        apiClient.setOnRefreshToken(() => refreshAuth());
-        state = AuthState.authenticated(displayName: displayName, role: role);
+        if (token != null && displayName != null && role != null) {
+          final apiClient = ref.read(apiClientProvider);
+          apiClient.setToken(token);
+          apiClient.setOnUnauthorized(() => logout());
+          apiClient.setOnRefreshToken(() => refreshAuth());
+          state = AuthState.authenticated(displayName: displayName, role: role);
+        } else {
+          state = const AuthState.unauthenticated();
+        }
       } else {
         state = const AuthState.unauthenticated();
       }
@@ -77,20 +84,17 @@ class AuthNotifier extends Notifier<AuthState> {
 
     try {
       final authService = ref.read(authApiServiceProvider);
-      final response = await authService.login(
-        LoginRequest(username: username, password: password),
-      );
+      final response = await authService.login(username, password);
 
-      await _storage.write(key: 'auth_token', value: response.token);
       await _storage.write(
-        key: 'auth_refresh_token',
-        value: response.refreshToken,
+        key: 'auth',
+        value: jsonEncode({
+          'token': response.token,
+          'refreshToken': response.refreshToken,
+          'displayName': response.displayName,
+          'role': response.role,
+        }),
       );
-      await _storage.write(
-        key: 'auth_display_name',
-        value: response.displayName,
-      );
-      await _storage.write(key: 'auth_role', value: response.role);
 
       final apiClient = ref.read(apiClientProvider);
       apiClient.setToken(response.token);
@@ -108,20 +112,24 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<bool> refreshAuth() async {
     try {
-      final currentRefreshToken = await _storage.read(
-        key: 'auth_refresh_token',
-      );
+      final raw = await _storage.read(key: 'auth');
+      if (raw == null) return false;
+
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final currentRefreshToken = data['refreshToken'] as String?;
       if (currentRefreshToken == null) return false;
 
       final authService = ref.read(authApiServiceProvider);
-      final response = await authService.refreshToken(
-        RefreshTokenRequest(refreshToken: currentRefreshToken),
-      );
+      final response = await authService.refreshToken(currentRefreshToken);
 
-      await _storage.write(key: 'auth_token', value: response.token);
       await _storage.write(
-        key: 'auth_refresh_token',
-        value: response.refreshToken,
+        key: 'auth',
+        value: jsonEncode({
+          'token': response.token,
+          'refreshToken': response.refreshToken,
+          'displayName': data['displayName'],
+          'role': data['role'],
+        }),
       );
 
       final apiClient = ref.read(apiClientProvider);

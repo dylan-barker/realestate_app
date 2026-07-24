@@ -1,14 +1,9 @@
 import 'dart:developer' as developer;
 
-import '../models/property_state_model.dart';
-import '../models/room_model.dart';
+import '../models/property_state.dart';
 
 class PropertyLocalDataSource {
-  Future<List<RoomModel>> getInitialRooms() async {
-    return [];
-  }
-
-  Future<void> savePropertyDraft(PropertyStateModel model) async {
-    developer.log('Draft saved: Property Type ID: ${model.propertyTypeId}');
+  Future<void> savePropertyDraft(PropertyState state) async {
+    developer.log('Draft saved: Property Type ID: ${state.propertyTypeId}');
   }
 }
