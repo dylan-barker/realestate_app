@@ -12,6 +12,9 @@ class ContactCard extends StatelessWidget {
   final bool showRemove;
   final ValueChanged<Contact> onChanged;
   final VoidCallback? onRemove;
+  final String? fullNameError;
+  final String? emailError;
+  final String? phoneError;
 
   const ContactCard({
     super.key,
@@ -22,6 +25,9 @@ class ContactCard extends StatelessWidget {
     required this.showRemove,
     required this.onChanged,
     this.onRemove,
+    this.fullNameError,
+    this.emailError,
+    this.phoneError,
   });
 
   @override
@@ -69,6 +75,9 @@ class ContactCard extends StatelessWidget {
             textTheme: textTheme,
             contact: contact,
             onChanged: onChanged,
+            fullNameError: fullNameError,
+            emailError: emailError,
+            phoneError: phoneError,
           ),
         ],
       ),

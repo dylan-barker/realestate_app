@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/providers/api_providers.dart';
+import '../data/default_features.dart';
 import '../data/models/contact.dart';
 import '../data/models/listing_parking.dart';
 import '../data/models/property_state.dart';
@@ -167,10 +168,12 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   void addCustomRoom(String name, int roomTypeId) {
+    final defaults = roomDefaultFeatures[roomTypeId] ?? [];
     final newRoom = Room(
       id: 'custom-${DateTime.now().millisecondsSinceEpoch}',
       name: name,
       roomTypeId: roomTypeId,
+      features: List.from(defaults),
     );
     state = state.copyWith(rooms: [...state.rooms, newRoom]);
   }
@@ -208,6 +211,18 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.copyWith(parking: current);
   }
 
+  void decrementParking(int parkingTypeId) {
+    final current = List<ListingParking>.from(state.parking);
+    final idx = current.indexWhere((p) => p.parkingTypeId == parkingTypeId);
+    if (idx < 0) return;
+    if (current[idx].quantity <= 1) {
+      current.removeAt(idx);
+    } else {
+      current[idx] = current[idx].copyWith(quantity: current[idx].quantity - 1);
+    }
+    state = state.copyWith(parking: current);
+  }
+
   void addOutdoorFeature(String feature) {
     final current = List<String>.from(state.outdoorFeatures);
     if (!current.contains(feature)) {
@@ -231,6 +246,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     int? conditionRating,
     List<String>? features,
     List<int>? featureIds,
+    List<String>? hiddenFeatures,
     String? notes,
     String? photoUrl,
   }) {
@@ -240,6 +256,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
           conditionRating: conditionRating,
           features: features,
           featureIds: featureIds,
+          hiddenFeatures: hiddenFeatures,
           notes: notes,
           photoUrl: photoUrl,
         );
@@ -247,6 +264,39 @@ class PropertyViewModel extends Notifier<PropertyState> {
       return room;
     }).toList();
     state = state.copyWith(rooms: updatedRooms);
+  }
+
+  void hideFeatureInRoom(String roomId, String feature) {
+    final updatedRooms = state.rooms.map((room) {
+      if (room.id == roomId) {
+        final hidden = List<String>.from(room.hiddenFeatures);
+        final features = List<String>.from(room.features);
+        if (!hidden.contains(feature)) hidden.add(feature);
+        features.remove(feature);
+        return room.copyWith(hiddenFeatures: hidden, features: features);
+      }
+      return room;
+    }).toList();
+    state = state.copyWith(rooms: updatedRooms);
+  }
+
+  void outdoorDefaultFeaturesIfEmpty() {
+    if (state.outdoorFeatures.isEmpty) {
+      state = state.copyWith(
+        outdoorFeatures: List.from(outdoorDefaultFeatures),
+      );
+    }
+  }
+
+  void hideOutdoorFeature(String feature) {
+    final hidden = List<String>.from(state.outdoorHiddenFeatures);
+    if (!hidden.contains(feature)) hidden.add(feature);
+    final features = List<String>.from(state.outdoorFeatures);
+    features.remove(feature);
+    state = state.copyWith(
+      outdoorFeatures: features,
+      outdoorHiddenFeatures: hidden,
+    );
   }
 
   void renameRoom(String roomId, String newName) {

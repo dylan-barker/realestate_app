@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_card.dart';
+import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../data/models/enums/property_type.dart';
 import '../../providers/property_provider.dart';
@@ -12,8 +13,14 @@ class PropertyTypeScreen extends ConsumerWidget {
   const PropertyTypeScreen({super.key});
 
   Future<void> _saveAndPop(BuildContext context, WidgetRef ref) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     await viewModel.savePropertyType();
+    if (context.mounted) Navigator.pop(context);
     if (context.mounted) context.pop();
   }
 
@@ -26,83 +33,110 @@ class PropertyTypeScreen extends ConsumerWidget {
 
     final types = [
       {'type': PropertyType.house, 'icon': Icons.home_outlined, 'id': 1},
-      {'type': PropertyType.townhouse, 'icon': Icons.business_outlined, 'id': 2},
-      {'type': PropertyType.apartment, 'icon': Icons.corporate_fare_outlined, 'id': 3},
-      {'type': PropertyType.vacantLand, 'icon': Icons.terrain_outlined, 'id': 4},
+      {
+        'type': PropertyType.townhouse,
+        'icon': Icons.business_outlined,
+        'id': 2,
+      },
+      {
+        'type': PropertyType.apartment,
+        'icon': Icons.corporate_fare_outlined,
+        'id': 3,
+      },
+      {
+        'type': PropertyType.vacantLand,
+        'icon': Icons.terrain_outlined,
+        'id': 4,
+      },
       {'type': PropertyType.plot, 'icon': Icons.grid_view_outlined, 'id': 5},
     ];
 
-    return Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: WizardAppBar(
-        title: 'Property Type',
-        onBack: () => _saveAndPop(context, ref),
-        theme: theme,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'What type of property is this?',
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.textPrimary,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final discard = await showDiscardDialog(context);
+        if (discard == true) {
+          context.pop();
+          return;
+        }
+        await _saveAndPop(context, ref);
+      },
+      child: Scaffold(
+        backgroundColor: theme.backgroundColor,
+        appBar: WizardAppBar(
+          title: 'Property Type',
+          onBack: () => Navigator.maybePop(context),
+          theme: theme,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 24.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'What type of property is this?',
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.textPrimary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.35,
-                ),
-                itemCount: types.length,
-                itemBuilder: (context, index) {
-                  final item = types[index];
-                  final itemType = item['type'] as PropertyType;
-                  final itemIcon = item['icon'] as IconData;
-                  final itemId = item['id'] as int;
-                  final isSelected = state.propertyTypeId == itemId;
-                  return CustomCard(
-                    theme: theme,
-                    isSelected: isSelected,
-                    onTap: () => viewModel.selectPropertyType(itemId),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 16.0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          itemIcon,
-                          size: 26,
-                          color: isSelected
-                              ? theme.primaryColor
-                              : theme.textPrimary.withValues(alpha: 0.6),
-                        ),
-                        Text(
-                          itemType.displayString,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.textPrimary,
-                            fontSize: 16,
+                const SizedBox(height: 24),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1.35,
+                  ),
+                  itemCount: types.length,
+                  itemBuilder: (context, index) {
+                    final item = types[index];
+                    final itemType = item['type'] as PropertyType;
+                    final itemIcon = item['icon'] as IconData;
+                    final itemId = item['id'] as int;
+                    final isSelected = state.propertyTypeId == itemId;
+                    return CustomCard(
+                      theme: theme,
+                      isSelected: isSelected,
+                      onTap: () => viewModel.selectPropertyType(itemId),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 16.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(
+                            itemIcon,
+                            size: 26,
+                            color: isSelected
+                                ? theme.primaryColor
+                                : theme.textPrimary.withValues(alpha: 0.6),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
+                          Text(
+                            itemType.displayString,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.textPrimary,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

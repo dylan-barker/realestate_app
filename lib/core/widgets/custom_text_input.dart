@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/themes.dart';
 
@@ -18,6 +19,9 @@ class CustomTextInput extends StatefulWidget {
   final bool isRequired;
   final int maxLines;
   final String? subtext;
+  final String? errorText;
+  final List<String>? autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
   final RealEstateTheme? theme;
 
   const CustomTextInput({
@@ -35,6 +39,9 @@ class CustomTextInput extends StatefulWidget {
     this.isRequired = false,
     this.maxLines = 1,
     this.subtext,
+    this.errorText,
+    this.autofillHints,
+    this.inputFormatters,
     this.theme,
   });
 
@@ -68,9 +75,10 @@ class _CustomTextInputState extends State<CustomTextInput> {
     final theme = widget.theme ?? RealEstateTheme.crimson();
     final textTheme = theme.toThemeData().textTheme;
 
-    final resolvedBorderColor = _isFocused
-        ? theme.primaryColor
-        : theme.borderLight;
+    final hasError = widget.errorText != null;
+    final resolvedBorderColor = hasError
+        ? const Color(0xFFEF4444)
+        : (_isFocused ? theme.primaryColor : theme.borderLight);
 
     Widget textField = TextFormField(
       controller: widget.controller,
@@ -80,6 +88,8 @@ class _CustomTextInputState extends State<CustomTextInput> {
       keyboardType: widget.keyboardType,
       obscureText: widget.obscureText,
       maxLines: widget.maxLines,
+      autofillHints: widget.autofillHints,
+      inputFormatters: widget.inputFormatters,
       style: textTheme.bodyLarge?.copyWith(
         fontWeight: FontWeight.w600,
         color: theme.textPrimary,
@@ -181,6 +191,16 @@ class _CustomTextInputState extends State<CustomTextInput> {
               fontSize: 11,
               color: theme.textSecondary.withValues(alpha: 0.8),
               fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+        if (widget.errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            widget.errorText!,
+            style: textTheme.bodyMedium?.copyWith(
+              fontSize: 11,
+              color: const Color(0xFFEF4444),
             ),
           ),
         ],

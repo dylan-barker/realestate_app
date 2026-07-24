@@ -9,6 +9,9 @@ class ContactFields extends StatelessWidget {
   final TextTheme textTheme;
   final Contact contact;
   final ValueChanged<Contact> onChanged;
+  final String? fullNameError;
+  final String? emailError;
+  final String? phoneError;
 
   const ContactFields({
     super.key,
@@ -16,6 +19,9 @@ class ContactFields extends StatelessWidget {
     required this.textTheme,
     required this.contact,
     required this.onChanged,
+    this.fullNameError,
+    this.emailError,
+    this.phoneError,
   });
 
   @override
@@ -28,6 +34,8 @@ class ContactFields extends StatelessWidget {
           placeholder: 'John Doe / Acme Properties',
           initialValue: contact.fullName,
           style: InputStyle.cardBorder,
+          autofillHints: const [AutofillHints.name],
+          errorText: fullNameError,
           onChanged: (val) =>
               onChanged(contact.copyWith(fullName: val)),
         ),
@@ -38,6 +46,8 @@ class ContactFields extends StatelessWidget {
           placeholder: 'john.doe@example.com',
           initialValue: contact.emailAddress,
           keyboardType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
+          errorText: emailError,
           onChanged: (val) =>
               onChanged(contact.copyWith(emailAddress: val)),
         ),
@@ -48,6 +58,8 @@ class ContactFields extends StatelessWidget {
           placeholder: '+27 82 000 0000',
           initialValue: contact.mobilePhone,
           keyboardType: TextInputType.phone,
+          autofillHints: const [AutofillHints.telephoneNumber],
+          errorText: phoneError,
           onChanged: (val) =>
               onChanged(contact.copyWith(mobilePhone: val)),
         ),

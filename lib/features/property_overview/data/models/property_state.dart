@@ -35,6 +35,7 @@ class PropertyState {
   final List<Room> rooms;
   final List<ListingParking> parking;
   final List<String> outdoorFeatures;
+  final List<String> outdoorHiddenFeatures;
 
   // Step 5: Valuation & Running Costs
   final ListingValuation listingValuation;
@@ -77,6 +78,7 @@ class PropertyState {
     this.rooms = const [],
     this.parking = const [],
     this.outdoorFeatures = const [],
+    this.outdoorHiddenFeatures = const [],
     this.listingValuation = const ListingValuation(),
     this.propertyRunningCosts = const PropertyRunningCosts(),
     this.primaryContact = const Contact(),
@@ -110,6 +112,7 @@ class PropertyState {
     List<Room>? rooms,
     List<ListingParking>? parking,
     List<String>? outdoorFeatures,
+    List<String>? outdoorHiddenFeatures,
     ListingValuation? listingValuation,
     PropertyRunningCosts? propertyRunningCosts,
     Contact? primaryContact,
@@ -144,6 +147,8 @@ class PropertyState {
       rooms: rooms ?? this.rooms,
       parking: parking ?? this.parking,
       outdoorFeatures: outdoorFeatures ?? this.outdoorFeatures,
+      outdoorHiddenFeatures:
+          outdoorHiddenFeatures ?? this.outdoorHiddenFeatures,
       listingValuation: listingValuation ?? this.listingValuation,
       propertyRunningCosts: propertyRunningCosts ?? this.propertyRunningCosts,
       primaryContact: primaryContact ?? this.primaryContact,

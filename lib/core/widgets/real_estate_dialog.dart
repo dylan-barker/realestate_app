@@ -52,11 +52,29 @@ Widget dialogActionButton({
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
       backgroundColor: theme.primaryColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
     child: Text(text, style: const TextStyle(color: Colors.white)),
+  );
+}
+
+Future<bool?> showDiscardDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Unsaved Changes'),
+      content: const Text('Do you want to save your changes before leaving?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Discard'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Save'),
+        ),
+      ],
+    ),
   );
 }
 

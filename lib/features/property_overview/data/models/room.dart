@@ -6,6 +6,7 @@ class Room {
   final int? conditionRating;
   final List<String> features;
   final List<int> featureIds;
+  final List<String> hiddenFeatures;
   final String notes;
   final String? photoUrl;
   final DateTime createdAt;
@@ -19,6 +20,7 @@ class Room {
     this.conditionRating,
     this.features = const [],
     this.featureIds = const [],
+    this.hiddenFeatures = const [],
     this.notes = '',
     this.photoUrl,
     DateTime? createdAt,
@@ -34,6 +36,7 @@ class Room {
     int? conditionRating,
     List<String>? features,
     List<int>? featureIds,
+    List<String>? hiddenFeatures,
     String? notes,
     String? photoUrl,
     DateTime? createdAt,
@@ -47,6 +50,7 @@ class Room {
       conditionRating: conditionRating ?? this.conditionRating,
       features: features ?? this.features,
       featureIds: featureIds ?? this.featureIds,
+      hiddenFeatures: hiddenFeatures ?? this.hiddenFeatures,
       notes: notes ?? this.notes,
       photoUrl: photoUrl ?? this.photoUrl,
       createdAt: createdAt ?? this.createdAt,

@@ -9,8 +9,8 @@ import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
-import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
+import '../../../../core/widgets/feature_list_widget.dart';
 import '../../../../core/widgets/rating_slider.dart';
 import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
@@ -62,18 +62,26 @@ class RoomDetailsScreen extends ConsumerWidget {
       },
     ];
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        viewModel.selectRoomForEditing(null);
+        context.pop();
+      },
+      child: Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: WizardAppBar(
         title: 'Property Details',
         onBack: () {
-          viewModel.selectRoomForEditing(null);
-          context.pop();
+          Navigator.maybePop(context);
         },
         theme: theme,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.only(
             left: 20.0,
@@ -249,7 +257,9 @@ class RoomDetailsScreen extends ConsumerWidget {
               ...AmenityCategory.values.map((category) {
                 final amenities = StandardAmenity.values
                     .where((a) => a.category == category)
+                    .map((a) => a.displayString)
                     .toList();
+                final hiddenSet = Set<String>.from(room.hiddenFeatures);
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Column(
@@ -264,74 +274,25 @@ class RoomDetailsScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 10.0,
-                        children: amenities.map((amenity) {
-                          final isSelected = room.features.contains(
-                            amenity.displayString,
-                          );
-                          return CustomChip(
-                            theme: theme,
-                            label: amenity.displayString,
-                            isSelected: isSelected,
-                            onTap: () {
-                              if (isSelected) {
-                                viewModel.removeFeatureFromRoom(
-                                  room.id,
-                                  amenity.displayString,
-                                );
-                              } else {
-                                viewModel.addFeatureToRoom(
-                                  room.id,
-                                  amenity.displayString,
-                                );
-                              }
-                            },
-                          );
-                        }).toList(),
+                      FeatureListWidget(
+                        allAvailable: amenities,
+                        selectedFeatures: room.features,
+                        hiddenFeatures: hiddenSet,
+                        onToggle: (f) {
+                          if (room.features.contains(f)) {
+                            viewModel.removeFeatureFromRoom(room.id, f);
+                          } else {
+                            viewModel.addFeatureToRoom(room.id, f);
+                          }
+                        },
+                        onHide: (f) => viewModel.hideFeatureInRoom(room.id, f),
+                        theme: theme,
+                        textTheme: textTheme,
                       ),
                     ],
                   ),
                 );
               }),
-              if (room.features
-                  .where((f) => StandardAmenity.fromString(f) == null)
-                  .isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Custom',
-                        style: textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 10.0,
-                        children: room.features
-                            .where((f) => StandardAmenity.fromString(f) == null)
-                            .map(
-                              (feature) => CustomChip(
-                                theme: theme,
-                                label: feature,
-                                onDelete: () => viewModel.removeFeatureFromRoom(
-                                  room.id,
-                                  feature,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ],
-                  ),
-                ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
@@ -435,6 +396,8 @@ class RoomDetailsScreen extends ConsumerWidget {
             ],
           ),
         ),
+        ),
+      ),
       ),
     );
   }
