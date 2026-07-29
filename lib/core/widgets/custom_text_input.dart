@@ -15,6 +15,7 @@ class CustomTextInput extends StatefulWidget {
   final InputStyle style;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final BoxConstraints? suffixIconConstraints;
   final bool obscureText;
   final bool isRequired;
   final int maxLines;
@@ -36,6 +37,7 @@ class CustomTextInput extends StatefulWidget {
     this.style = InputStyle.cardBorder,
     this.prefixIcon,
     this.suffixIcon,
+    this.suffixIconConstraints,
     this.isRequired = false,
     this.maxLines = 1,
     this.subtext,
@@ -111,6 +113,14 @@ class _CustomTextInputState extends State<CustomTextInput> {
           minHeight: 24,
         ),
         suffixIcon: widget.suffixIcon,
+        suffixIconConstraints:
+            widget.suffixIconConstraints ??
+            const BoxConstraints(
+              minWidth: 24,
+              minHeight: 24,
+              maxWidth: 40,
+              maxHeight: 40,
+            ),
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,
         isDense: true,

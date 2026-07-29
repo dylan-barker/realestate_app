@@ -70,334 +70,422 @@ class RoomDetailsScreen extends ConsumerWidget {
         context.pop();
       },
       child: Scaffold(
-      backgroundColor: theme.backgroundColor,
-      appBar: WizardAppBar(
-        title: 'Property Details',
-        onBack: () {
-          Navigator.maybePop(context);
-        },
-        theme: theme,
-      ),
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(
-            left: 20.0,
-            right: 20.0,
-            top: 24.0,
-            bottom: 40.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'ROOM IDENTITY',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.textLabel,
-                  fontSize: 13,
-                  letterSpacing: 0.5,
-                ),
+        backgroundColor: theme.backgroundColor,
+        appBar: WizardAppBar(
+          title: 'Property Details',
+          onBack: () {
+            Navigator.maybePop(context);
+          },
+          theme: theme,
+        ),
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: 24.0,
+                bottom: 40.0,
               ),
-              const SizedBox(height: 8),
-              CustomCard(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 16.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      room.name,
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.textPrimary,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.edit_outlined,
-                        color: theme.textSecondary,
-                        size: 20,
-                      ),
-                      onPressed: () => _showRenameDialog(
-                        context,
-                        viewModel,
-                        room.id,
-                        room.name,
-                        theme,
-                        textTheme,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildRoomGraphic(context, theme, textTheme, room, viewModel),
-              const SizedBox(height: 28),
-              Text(
-                'Room Condition Rating',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Rate the current state of the space.',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: theme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: ratings.map((rating) {
-                  final level = rating['level'] as int;
-                  final emoji = rating['emoji'] as String;
-                  final label = rating['label'] as String;
-                  final range = rating['range'] as String;
-                  final isSelected = room.conditionRating == level;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: CustomCard(
-                        isSelected: isSelected,
-                        onTap: () => viewModel.updateRoomDetails(
-                          roomId: room.id,
-                          conditionRating: level,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14.0,
-                          horizontal: 8.0,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(emoji, style: const TextStyle(fontSize: 22)),
-                            const SizedBox(height: 10),
-                            Text(
-                              label,
-                              textAlign: TextAlign.center,
-                              style: textTheme.labelMedium?.copyWith(
-                                fontSize: 9,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isSelected
-                                    ? theme.primaryColor
-                                    : theme.textSecondary,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              range,
-                              style: textTheme.labelLarge?.copyWith(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected
-                                    ? theme.primaryColor
-                                    : theme.textSecondary.withValues(
-                                        alpha: 0.6,
-                                      ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-              RatingSlider(
-                conditionRating: room.conditionRating,
-                theme: theme,
-                textTheme: textTheme,
-                onChanged: (level) {
-                  viewModel.updateRoomDetails(
-                    roomId: room.id,
-                    conditionRating: level,
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-              Container(height: 1, color: theme.borderLight),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Features & Amenities',
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Select all that apply to this space.',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: theme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ...AmenityCategory.values.map((category) {
-                final amenities = StandardAmenity.values
-                    .where((a) => a.category == category)
-                    .map((a) => a.displayString)
-                    .toList();
-                final hiddenSet = Set<String>.from(room.hiddenFeatures);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        category.displayString,
-                        style: textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      FeatureListWidget(
-                        allAvailable: amenities,
-                        selectedFeatures: room.features,
-                        hiddenFeatures: hiddenSet,
-                        onToggle: (f) {
-                          if (room.features.contains(f)) {
-                            viewModel.removeFeatureFromRoom(room.id, f);
-                          } else {
-                            viewModel.addFeatureToRoom(room.id, f);
-                          }
-                        },
-                        onHide: (f) => viewModel.hideFeatureInRoom(room.id, f),
-                        theme: theme,
-                        textTheme: textTheme,
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => _showAddFeatureDialog(
-                    context,
-                    viewModel,
-                    room.id,
-                    theme,
-                    textTheme,
-                  ),
-                  icon: const Icon(Icons.add, size: 22),
-                  label: const Text('ADD CUSTOM FEATURE'),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: theme.cardBackgroundColor,
-                    foregroundColor: theme.primaryColor,
-                    side: BorderSide(
-                      color: theme.primaryColor.withValues(alpha: 0.4),
-                      width: 1.5,
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    textStyle: textTheme.bodyLarge?.copyWith(
+                  Text(
+                    'ROOM IDENTITY',
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: theme.textLabel,
+                      fontSize: 13,
                       letterSpacing: 0.5,
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(height: 1, color: theme.borderLight),
-              const SizedBox(height: 20),
-              Text(
-                'ROOM NOTES',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.textLabel,
-                  fontSize: 13,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              CustomCard(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                  const SizedBox(height: 8),
+                  CustomCard(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 16.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(
-                          Icons.note_alt_outlined,
-                          color: theme.textLabel,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
                         Text(
-                          'ROOM NOTES',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: theme.textLabel,
+                          room.name,
+                          style: textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: theme.textPrimary,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.edit_outlined,
+                            color: theme.textSecondary,
+                            size: 20,
+                          ),
+                          onPressed: () => _showRenameDialog(
+                            context,
+                            viewModel,
+                            room.id,
+                            room.name,
+                            theme,
+                            textTheme,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      initialValue: room.notes,
-                      maxLines: 4,
-                      onChanged: (val) => viewModel.updateRoomDetails(
-                        roomId: room.id,
-                        notes: val,
-                      ),
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: theme.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        hintText:
-                            'Add specific details about the condition or layout of this room...',
-                        hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: theme.textSecondary.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildRoomGraphic(context, theme, textTheme, room, viewModel),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Room Condition Rating',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Rate the current state of the space.',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: theme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: ratings.map((rating) {
+                      final level = rating['level'] as int;
+                      final emoji = rating['emoji'] as String;
+                      final label = rating['label'] as String;
+                      final range = rating['range'] as String;
+                      final isSelected = room.conditionRating == level;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: CustomCard(
+                            isSelected: isSelected,
+                            onTap: () => viewModel.updateRoomDetails(
+                              roomId: room.id,
+                              conditionRating: level,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14.0,
+                              horizontal: 8.0,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  emoji,
+                                  style: const TextStyle(fontSize: 22),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  label,
+                                  textAlign: TextAlign.center,
+                                  style: textTheme.labelMedium?.copyWith(
+                                    fontSize: 9,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : theme.textSecondary,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  range,
+                                  style: textTheme.labelLarge?.copyWith(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : theme.textSecondary.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+                  RatingSlider(
+                    conditionRating: room.conditionRating,
+                    theme: theme,
+                    textTheme: textTheme,
+                    onChanged: (level) {
+                      viewModel.updateRoomDetails(
+                        roomId: room.id,
+                        conditionRating: level,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Container(height: 1, color: theme.borderLight),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Features & Amenities',
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.textPrimary,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Select all that apply to this space.',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: theme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  () {
+                    final allStandardAmenities = StandardAmenity.values
+                        .map((a) => a.displayString)
+                        .toSet();
+                    return Column(
+                      children: [
+                        ...AmenityCategory.values.map((category) {
+                          final amenities = StandardAmenity.values
+                              .where((a) => a.category == category)
+                              .map((a) => a.displayString)
+                              .toList();
+                          final selectedForCategory = room.features
+                              .where((f) => amenities.contains(f))
+                              .toList();
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  category.displayString,
+                                  style: textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                FeatureListWidget(
+                                  selectedFeatures: selectedForCategory,
+                                  availableDefaults: amenities,
+                                  onAdd: (f) =>
+                                      viewModel.addFeatureToRoom(room.id, f),
+                                  onRemove: (f) => viewModel
+                                      .removeFeatureFromRoom(room.id, f),
+                                  categoryLabel: category.displayString,
+                                  theme: theme,
+                                  textTheme: textTheme,
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                        () {
+                          final customFeatures = room.features
+                              .where((f) => !allStandardAmenities.contains(f))
+                              .toList();
+                          if (customFeatures.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Custom',
+                                  style: textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ...customFeatures.map(
+                                  (f) => Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.cardBackgroundColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: theme.borderLight,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.build_outlined,
+                                          size: 18,
+                                          color: theme.textSecondary,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            f,
+                                            style: textTheme.bodyLarge
+                                                ?.copyWith(
+                                                  color: theme.textPrimary,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.close,
+                                            size: 18,
+                                            color: theme.textSecondary,
+                                          ),
+                                          onPressed: () =>
+                                              viewModel.removeFeatureFromRoom(
+                                                room.id,
+                                                f,
+                                              ),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 36,
+                                            minHeight: 36,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }(),
+                      ],
+                    );
+                  }(),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showAddFeatureDialog(
+                        context,
+                        viewModel,
+                        room.id,
+                        theme,
+                        textTheme,
+                      ),
+                      icon: const Icon(Icons.add, size: 22),
+                      label: const Text('ADD CUSTOM FEATURE'),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: theme.cardBackgroundColor,
+                        foregroundColor: theme.primaryColor,
+                        side: BorderSide(
+                          color: theme.primaryColor.withValues(alpha: 0.4),
+                          width: 1.5,
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(height: 1, color: theme.borderLight),
+                  const SizedBox(height: 20),
+                  Text(
+                    'ROOM NOTES',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.textLabel,
+                      fontSize: 13,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  CustomCard(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.note_alt_outlined,
+                              color: theme.textLabel,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'ROOM NOTES',
+                              style: textTheme.labelLarge?.copyWith(
+                                color: theme.textLabel,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          initialValue: room.notes,
+                          maxLines: 4,
+                          onChanged: (val) => viewModel.updateRoomDetails(
+                            roomId: room.id,
+                            notes: val,
+                          ),
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: theme.textPrimary,
+                          ),
+                          decoration: InputDecoration(
+                            hintText:
+                                'Add specific details about the condition or layout of this room...',
+                            hintStyle: textTheme.bodyMedium?.copyWith(
+                              color: theme.textSecondary.withValues(alpha: 0.5),
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  CustomButton(
+                    text: 'Save & Return to Features',
+                    fullWidth: true,
+                    onTap: () {
+                      viewModel.selectRoomForEditing(null);
+                      context.pop();
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 32),
-              CustomButton(
-                text: 'Save & Return to Features',
-                fullWidth: true,
-                onTap: () {
-                  viewModel.selectRoomForEditing(null);
-                  context.pop();
-                },
-              ),
-            ],
+            ),
           ),
         ),
-        ),
-      ),
       ),
     );
   }

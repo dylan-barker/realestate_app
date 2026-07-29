@@ -79,8 +79,6 @@ class PropertyFeaturesScreen extends ConsumerWidget {
     final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
 
-    viewModel.outdoorDefaultFeaturesIfEmpty();
-
     final listingId = state.listingId;
     final categories = RoomCategory.values;
 
@@ -256,46 +254,125 @@ class PropertyFeaturesScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ...OutdoorExtraCategory.values.map((category) {
-                  final extras = OutdoorExtra.values
-                      .where((e) => e.category == category)
+                () {
+                  final allOutdoorExtras = OutdoorExtra.values
                       .map((e) => e.displayString)
-                      .toList();
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          category.displayString,
-                          style: textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.textPrimary,
-                            fontSize: 14,
+                      .toSet();
+                  return Column(
+                    children: [
+                      ...OutdoorExtraCategory.values.map((category) {
+                        final extras = OutdoorExtra.values
+                            .where((e) => e.category == category)
+                            .map((e) => e.displayString)
+                            .toList();
+                        final selectedForCategory = state.outdoorFeatures
+                            .where((f) => extras.contains(f))
+                            .toList();
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                category.displayString,
+                                style: textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.textPrimary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              FeatureListWidget(
+                                selectedFeatures: selectedForCategory,
+                                availableDefaults: extras,
+                                onAdd: (f) => viewModel.addOutdoorFeature(f),
+                                onRemove: (f) =>
+                                    viewModel.removeOutdoorFeature(f),
+                                categoryLabel: category.displayString,
+                                theme: theme,
+                                textTheme: textTheme,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        FeatureListWidget(
-                          allAvailable: extras,
-                          selectedFeatures: state.outdoorFeatures,
-                          hiddenFeatures: Set<String>.from(
-                            state.outdoorHiddenFeatures,
+                        );
+                      }),
+                      () {
+                        final customFeatures = state.outdoorFeatures
+                            .where((f) => !allOutdoorExtras.contains(f))
+                            .toList();
+                        if (customFeatures.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Custom',
+                                style: textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.textPrimary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ...customFeatures.map(
+                                (f) => Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardBackgroundColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: theme.borderLight,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.build_outlined,
+                                        size: 18,
+                                        color: theme.textSecondary,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          f,
+                                          style: textTheme.bodyLarge?.copyWith(
+                                            color: theme.textPrimary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.close,
+                                          size: 18,
+                                          color: theme.textSecondary,
+                                        ),
+                                        onPressed: () =>
+                                            viewModel.removeOutdoorFeature(f),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                          minWidth: 36,
+                                          minHeight: 36,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          onToggle: (f) {
-                            if (state.outdoorFeatures.contains(f)) {
-                              viewModel.removeOutdoorFeature(f);
-                            } else {
-                              viewModel.addOutdoorFeature(f);
-                            }
-                          },
-                          onHide: (f) => viewModel.hideOutdoorFeature(f),
-                          theme: theme,
-                          textTheme: textTheme,
-                        ),
-                      ],
-                    ),
+                        );
+                      }(),
+                    ],
                   );
-                }),
+                }(),
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,

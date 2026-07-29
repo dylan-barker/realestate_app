@@ -280,14 +280,6 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.copyWith(rooms: updatedRooms);
   }
 
-  void outdoorDefaultFeaturesIfEmpty() {
-    if (state.outdoorFeatures.isEmpty) {
-      state = state.copyWith(
-        outdoorFeatures: List.from(outdoorDefaultFeatures),
-      );
-    }
-  }
-
   void hideOutdoorFeature(String feature) {
     final hidden = List<String>.from(state.outdoorHiddenFeatures);
     if (!hidden.contains(feature)) hidden.add(feature);

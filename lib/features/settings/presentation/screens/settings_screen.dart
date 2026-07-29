@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme_provider.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -49,10 +49,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: theme.cardBackgroundColor,
         surfaceTintColor: theme.cardBackgroundColor,
-        title: Text(
-          'Settings',
-          style: textTheme.titleLarge,
-        ),
+        title: Text('Settings', style: textTheme.titleLarge),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(color: theme.borderLight, height: 1),
@@ -68,10 +65,7 @@ class SettingsScreen extends ConsumerWidget {
               border: Border.all(color: theme.borderLight),
             ),
             child: SwitchListTile(
-              title: Text(
-                'Dark Mode',
-                style: textTheme.titleMedium,
-              ),
+              title: Text('Dark Mode', style: textTheme.titleMedium),
               subtitle: Text(
                 'Switch between light and dark appearance',
                 style: textTheme.bodyMedium,
@@ -79,9 +73,9 @@ class SettingsScreen extends ConsumerWidget {
               value: isDark,
               activeThumbColor: theme.primaryColor,
               onChanged: (value) {
-                ref.read(themeModeProvider.notifier).setThemeMode(
-                      value ? ThemeMode.dark : ThemeMode.light,
-                    );
+                ref
+                    .read(themeModeProvider.notifier)
+                    .setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
               },
             ),
           ),
@@ -141,10 +135,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: theme.primaryColor,
                     ),
                   ),
-                  leading: Icon(
-                    Icons.logout,
-                    color: theme.primaryColor,
-                  ),
+                  leading: Icon(Icons.logout, color: theme.primaryColor),
                   onTap: () => _handleLogout(context, ref),
                 ),
               ],
