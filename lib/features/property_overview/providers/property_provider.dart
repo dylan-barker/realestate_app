@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/errors/failure_mapper.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../../core/network/providers/api_providers.dart';
 import '../data/default_features.dart';
 import '../data/models/contact.dart';
@@ -49,7 +51,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.updatePropertyType(id, state.propertyTypeId);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save property type: $e');
+      state = state.copyWith(
+        errorMessage: mapFailure(e).message,
+      );
     }
   }
 
@@ -60,7 +64,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.upsertAddress(id, state);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save address: $e');
+      state = state.copyWith(errorMessage: mapFailure(e).message);
     }
   }
 
@@ -71,7 +75,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.upsertBuildingInfo(id, state);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save building info: $e');
+      state = state.copyWith(
+        errorMessage: mapFailure(e).message,
+      );
     }
   }
 
@@ -85,7 +91,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
       await _repository.upsertOutdoorFeatures(id, state.outdoorFeatures);
     } catch (e) {
       state = state.copyWith(
-        errorMessage: 'Failed to save property features: $e',
+        errorMessage: mapFailure(e).message,
       );
     }
   }
@@ -98,7 +104,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
       await _repository.upsertValuation(id, state);
       await _repository.upsertRunningCosts(id, state);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save valuation: $e');
+      state = state.copyWith(errorMessage: mapFailure(e).message);
     }
   }
 
@@ -113,7 +119,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
         state.coContacts,
       );
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to save contacts: $e');
+      state = state.copyWith(errorMessage: mapFailure(e).message);
     }
   }
 
@@ -387,10 +393,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     state = state.copyWith(errorMessage: null);
 
     if (listingId == null) {
-      state = state.copyWith(
-        errorMessage:
-            'Cannot submit: API server is not available. Please check your connection and try again.',
-      );
+      state = state.copyWith(errorMessage: const NetworkFailure().message);
       return false;
     }
 
@@ -410,7 +413,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
       await _repository.submitListing(listingId);
       return true;
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to submit: $e');
+      state = state.copyWith(errorMessage: mapFailure(e).message);
       await _repository.savePropertyDraft(state);
       return false;
     }
@@ -423,7 +426,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.deleteListing(id);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Failed to delete listing: $e');
+      state = state.copyWith(errorMessage: mapFailure(e).message);
       rethrow;
     }
   }

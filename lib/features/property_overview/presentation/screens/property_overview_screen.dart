@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/route_constants.dart';
+import '../../../../core/errors/failure_mapper.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../home/presentation/screens/home_screen.dart'
     show listingsProvider;
+import '../../data/models/enums/property_type.dart';
 import '../../providers/property_provider.dart';
 import '../widgets/section_card.dart';
 
@@ -30,7 +33,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
         title: 'Property Type',
         subtitle: _propertyTypeLabel(state.propertyTypeId),
         icon: Icons.home_outlined,
-        route: '/property/$propertyId/property-type',
+        route: AppRoutes.propertyType(propertyId),
         isComplete: state.propertyTypeId > 0,
       ),
       _SectionData(
@@ -39,7 +42,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             ? '${state.streetNumber} ${state.street}'
             : 'Not provided',
         icon: Icons.location_on_outlined,
-        route: '/property/$propertyId/address',
+        route: AppRoutes.address(propertyId),
         isComplete: state.street.isNotEmpty && state.city.isNotEmpty,
       ),
       _SectionData(
@@ -48,7 +51,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             ? '${state.erfSize} m\u00B2'
             : 'Not provided',
         icon: Icons.architecture_outlined,
-        route: '/property/$propertyId/building-info',
+        route: AppRoutes.buildingInfo(propertyId),
         isComplete: state.erfSize.isNotEmpty || state.floorArea.isNotEmpty,
       ),
       _SectionData(
@@ -57,7 +60,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             ? '${state.rooms.length} room(s)'
             : 'Not provided',
         icon: Icons.meeting_room_outlined,
-        route: '/property/$propertyId/property-features',
+        route: AppRoutes.propertyFeatures(propertyId),
         isComplete: state.rooms.isNotEmpty,
       ),
       _SectionData(
@@ -66,7 +69,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             ? 'R ${state.listingValuation.ownersNetPrice}'
             : 'Not provided',
         icon: Icons.account_balance_wallet_outlined,
-        route: '/property/$propertyId/valuation-costs',
+        route: AppRoutes.valuationCosts(propertyId),
         isComplete: state.listingValuation.ownersNetPrice.isNotEmpty,
       ),
       _SectionData(
@@ -75,7 +78,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
             ? state.primaryContact.fullName
             : 'Not provided',
         icon: Icons.contacts_outlined,
-        route: '/property/$propertyId/contacts',
+        route: AppRoutes.contacts(propertyId),
         isComplete: state.primaryContact.fullName.isNotEmpty,
       ),
     ];
@@ -183,7 +186,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
                               backgroundColor: theme.primaryColor,
                             ),
                           );
-                          context.go('/home');
+                          context.go(AppRoutes.homePath);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -207,20 +210,8 @@ class PropertyOverviewScreen extends ConsumerWidget {
   }
 
   String _propertyTypeLabel(int id) {
-    switch (id) {
-      case 1:
-        return 'House';
-      case 2:
-        return 'Townhouse';
-      case 3:
-        return 'Apartment';
-      case 4:
-        return 'Vacant Land';
-      case 5:
-        return 'Plot';
-      default:
-        return 'Not selected';
-    }
+    if (id < 1 || id > PropertyType.values.length) return 'Not selected';
+    return PropertyType.values[id - 1].displayString;
   }
 
   Future<void> _confirmDelete(
@@ -259,12 +250,12 @@ class PropertyOverviewScreen extends ConsumerWidget {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Property deleted')));
-        context.go('/home');
+        context.go(AppRoutes.homePath);
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete property: $e')),
+          SnackBar(content: Text(mapFailure(e).message)),
         );
       }
     }

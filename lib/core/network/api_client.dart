@@ -5,6 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 
+import '../constants/api_constants.dart';
+import 'api_endpoints.dart';
+
 class ApiClient {
   final Dio _dio;
   String? _token;
@@ -18,13 +21,13 @@ class ApiClient {
           baseUrl:
               baseUrl ??
               (Platform.isAndroid
-                  ? 'https://10.0.2.2:7063'
-                  : 'https://localhost:7063'),
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
+                  ? ApiConstants.baseUrlAndroid
+                  : ApiConstants.baseUrlDesktop),
+          connectTimeout: ApiConstants.connectTimeout,
+          receiveTimeout: ApiConstants.receiveTimeout,
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            'Content-Type': ApiConstants.contentTypeJson,
+            'Accept': ApiConstants.acceptJson,
           },
           followRedirects: true,
         ),
@@ -41,7 +44,8 @@ class ApiClient {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (_token != null) {
-            options.headers['Authorization'] = 'Bearer $_token';
+            options.headers[ApiConstants.authorizationHeader] =
+                '${ApiConstants.bearerPrefix}$_token';
           }
           handler.next(options);
         },
@@ -53,7 +57,8 @@ class ApiClient {
 
           final path = error.requestOptions.path;
           final isAuthEndpoint =
-              path.contains('/auth/login') || path.contains('/auth/refresh');
+              path.contains(ApiEndpoints.login) ||
+              path.contains(ApiEndpoints.refresh);
 
           if (isAuthEndpoint) {
             _onUnauthorized?.call();
@@ -75,7 +80,8 @@ class ApiClient {
             await _refreshCompleter;
 
             final opts = error.requestOptions;
-            opts.headers['Authorization'] = 'Bearer $_token';
+            opts.headers[ApiConstants.authorizationHeader] =
+                '${ApiConstants.bearerPrefix}$_token';
             final response = await _dio.fetch(opts);
             handler.resolve(response);
           } catch (_) {

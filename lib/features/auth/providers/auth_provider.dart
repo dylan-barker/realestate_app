@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/errors/failure_mapper.dart';
 import '../../../../core/network/providers/api_providers.dart';
 
 enum AuthStatus { uninitialized, authenticated, unauthenticated }
@@ -55,7 +57,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> init() async {
     try {
-      final raw = await _storage.read(key: 'auth');
+      final raw = await _storage.read(key: AppConstants.storageAuthKey);
       if (raw != null) {
         final data = jsonDecode(raw) as Map<String, dynamic>;
         final token = data['token'] as String?;
@@ -87,7 +89,7 @@ class AuthNotifier extends Notifier<AuthState> {
       final response = await authService.login(username, password);
 
       await _storage.write(
-        key: 'auth',
+        key: AppConstants.storageAuthKey,
         value: jsonEncode({
           'token': response.token,
           'refreshToken': response.refreshToken,
@@ -106,13 +108,13 @@ class AuthNotifier extends Notifier<AuthState> {
         role: response.role,
       );
     } catch (e) {
-      state = AuthState.unauthenticated(errorMessage: e.toString());
+      state = AuthState.unauthenticated(errorMessage: mapFailure(e).message);
     }
   }
 
   Future<bool> refreshAuth() async {
     try {
-      final raw = await _storage.read(key: 'auth');
+      final raw = await _storage.read(key: AppConstants.storageAuthKey);
       if (raw == null) return false;
 
       final data = jsonDecode(raw) as Map<String, dynamic>;
@@ -123,7 +125,7 @@ class AuthNotifier extends Notifier<AuthState> {
       final response = await authService.refreshToken(currentRefreshToken);
 
       await _storage.write(
-        key: 'auth',
+        key: AppConstants.storageAuthKey,
         value: jsonEncode({
           'token': response.token,
           'refreshToken': response.refreshToken,

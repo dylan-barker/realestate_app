@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../auth/providers/auth_provider.dart';
 
@@ -30,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       await ref.read(authProvider.notifier).logout();
       if (context.mounted) {
-        context.go('/login');
+        context.go(AppRoutes.loginPath);
       }
     }
   }

@@ -14,6 +14,7 @@ import '../../features/property_overview/presentation/screens/property_overview_
 import '../../features/property_overview/presentation/screens/property_type_screen.dart';
 import '../../features/property_overview/presentation/screens/room_details_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../constants/route_constants.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -22,21 +23,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login',
+    initialLocation: AppRoutes.loginPath,
     redirect: (context, state) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isInitialized = authState.status != AuthStatus.uninitialized;
-      final isLoginRoute = state.matchedLocation == '/login';
+      final isLoginRoute = state.matchedLocation == AppRoutes.loginPath;
 
       if (!isInitialized) return null;
 
-      if (!isAuthenticated && !isLoginRoute) return '/login';
-      if (isAuthenticated && isLoginRoute) return '/home';
+      if (!isAuthenticated && !isLoginRoute) return AppRoutes.loginPath;
+      if (isAuthenticated && isLoginRoute) return AppRoutes.homePath;
 
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: AppRoutes.loginPath,
+        builder: (context, state) => const LoginScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -45,7 +49,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/home',
+                path: AppRoutes.homePath,
                 builder: (context, state) => const HomeScreen(),
               ),
             ],
@@ -53,7 +57,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/settings',
+                path: AppRoutes.settingsPath,
                 builder: (context, state) => const SettingsScreen(),
               ),
             ],
@@ -61,7 +65,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: '/property/:id',
+        path: AppRoutes.propertyPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
@@ -69,27 +73,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/property/:id/property-type',
+        path: AppRoutes.propertyTypePath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyTypeScreen(),
       ),
       GoRoute(
-        path: '/property/:id/address',
+        path: AppRoutes.addressPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AddressScreen(),
       ),
       GoRoute(
-        path: '/property/:id/building-info',
+        path: AppRoutes.buildingInfoPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const BuildingInfoScreen(),
       ),
       GoRoute(
-        path: '/property/:id/property-features',
+        path: AppRoutes.propertyFeaturesPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PropertyFeaturesScreen(),
       ),
       GoRoute(
-        path: '/property/:id/room-details/:roomId',
+        path: AppRoutes.roomDetailsPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final roomId = state.pathParameters['roomId']!;
@@ -97,12 +101,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/property/:id/valuation-costs',
+        path: AppRoutes.valuationCostsPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ListingValuationScreen(),
       ),
       GoRoute(
-        path: '/property/:id/contacts',
+        path: AppRoutes.contactsPath,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ContactsScreen(),
       ),

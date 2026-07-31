@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_text_input.dart';
@@ -157,7 +158,7 @@ class PropertyFeaturesScreen extends ConsumerWidget {
                     rooms: groupedRooms[category]!,
                     viewModel: viewModel,
                     onRoomTap: (roomId) => context.push(
-                      '/property/$listingId/room-details/$roomId',
+                      AppRoutes.roomDetails(listingId!, roomId),
                     ),
                   ),
                   const SizedBox(height: 12),

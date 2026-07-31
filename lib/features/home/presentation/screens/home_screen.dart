@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/route_constants.dart';
+import '../../../../core/errors/failure_mapper.dart';
 import '../../../../core/network/dto/listing_dtos.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
@@ -51,14 +53,14 @@ class HomeScreen extends ConsumerWidget {
             viewModel.reset();
             final listingId = await viewModel.createNewListing();
             if (context.mounted) {
-              await context.push('/property/$listingId');
+              await context.push(AppRoutes.property(listingId));
               ref.invalidate(listingsProvider);
             }
           } catch (e, st) {
             debugPrint('Add Property error: $e\n$st');
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to create property: $e')),
+                SnackBar(content: Text(mapFailure(e).message)),
               );
             }
           }
@@ -101,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
   ) {
     return InkWell(
       onTap: () async {
-        await context.push('/property/${listing.id}');
+        await context.push(AppRoutes.property(listing.id));
         ref.invalidate(listingsProvider);
       },
       borderRadius: BorderRadius.circular(12),
