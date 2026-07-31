@@ -31,13 +31,16 @@ class PropertyViewModel extends Notifier<PropertyState> {
   }
 
   Future<int> createNewListing() async {
-    final listingId = await _repository.createListing(
+    final result = await _repository.createListing(
       state.propertyTypeId > 0 ? state.propertyTypeId : 1,
     );
     if (ref.mounted) {
-      state = state.copyWith(listingId: listingId, referenceNumber: '');
+      state = state.copyWith(
+        listingId: result.id,
+        referenceNumber: result.referenceNumber,
+      );
     }
-    return listingId;
+    return result.id;
   }
 
   Future<void> loadListing(int id) async {
@@ -86,9 +89,10 @@ class PropertyViewModel extends Notifier<PropertyState> {
     if (id == null) return;
     state = state.copyWith(errorMessage: null);
     try {
-      await _repository.upsertRooms(id, state.rooms);
+      final syncedRooms = await _repository.upsertRooms(id, state.rooms);
       await _repository.upsertParking(id, state.parking);
       await _repository.upsertOutdoorFeatures(id, state.outdoorFeatures);
+      if (ref.mounted) state = state.copyWith(rooms: syncedRooms);
     } catch (e) {
       state = state.copyWith(
         errorMessage: mapFailure(e).message,
@@ -113,11 +117,22 @@ class PropertyViewModel extends Notifier<PropertyState> {
     if (id == null) return;
     state = state.copyWith(errorMessage: null);
     try {
-      await _repository.upsertContacts(
+      final syncedContacts = await _repository.upsertContacts(
         id,
         state.primaryContact,
         state.coContacts,
       );
+      if (ref.mounted) {
+        final includedPrimary = state.primaryContact.fullName.isNotEmpty;
+        state = state.copyWith(
+          primaryContact: includedPrimary && syncedContacts.isNotEmpty
+              ? syncedContacts.first
+              : const Contact(),
+          coContacts: includedPrimary
+              ? (syncedContacts.length > 1 ? syncedContacts.sublist(1) : [])
+              : syncedContacts,
+        );
+      }
     } catch (e) {
       state = state.copyWith(errorMessage: mapFailure(e).message);
     }
@@ -400,17 +415,29 @@ class PropertyViewModel extends Notifier<PropertyState> {
     try {
       await _repository.upsertAddress(listingId, state);
       await _repository.upsertBuildingInfo(listingId, state);
-      await _repository.upsertRooms(listingId, state.rooms);
+      final syncedRooms = await _repository.upsertRooms(listingId, state.rooms);
       await _repository.upsertParking(listingId, state.parking);
       await _repository.upsertOutdoorFeatures(listingId, state.outdoorFeatures);
       await _repository.upsertValuation(listingId, state);
       await _repository.upsertRunningCosts(listingId, state);
-      await _repository.upsertContacts(
+      final syncedContacts = await _repository.upsertContacts(
         listingId,
         state.primaryContact,
         state.coContacts,
       );
       await _repository.submitListing(listingId);
+      if (ref.mounted) {
+        final includedPrimary = state.primaryContact.fullName.isNotEmpty;
+        state = state.copyWith(
+          rooms: syncedRooms,
+          primaryContact: includedPrimary && syncedContacts.isNotEmpty
+              ? syncedContacts.first
+              : const Contact(),
+          coContacts: includedPrimary
+              ? (syncedContacts.length > 1 ? syncedContacts.sublist(1) : [])
+              : syncedContacts,
+        );
+      }
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: mapFailure(e).message);

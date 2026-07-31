@@ -57,13 +57,18 @@ class PropertyRepository {
     }).toList();
   }
 
-  Future<int> createListing(int propertyTypeId) async {
+  Future<({int id, String referenceNumber})> createListing(
+    int propertyTypeId,
+  ) async {
     final response = await _client.post(
       ApiEndpoints.listings,
       data: {'propertyTypeId': propertyTypeId},
     );
     final json = response.data as Map<String, dynamic>;
-    return json['id'] as int;
+    return (
+      id: json['id'] as int,
+      referenceNumber: json['referenceNumber'] as String? ?? '',
+    );
   }
 
   Future<PropertyState> loadListing(int listingId) async {
@@ -275,130 +280,144 @@ class PropertyRepository {
     await _client.put(ApiEndpoints.listingRunningCosts(listingId), data: data);
   }
 
-  Future<void> upsertRooms(int listingId, List<Room> rooms) async {
+  Future<List<Room>> upsertRooms(int listingId, List<Room> rooms) async {
     final existingRoomsJson = await _getRoomsJson(listingId);
     final existingMap = {
       for (final r in existingRoomsJson) (r['id'] as int): r,
     };
 
-    final roomLocalIds = rooms.map((r) => r.id).toSet();
+    final desiredApiIds = rooms
+        .map((r) => int.tryParse(r.id))
+        .whereType<int>()
+        .toSet();
 
-    final toDelete = existingMap.keys
-        .where((id) => !roomLocalIds.contains(id.toString()))
-        .toList();
-    final toCreate = <Room>[];
-    final toUpdate = <MapEntry<int, Room>>[];
+    for (final apiId in existingMap.keys.where(
+      (id) => !desiredApiIds.contains(id),
+    )) {
+      await _client.delete(ApiEndpoints.listingRoom(listingId, apiId));
+    }
+
+    final syncedRooms = <Room>[];
 
     for (final room in rooms) {
       final apiId = int.tryParse(room.id);
       if (apiId != null && existingMap.containsKey(apiId)) {
-        toUpdate.add(MapEntry(apiId, room));
-      } else if (apiId == null ||
-          (!existingMap.containsKey(apiId) &&
-              existingRoomsJson.every((e) => e['name'] != room.name))) {
-        toCreate.add(room);
-      }
-    }
-
-    for (final apiId in toDelete) {
-      await _client.delete(ApiEndpoints.listingRoom(listingId, apiId));
-    }
-
-    for (final room in toCreate) {
-      final createdJson = await _createRoom(listingId, room);
-      final createdId = createdJson['id'] as int;
-
-      if (room.photoUrl != null && !room.photoUrl!.startsWith('http')) {
-        try {
-          await _uploadRoomPhoto(listingId, createdId, room.photoUrl!);
-        } catch (_) {}
-      }
-
-      if (room.conditionRating != null) {
-        await _upsertRoomCondition(
-          listingId,
-          createdId,
-          conditionRating: room.conditionRating,
-          notes: room.notes.isNotEmpty ? room.notes : null,
+        syncedRooms.add(
+          await _syncExistingRoom(listingId, apiId, room, existingMap[apiId]!),
         );
-      }
-
-      for (final feature in room.features) {
-        if (feature.featureId != null) {
-          await _linkRoomFeature(listingId, createdId, feature.featureId!);
-        } else {
-          await _addCustomFeature(listingId, createdId, feature.description);
-        }
+      } else {
+        syncedRooms.add(await _createRoomWithDetails(listingId, room));
       }
     }
 
-    for (final entry in toUpdate) {
-      final apiId = entry.key;
-      final room = entry.value;
-      final existing = existingMap[apiId]!;
+    return syncedRooms;
+  }
 
-      await _updateRoom(listingId, apiId, room);
+  Future<Room> _createRoomWithDetails(int listingId, Room room) async {
+    final createdJson = await _createRoom(listingId, room);
+    final createdId = createdJson['id'] as int;
+    var photoUrl = room.photoUrl;
 
-      if (room.photoUrl != null && !room.photoUrl!.startsWith('http')) {
-        try {
-          await _uploadRoomPhoto(listingId, apiId, room.photoUrl!);
-        } catch (_) {}
-      }
+    if (photoUrl != null && !photoUrl.startsWith('http')) {
+      try {
+        photoUrl = await _uploadRoomPhoto(listingId, createdId, photoUrl);
+      } catch (_) {}
+    }
 
-      final existingCondition = existing['condition'] as Map<String, dynamic>?;
-      if (room.conditionRating !=
-              (existingCondition?['conditionRating'] as int?) ||
-          room.notes != (existingCondition?['notes'] as String? ?? '')) {
-        await _upsertRoomCondition(
-          listingId,
-          apiId,
-          conditionRating: room.conditionRating,
-          notes: room.notes.isNotEmpty ? room.notes : null,
-        );
-      }
+    if (room.conditionRating != null) {
+      await _upsertRoomCondition(
+        listingId,
+        createdId,
+        conditionRating: room.conditionRating,
+        notes: room.notes.isNotEmpty ? room.notes : null,
+      );
+    }
 
-      final existingFeatureIds =
-          (existing['features'] as List<dynamic>?)
-              ?.map((f) => (f as Map<String, dynamic>)['id'] as int)
-              .toSet() ??
-          <int>{};
-      final existingCustomFeatures =
-          (existing['customFeatures'] as List<dynamic>?)
-              ?.map((f) => f as Map<String, dynamic>)
-              .toList() ??
-          <Map<String, dynamic>>[];
-      final existingCustomById = {
-        for (final f in existingCustomFeatures)
-          (f['id'] as int): (f['description'] as String),
-      };
-      final existingCustomDescriptions = existingCustomById.values.toSet();
-
-      final desiredFeatureIds = room.features
-          .where((f) => f.featureId != null)
-          .map((f) => f.featureId!)
-          .toSet();
-      final desiredCustomDescriptions = room.features
-          .where((f) => f.featureId == null)
-          .map((f) => f.description)
-          .toSet();
-
-      for (final fid in desiredFeatureIds.difference(existingFeatureIds)) {
-        await _linkRoomFeature(listingId, apiId, fid);
-      }
-      for (final fid in existingFeatureIds.difference(desiredFeatureIds)) {
-        await _unlinkRoomFeature(listingId, apiId, fid);
-      }
-      for (final description in desiredCustomDescriptions.difference(
-        existingCustomDescriptions,
-      )) {
-        await _addCustomFeature(listingId, apiId, description);
-      }
-      for (final entry in existingCustomById.entries) {
-        if (!desiredCustomDescriptions.contains(entry.value)) {
-          await _deleteCustomFeature(listingId, apiId, entry.key);
-        }
+    for (final feature in room.features) {
+      if (feature.featureId != null) {
+        await _linkRoomFeature(listingId, createdId, feature.featureId!);
+      } else {
+        await _addCustomFeature(listingId, createdId, feature.description);
       }
     }
+
+    return room.copyWith(id: createdId.toString(), photoUrl: photoUrl);
+  }
+
+  Future<Room> _syncExistingRoom(
+    int listingId,
+    int apiId,
+    Room room,
+    Map<String, dynamic> existing,
+  ) async {
+    var photoUrl = room.photoUrl;
+
+    await _updateRoom(listingId, apiId, room);
+
+    final existingPhotoUrl = existing['photoUrl'] as String?;
+    if (existingPhotoUrl != null && (photoUrl == null || photoUrl.isEmpty)) {
+      await _client.delete(ApiEndpoints.listingRoomPhoto(listingId, apiId));
+    } else if (photoUrl != null && !photoUrl.startsWith('http')) {
+      try {
+        photoUrl = await _uploadRoomPhoto(listingId, apiId, photoUrl);
+      } catch (_) {}
+    }
+
+    final existingCondition = existing['condition'] as Map<String, dynamic>?;
+    if (room.conditionRating !=
+            (existingCondition?['conditionRating'] as int?) ||
+        room.notes != (existingCondition?['notes'] as String? ?? '')) {
+      await _upsertRoomCondition(
+        listingId,
+        apiId,
+        conditionRating: room.conditionRating,
+        notes: room.notes.isNotEmpty ? room.notes : null,
+      );
+    }
+
+    final existingFeatureIds =
+        (existing['features'] as List<dynamic>?)
+            ?.map((f) => (f as Map<String, dynamic>)['id'] as int)
+            .toSet() ??
+        <int>{};
+    final existingCustomFeatures =
+        (existing['customFeatures'] as List<dynamic>?)
+            ?.map((f) => f as Map<String, dynamic>)
+            .toList() ??
+        <Map<String, dynamic>>[];
+    final existingCustomById = {
+      for (final f in existingCustomFeatures)
+        (f['id'] as int): (f['description'] as String),
+    };
+    final existingCustomDescriptions = existingCustomById.values.toSet();
+
+    final desiredFeatureIds = room.features
+        .where((f) => f.featureId != null)
+        .map((f) => f.featureId!)
+        .toSet();
+    final desiredCustomDescriptions = room.features
+        .where((f) => f.featureId == null)
+        .map((f) => f.description)
+        .toSet();
+
+    for (final fid in desiredFeatureIds.difference(existingFeatureIds)) {
+      await _linkRoomFeature(listingId, apiId, fid);
+    }
+    for (final fid in existingFeatureIds.difference(desiredFeatureIds)) {
+      await _unlinkRoomFeature(listingId, apiId, fid);
+    }
+    for (final description in desiredCustomDescriptions.difference(
+      existingCustomDescriptions,
+    )) {
+      await _addCustomFeature(listingId, apiId, description);
+    }
+    for (final entry in existingCustomById.entries) {
+      if (!desiredCustomDescriptions.contains(entry.value)) {
+        await _deleteCustomFeature(listingId, apiId, entry.key);
+      }
+    }
+
+    return room.copyWith(photoUrl: photoUrl);
   }
 
   Future<void> upsertParking(
@@ -406,9 +425,19 @@ class PropertyRepository {
     List<ListingParking> parking,
   ) async {
     final existingParkingJson = await _getParkingJson(listingId);
+    final desiredTypeIds = parking.map((p) => p.parkingTypeId).toSet();
     final existingTypeIds = existingParkingJson
         .map((p) => p['parkingTypeId'] as int)
         .toSet();
+
+    for (final existing in existingParkingJson) {
+      final typeId = existing['parkingTypeId'] as int;
+      if (!desiredTypeIds.contains(typeId)) {
+        await _client.delete(
+          ApiEndpoints.listingSingleParking(listingId, existing['id'] as int),
+        );
+      }
+    }
 
     for (final p in parking) {
       if (existingTypeIds.contains(p.parkingTypeId)) {
@@ -428,62 +457,73 @@ class PropertyRepository {
     }
   }
 
-  Future<void> upsertContacts(
+  Future<List<Contact>> upsertContacts(
     int listingId,
     Contact primaryContact,
     List<Contact> coContacts,
   ) async {
     final allContacts = [
       if (primaryContact.fullName.isNotEmpty) primaryContact,
-      ...coContacts,
+      ...coContacts.where(_contactHasData),
     ];
     final existingJson = await _getContactsJson(listingId);
+    final existingById = {
+      for (final c in existingJson) (c['id'] as int): c,
+    };
 
-    for (int i = 0; i < allContacts.length; i++) {
-      final contact = allContacts[i];
+    final desiredApiIds = allContacts
+        .map((c) => int.tryParse(c.id))
+        .whereType<int>()
+        .toSet();
 
-      if (i < existingJson.length) {
-        final existingId = existingJson[i]['id'] as int;
-        final data = <String, dynamic>{};
-        if (contact.fullName.isNotEmpty) data['fullName'] = contact.fullName;
-        if (contact.idNumber.isNotEmpty) data['idNumber'] = contact.idNumber;
-        if (contact.companyName.isNotEmpty) {
-          data['companyName'] = contact.companyName;
-        }
-        if (contact.companyRegistrationNumber.isNotEmpty) {
-          data['companyRegistrationNumber'] = contact.companyRegistrationNumber;
-        }
-        if (contact.mobilePhone.isNotEmpty) {
-          data['mobilePhone'] = contact.mobilePhone;
-        }
-        if (contact.emailAddress.isNotEmpty) {
-          data['emailAddress'] = contact.emailAddress;
-        }
-        if (contact.role.isNotEmpty) data['role'] = contact.role;
+    for (final cid in existingById.keys.where(
+      (id) => !desiredApiIds.contains(id),
+    )) {
+      await _client.delete(
+        ApiEndpoints.listingSingleContact(listingId, cid),
+      );
+    }
+
+    final syncedContacts = <Contact>[];
+
+    for (final contact in allContacts) {
+      final data = <String, dynamic>{};
+      if (contact.fullName.isNotEmpty) data['fullName'] = contact.fullName;
+      if (contact.idNumber.isNotEmpty) data['idNumber'] = contact.idNumber;
+      if (contact.companyName.isNotEmpty) {
+        data['companyName'] = contact.companyName;
+      }
+      if (contact.companyRegistrationNumber.isNotEmpty) {
+        data['companyRegistrationNumber'] = contact.companyRegistrationNumber;
+      }
+      if (contact.mobilePhone.isNotEmpty) {
+        data['mobilePhone'] = contact.mobilePhone;
+      }
+      if (contact.emailAddress.isNotEmpty) {
+        data['emailAddress'] = contact.emailAddress;
+      }
+      if (contact.role.isNotEmpty) data['role'] = contact.role;
+
+      final apiId = int.tryParse(contact.id);
+      if (apiId != null && existingById.containsKey(apiId)) {
         await _client.put(
-          ApiEndpoints.listingSingleContact(listingId, existingId),
+          ApiEndpoints.listingSingleContact(listingId, apiId),
           data: data,
         );
+        syncedContacts.add(contact);
       } else {
-        final data = <String, dynamic>{};
-        if (contact.fullName.isNotEmpty) data['fullName'] = contact.fullName;
-        if (contact.idNumber.isNotEmpty) data['idNumber'] = contact.idNumber;
-        if (contact.companyName.isNotEmpty) {
-          data['companyName'] = contact.companyName;
-        }
-        if (contact.companyRegistrationNumber.isNotEmpty) {
-          data['companyRegistrationNumber'] = contact.companyRegistrationNumber;
-        }
-        if (contact.mobilePhone.isNotEmpty) {
-          data['mobilePhone'] = contact.mobilePhone;
-        }
-        if (contact.emailAddress.isNotEmpty) {
-          data['emailAddress'] = contact.emailAddress;
-        }
-        if (contact.role.isNotEmpty) data['role'] = contact.role;
-        await _client.post(ApiEndpoints.listingContacts(listingId), data: data);
+        final response = await _client.post(
+          ApiEndpoints.listingContacts(listingId),
+          data: data,
+        );
+        final created = response.data as Map<String, dynamic>;
+        syncedContacts.add(
+          contact.copyWith(id: created['id'].toString()),
+        );
       }
     }
+
+    return syncedContacts;
   }
 
   Future<void> upsertOutdoorFeatures(
@@ -506,12 +546,12 @@ class PropertyRepository {
     developer.log('Listing deleted: ID=$listingId');
   }
 
-  Future<void> uploadRoomPhoto(
+  Future<String?> uploadRoomPhoto(
     int listingId,
     int roomId,
     String filePath,
-  ) async {
-    await _uploadRoomPhoto(listingId, roomId, filePath);
+  ) {
+    return _uploadRoomPhoto(listingId, roomId, filePath);
   }
 
   Future<List<Map<String, dynamic>>> _getRoomsJson(int listingId) async {
@@ -525,7 +565,9 @@ class PropertyRepository {
       'roomTypeId': room.roomTypeId,
     };
     if (room.roomTypeOther != null) data['roomTypeOther'] = room.roomTypeOther;
-    if (room.photoUrl != null) data['photoUrl'] = room.photoUrl;
+    if (room.photoUrl != null && room.photoUrl!.startsWith('http')) {
+      data['photoUrl'] = room.photoUrl;
+    }
     final response = await _client.post(
       ApiEndpoints.listingRooms(listingId),
       data: data,
@@ -538,7 +580,9 @@ class PropertyRepository {
     if (room.name.isNotEmpty) data['name'] = room.name;
     data['roomTypeId'] = room.roomTypeId;
     if (room.roomTypeOther != null) data['roomTypeOther'] = room.roomTypeOther;
-    if (room.photoUrl != null) data['photoUrl'] = room.photoUrl;
+    if (room.photoUrl != null && room.photoUrl!.startsWith('http')) {
+      data['photoUrl'] = room.photoUrl;
+    }
     await _client.put(ApiEndpoints.listingRoom(listingId, roomId), data: data);
   }
 
@@ -599,7 +643,7 @@ class PropertyRepository {
     );
   }
 
-  Future<void> _uploadRoomPhoto(
+  Future<String?> _uploadRoomPhoto(
     int listingId,
     int roomId,
     String filePath,
@@ -610,10 +654,12 @@ class PropertyRepository {
         filename: 'room_photo.jpg',
       ),
     });
-    await _client.post(
+    final response = await _client.post(
       ApiEndpoints.listingRoomPhoto(listingId, roomId),
       data: formData,
     );
+    final json = response.data as Map<String, dynamic>?;
+    return json?['url'] as String?;
   }
 
   Future<List<Map<String, dynamic>>> _getParkingJson(int listingId) async {
@@ -629,5 +675,15 @@ class PropertyRepository {
   num? _parseDecimal(String value) {
     if (value.isEmpty) return null;
     return num.tryParse(value);
+  }
+
+  bool _contactHasData(Contact contact) {
+    return contact.fullName.isNotEmpty ||
+        contact.idNumber.isNotEmpty ||
+        contact.companyName.isNotEmpty ||
+        contact.companyRegistrationNumber.isNotEmpty ||
+        contact.mobilePhone.isNotEmpty ||
+        contact.emailAddress.isNotEmpty ||
+        contact.role.isNotEmpty;
   }
 }
