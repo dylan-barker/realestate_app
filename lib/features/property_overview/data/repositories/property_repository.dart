@@ -199,8 +199,9 @@ class PropertyRepository {
 
   Future<void> upsertAddress(int listingId, PropertyState state) async {
     final data = <String, dynamic>{};
-    if (state.streetNumber.isNotEmpty)
+    if (state.streetNumber.isNotEmpty) {
       data['streetNumber'] = state.streetNumber;
+    }
     if (state.street.isNotEmpty) data['street'] = state.street;
     if (state.unitNumber.isNotEmpty) data['unitNumber'] = state.unitNumber;
     if (state.suburb.isNotEmpty) data['suburb'] = state.suburb;

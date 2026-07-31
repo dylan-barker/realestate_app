@@ -38,8 +38,9 @@ class _AddressScreenState extends ConsumerState<AddressScreen> {
     );
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     await viewModel.saveAddress();
-    if (context.mounted) Navigator.pop(context);
-    if (context.mounted) context.pop();
+    if (!mounted) return;
+    Navigator.pop(context);
+    context.pop();
   }
 
   @override
@@ -61,6 +62,7 @@ class _AddressScreenState extends ConsumerState<AddressScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final discard = await showDiscardDialog(context);
+        if (!context.mounted) return;
         if (discard == true) {
           context.pop();
           return;

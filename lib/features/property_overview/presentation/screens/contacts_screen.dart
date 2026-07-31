@@ -38,8 +38,9 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     );
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     await viewModel.saveContacts();
-    if (context.mounted) Navigator.pop(context);
-    if (context.mounted) context.pop();
+    if (!mounted) return;
+    Navigator.pop(context);
+    context.pop();
   }
 
   @override
@@ -51,10 +52,12 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
     _errors.removeWhere((k, v) {
       if (k == 'name') return state.primaryContact.fullName.trim().isNotEmpty;
-      if (k == 'email')
+      if (k == 'email') {
         return state.primaryContact.emailAddress.trim().isNotEmpty;
-      if (k == 'phone')
+      }
+      if (k == 'phone') {
         return state.primaryContact.mobilePhone.trim().isNotEmpty;
+      }
       return true;
     });
 
@@ -63,6 +66,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final discard = await showDiscardDialog(context);
+        if (!context.mounted) return;
         if (discard == true) {
           context.pop();
           return;

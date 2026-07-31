@@ -37,6 +37,7 @@ class ListingValuationScreen extends ConsumerWidget {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final discard = await showDiscardDialog(context);
+        if (!context.mounted) return;
         if (discard == true) {
           context.pop();
           return;

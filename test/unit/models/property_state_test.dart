@@ -11,7 +11,7 @@ void main() {
     test('constructor sets default values', () {
       final state = PropertyState();
 
-      expect(state.propertyTypeId, 1);
+      expect(state.propertyTypeId, 0);
       expect(state.street, '');
       expect(state.suburb, '');
       expect(state.city, '');
@@ -31,7 +31,7 @@ void main() {
 
       expect(updated.city, 'Johannesburg');
       expect(updated.street, 'Main St');
-      expect(updated.propertyTypeId, 1);
+      expect(updated.propertyTypeId, 0);
     });
 
     test('copyWith() handles rooms list', () {

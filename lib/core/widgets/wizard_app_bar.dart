@@ -74,7 +74,7 @@ class WizardAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
-        if (actions != null) ...actions!,
+        ...?actions,
       ],
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(bottomBorderHeight),
