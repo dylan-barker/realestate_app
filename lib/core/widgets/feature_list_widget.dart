@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/themes.dart';
+import 'custom_chip.dart';
 
 class FeatureListWidget extends StatelessWidget {
   final List<String> selectedFeatures;
@@ -31,13 +32,18 @@ class FeatureListWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...selectedFeatures.map(
-          (f) => _SelectedFeatureRow(
-            name: f,
-            onRemove: () => onRemove(f),
-            theme: theme,
-            textTheme: textTheme,
-          ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: selectedFeatures
+              .map(
+                (f) => CustomChip(
+                  label: f,
+                  onDelete: () => onRemove(f),
+                  theme: theme,
+                ),
+              )
+              .toList(),
         ),
         _buildAddButton(context),
       ],
@@ -114,54 +120,6 @@ class FeatureListWidget extends StatelessWidget {
         categoryLabel: categoryLabel,
         theme: theme,
         textTheme: textTheme,
-      ),
-    );
-  }
-}
-
-class _SelectedFeatureRow extends StatelessWidget {
-  final String name;
-  final VoidCallback onRemove;
-  final RealEstateTheme theme;
-  final TextTheme textTheme;
-
-  const _SelectedFeatureRow({
-    required this.name,
-    required this.onRemove,
-    required this.theme,
-    required this.textTheme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: theme.cardBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, size: 18, color: theme.primaryColor),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              name,
-              style: textTheme.bodyLarge?.copyWith(
-                color: theme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.close, size: 18, color: theme.textSecondary),
-            onPressed: onRemove,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-          ),
-        ],
       ),
     );
   }

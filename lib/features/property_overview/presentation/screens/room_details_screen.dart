@@ -269,7 +269,8 @@ class RoomDetailsScreen extends ConsumerWidget {
                               .map((a) => a.displayString)
                               .toList();
                           final selectedForCategory = room.features
-                              .where((f) => amenities.contains(f))
+                              .where((f) => amenities.contains(f.description))
+                              .map((f) => f.description)
                               .toList();
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16),
@@ -302,7 +303,11 @@ class RoomDetailsScreen extends ConsumerWidget {
                         }),
                         () {
                           final customFeatures = room.features
-                              .where((f) => !allStandardAmenities.contains(f))
+                              .where(
+                                (f) => !allStandardAmenities.contains(
+                                  f.description,
+                                ),
+                              )
                               .toList();
                           if (customFeatures.isEmpty) {
                             return const SizedBox.shrink();
@@ -345,7 +350,7 @@ class RoomDetailsScreen extends ConsumerWidget {
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
-                                            f,
+                                            f.description,
                                             style: textTheme.bodyLarge
                                                 ?.copyWith(
                                                   color: theme.textPrimary,
@@ -362,7 +367,7 @@ class RoomDetailsScreen extends ConsumerWidget {
                                           onPressed: () =>
                                               viewModel.removeFeatureFromRoom(
                                                 room.id,
-                                                f,
+                                                f.description,
                                               ),
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(

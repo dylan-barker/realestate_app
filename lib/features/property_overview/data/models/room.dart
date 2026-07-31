@@ -1,11 +1,30 @@
+class RoomFeature {
+  final String description;
+  final int? featureId;
+  final int? customId;
+
+  const RoomFeature({required this.description, this.featureId, this.customId});
+
+  bool get isPredefined => featureId != null;
+
+  bool get isPersisted => featureId != null || customId != null;
+
+  RoomFeature copyWith({int? featureId, int? customId}) {
+    return RoomFeature(
+      description: description,
+      featureId: featureId ?? this.featureId,
+      customId: customId ?? this.customId,
+    );
+  }
+}
+
 class Room {
   final String id;
   final String name;
   final int roomTypeId;
   final String? roomTypeOther;
   final int? conditionRating;
-  final List<String> features;
-  final List<int> featureIds;
+  final List<RoomFeature> features;
   final List<String> hiddenFeatures;
   final String notes;
   final String? photoUrl;
@@ -19,14 +38,13 @@ class Room {
     this.roomTypeOther,
     this.conditionRating,
     this.features = const [],
-    this.featureIds = const [],
     this.hiddenFeatures = const [],
     this.notes = '',
     this.photoUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   Room copyWith({
     String? id,
@@ -34,8 +52,7 @@ class Room {
     int? roomTypeId,
     String? roomTypeOther,
     int? conditionRating,
-    List<String>? features,
-    List<int>? featureIds,
+    List<RoomFeature>? features,
     List<String>? hiddenFeatures,
     String? notes,
     String? photoUrl,
@@ -49,7 +66,6 @@ class Room {
       roomTypeOther: roomTypeOther ?? this.roomTypeOther,
       conditionRating: conditionRating ?? this.conditionRating,
       features: features ?? this.features,
-      featureIds: featureIds ?? this.featureIds,
       hiddenFeatures: hiddenFeatures ?? this.hiddenFeatures,
       notes: notes ?? this.notes,
       photoUrl: photoUrl ?? this.photoUrl,

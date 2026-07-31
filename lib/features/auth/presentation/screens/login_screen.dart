@@ -122,6 +122,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: () {
                       setState(() => _obscurePassword = !_obscurePassword);
                     },
+                    iconSize: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 32,
+                      height: 20,
+                    ),
+                  ),
+                  suffixIconConstraints: const BoxConstraints(
+                    minWidth: 32,
+                    maxWidth: 32,
+                    minHeight: 20,
+                    maxHeight: 20,
                   ),
                 ),
                 const SizedBox(height: 32),

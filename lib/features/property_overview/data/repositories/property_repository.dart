@@ -125,14 +125,22 @@ class PropertyRepository {
         final features =
             (r['features'] as List<dynamic>?)
                 ?.map(
-                  (f) => (f as Map<String, dynamic>)['description'] as String,
+                  (f) => RoomFeature(
+                    description:
+                        (f as Map<String, dynamic>)['description'] as String,
+                    featureId: f['id'] as int,
+                  ),
                 )
                 .toList() ??
             [];
         final customFeatures =
             (r['customFeatures'] as List<dynamic>?)
                 ?.map(
-                  (f) => (f as Map<String, dynamic>)['description'] as String,
+                  (f) => RoomFeature(
+                    description:
+                        (f as Map<String, dynamic>)['description'] as String,
+                    customId: f['id'] as int,
+                  ),
                 )
                 .toList() ??
             [];
@@ -143,7 +151,6 @@ class PropertyRepository {
           roomTypeOther: r['roomTypeOther'] as String?,
           conditionRating: condition?['conditionRating'] as int?,
           features: [...features, ...customFeatures],
-          featureIds: features.map((_) => 0).toList(),
           notes: condition?['notes'] as String? ?? '',
           photoUrl: r['photoUrl'] as String?,
           createdAt: r['createdAt'] != null
@@ -315,8 +322,12 @@ class PropertyRepository {
         );
       }
 
-      for (final featureId in room.featureIds) {
-        await _linkRoomFeature(listingId, createdId, featureId);
+      for (final feature in room.features) {
+        if (feature.featureId != null) {
+          await _linkRoomFeature(listingId, createdId, feature.featureId!);
+        } else {
+          await _addCustomFeature(listingId, createdId, feature.description);
+        }
       }
     }
 
@@ -350,13 +361,41 @@ class PropertyRepository {
               ?.map((f) => (f as Map<String, dynamic>)['id'] as int)
               .toSet() ??
           <int>{};
-      final desiredFeatureIds = room.featureIds.toSet();
+      final existingCustomFeatures =
+          (existing['customFeatures'] as List<dynamic>?)
+              ?.map((f) => f as Map<String, dynamic>)
+              .toList() ??
+          <Map<String, dynamic>>[];
+      final existingCustomById = {
+        for (final f in existingCustomFeatures)
+          (f['id'] as int): (f['description'] as String),
+      };
+      final existingCustomDescriptions = existingCustomById.values.toSet();
+
+      final desiredFeatureIds = room.features
+          .where((f) => f.featureId != null)
+          .map((f) => f.featureId!)
+          .toSet();
+      final desiredCustomDescriptions = room.features
+          .where((f) => f.featureId == null)
+          .map((f) => f.description)
+          .toSet();
 
       for (final fid in desiredFeatureIds.difference(existingFeatureIds)) {
         await _linkRoomFeature(listingId, apiId, fid);
       }
       for (final fid in existingFeatureIds.difference(desiredFeatureIds)) {
         await _unlinkRoomFeature(listingId, apiId, fid);
+      }
+      for (final description in desiredCustomDescriptions.difference(
+        existingCustomDescriptions,
+      )) {
+        await _addCustomFeature(listingId, apiId, description);
+      }
+      for (final entry in existingCustomById.entries) {
+        if (!desiredCustomDescriptions.contains(entry.value)) {
+          await _deleteCustomFeature(listingId, apiId, entry.key);
+        }
       }
     }
   }
@@ -535,6 +574,27 @@ class PropertyRepository {
   ) async {
     await _client.delete(
       ApiEndpoints.listingRoomFeature(listingId, roomId, featureId),
+    );
+  }
+
+  Future<void> _addCustomFeature(
+    int listingId,
+    int roomId,
+    String description,
+  ) async {
+    await _client.post(
+      ApiEndpoints.listingRoomCustomFeatures(listingId, roomId),
+      data: {'description': description},
+    );
+  }
+
+  Future<void> _deleteCustomFeature(
+    int listingId,
+    int roomId,
+    int customFeatureId,
+  ) async {
+    await _client.delete(
+      ApiEndpoints.listingRoomCustomFeature(listingId, roomId, customFeatureId),
     );
   }
 

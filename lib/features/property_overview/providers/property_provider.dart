@@ -173,7 +173,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
       id: 'custom-${DateTime.now().millisecondsSinceEpoch}',
       name: name,
       roomTypeId: roomTypeId,
-      features: List.from(defaults),
+      features: defaults.map((d) => RoomFeature(description: d)).toList(),
     );
     state = state.copyWith(rooms: [...state.rooms, newRoom]);
   }
@@ -244,8 +244,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
   void updateRoomDetails({
     required String roomId,
     int? conditionRating,
-    List<String>? features,
-    List<int>? featureIds,
+    List<RoomFeature>? features,
     List<String>? hiddenFeatures,
     String? notes,
     String? photoUrl,
@@ -255,7 +254,6 @@ class PropertyViewModel extends Notifier<PropertyState> {
         return room.copyWith(
           conditionRating: conditionRating,
           features: features,
-          featureIds: featureIds,
           hiddenFeatures: hiddenFeatures,
           notes: notes,
           photoUrl: photoUrl,
@@ -270,9 +268,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
     final updatedRooms = state.rooms.map((room) {
       if (room.id == roomId) {
         final hidden = List<String>.from(room.hiddenFeatures);
-        final features = List<String>.from(room.features);
+        final features = List<RoomFeature>.from(room.features);
         if (!hidden.contains(feature)) hidden.add(feature);
-        features.remove(feature);
+        features.removeWhere((f) => f.description == feature);
         return room.copyWith(hiddenFeatures: hidden, features: features);
       }
       return room;
@@ -302,9 +300,9 @@ class PropertyViewModel extends Notifier<PropertyState> {
   void addFeatureToRoom(String roomId, String feature) {
     final updatedRooms = state.rooms.map((room) {
       if (room.id == roomId) {
-        final currentFeatures = List<String>.from(room.features);
-        if (!currentFeatures.contains(feature)) {
-          currentFeatures.add(feature);
+        final currentFeatures = List<RoomFeature>.from(room.features);
+        if (!currentFeatures.any((f) => f.description == feature)) {
+          currentFeatures.add(RoomFeature(description: feature));
         }
         return room.copyWith(features: currentFeatures);
       }
@@ -316,8 +314,8 @@ class PropertyViewModel extends Notifier<PropertyState> {
   void removeFeatureFromRoom(String roomId, String feature) {
     final updatedRooms = state.rooms.map((room) {
       if (room.id == roomId) {
-        final currentFeatures = List<String>.from(room.features);
-        currentFeatures.remove(feature);
+        final currentFeatures = List<RoomFeature>.from(room.features);
+        currentFeatures.removeWhere((f) => f.description == feature);
         return room.copyWith(features: currentFeatures);
       }
       return room;
