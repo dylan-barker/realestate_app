@@ -399,10 +399,6 @@ class PropertyViewModel extends Notifier<PropertyState> {
     );
   }
 
-  Future<void> saveDraft() async {
-    await _repository.savePropertyDraft(state);
-  }
-
   Future<bool> submitAndSave() async {
     final listingId = state.listingId;
     state = state.copyWith(errorMessage: null);
@@ -441,7 +437,6 @@ class PropertyViewModel extends Notifier<PropertyState> {
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: mapFailure(e).message);
-      await _repository.savePropertyDraft(state);
       return false;
     }
   }

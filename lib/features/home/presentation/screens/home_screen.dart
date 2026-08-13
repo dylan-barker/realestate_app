@@ -59,9 +59,9 @@ class HomeScreen extends ConsumerWidget {
           } catch (e, st) {
             debugPrint('Add Property error: $e\n$st');
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(mapFailure(e).message)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(mapFailure(e).message)));
             }
           }
         },
@@ -101,6 +101,9 @@ class HomeScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
+    final isSubmitted = listing.status == 'submitted';
+    final statusLabel = isSubmitted ? 'Submitted' : 'Incomplete';
+
     return InkWell(
       onTap: () async {
         await context.push(AppRoutes.property(listing.id));
@@ -129,7 +132,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Status: ${listing.status}',
+                    'Status: $statusLabel',
                     style: textTheme.bodyMedium?.copyWith(
                       color: theme.textSecondary,
                     ),
@@ -140,17 +143,15 @@ class HomeScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: listing.status == 'draft'
-                    ? theme.pendingColor.withValues(alpha: 0.15)
-                    : theme.completeColor.withValues(alpha: 0.15),
+                color: isSubmitted
+                    ? theme.completeColor.withValues(alpha: 0.15)
+                    : theme.pendingColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                listing.status.toUpperCase(),
+                statusLabel.toUpperCase(),
                 style: textTheme.labelLarge?.copyWith(
-                  color: listing.status == 'draft'
-                      ? theme.pendingColor
-                      : theme.completeColor,
+                  color: isSubmitted ? theme.completeColor : theme.pendingColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

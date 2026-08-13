@@ -50,7 +50,6 @@ class PropertyState {
 
   // Listing metadata
   final String referenceNumber;
-  final String status;
   final String? p24Ref;
   final String? errorMessage;
 
@@ -84,7 +83,6 @@ class PropertyState {
     this.primaryContact = const Contact(),
     this.coContacts = const [],
     this.referenceNumber = '',
-    this.status = 'draft',
     this.p24Ref,
     this.errorMessage,
   });
@@ -119,7 +117,6 @@ class PropertyState {
     List<Contact>? coContacts,
     int? listingId,
     String? referenceNumber,
-    String? status,
     String? p24Ref,
     String? errorMessage,
   }) {
@@ -154,7 +151,6 @@ class PropertyState {
       primaryContact: primaryContact ?? this.primaryContact,
       coContacts: coContacts ?? this.coContacts,
       referenceNumber: referenceNumber ?? this.referenceNumber,
-      status: status ?? this.status,
       p24Ref: p24Ref ?? this.p24Ref,
       errorMessage: errorMessage ?? this.errorMessage,
     );

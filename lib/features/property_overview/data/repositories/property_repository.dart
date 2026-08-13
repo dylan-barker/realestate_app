@@ -19,12 +19,6 @@ class PropertyRepository {
 
   Future<List<Room>> getInitialRooms() async => [];
 
-  Future<void> savePropertyDraft(PropertyState propertyState) async {
-    developer.log(
-      'Draft saved: Property Type ID: ${propertyState.propertyTypeId}',
-    );
-  }
-
   Future<List<ListingSummaryDto>> getAllListings({
     String? status,
     DateTime? dateFrom,
@@ -106,7 +100,6 @@ class PropertyRepository {
       listingId: j['id'] as int?,
       propertyTypeId: j['propertyTypeId'] as int? ?? 0,
       referenceNumber: j['referenceNumber'] as String? ?? '',
-      status: j['status'] as String? ?? 'draft',
       p24Ref: j['p24Ref'] as String?,
       streetNumber: address?['streetNumber'] as String? ?? '',
       street: address?['street'] as String? ?? '',
