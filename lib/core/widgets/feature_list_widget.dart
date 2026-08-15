@@ -169,7 +169,7 @@ class _FeaturePickerSheetState extends State<_FeaturePickerSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: widget.theme.borderLight,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

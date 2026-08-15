@@ -107,7 +107,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+            icon: Icon(Icons.delete_outline, color: theme.error),
             onPressed: () =>
                 _confirmDelete(context, ref, viewModel, propertyId),
           ),
@@ -194,7 +194,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
                                 state.errorMessage ??
                                     'Failed to submit evaluation',
                               ),
-                              backgroundColor: Colors.red.shade700,
+                              backgroundColor: theme.error,
                             ),
                           );
                         }
@@ -234,7 +234,7 @@ class PropertyOverviewScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => ctx.pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(ctx).colorScheme.error),
             child: const Text('Delete'),
           ),
         ],
