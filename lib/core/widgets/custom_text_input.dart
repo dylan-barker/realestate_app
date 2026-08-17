@@ -79,7 +79,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
 
     final hasError = widget.errorText != null;
     final resolvedBorderColor = hasError
-        ? const Color(0xFFEF4444)
+        ? theme.error
         : (_isFocused ? theme.primaryColor : theme.borderLight);
 
     Widget textField = TextFormField(
@@ -177,13 +177,13 @@ class _CustomTextInputState extends State<CustomTextInput> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEE2E2), // Soft red background
+                  color: theme.errorBackground,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   'REQUIRED',
                   style: textTheme.labelMedium?.copyWith(
-                    color: const Color(0xFFEF4444), // Red text
+                    color: theme.error,
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
@@ -210,7 +210,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
             widget.errorText!,
             style: textTheme.bodyMedium?.copyWith(
               fontSize: 11,
-              color: const Color(0xFFEF4444),
+              color: theme.error,
             ),
           ),
         ],

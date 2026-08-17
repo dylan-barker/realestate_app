@@ -9,6 +9,17 @@ import '../constants/api_constants.dart';
 import 'api_endpoints.dart';
 
 class ApiClient {
+  /// Resolves the backend base URL: a `--dart-define=API_BASE_URL` build
+  /// override wins, otherwise fall back to the local dev hosts.
+  static String _defaultBaseUrl() {
+    if (ApiConstants.baseUrlOverride.isNotEmpty) {
+      return ApiConstants.baseUrlOverride;
+    }
+    return Platform.isAndroid
+        ? ApiConstants.baseUrlAndroid
+        : ApiConstants.baseUrlDesktop;
+  }
+
   final Dio _dio;
   String? _token;
   void Function()? _onUnauthorized;
@@ -18,11 +29,7 @@ class ApiClient {
   ApiClient({String? baseUrl})
     : _dio = Dio(
         BaseOptions(
-          baseUrl:
-              baseUrl ??
-              (Platform.isAndroid
-                  ? ApiConstants.baseUrlAndroid
-                  : ApiConstants.baseUrlDesktop),
+          baseUrl: baseUrl ?? _defaultBaseUrl(),
           connectTimeout: ApiConstants.connectTimeout,
           receiveTimeout: ApiConstants.receiveTimeout,
           headers: {
@@ -32,13 +39,18 @@ class ApiClient {
           followRedirects: true,
         ),
       ) {
-    _dio.httpClientAdapter = IOHttpClientAdapter(
-      createHttpClient: () {
-        final client = HttpClient();
-        client.badCertificateCallback = (cert, host, port) => true;
-        return client;
-      },
-    );
+    // Only bypass TLS certificate validation in debug builds, where the local
+    // dev backend serves a self-signed cert. Release builds keep the
+    // platform's default validation.
+    if (kDebugMode) {
+      _dio.httpClientAdapter = IOHttpClientAdapter(
+        createHttpClient: () {
+          final client = HttpClient();
+          client.badCertificateCallback = (cert, host, port) => true;
+          return client;
+        },
+      );
+    }
     _dio.interceptors.addAll([
       LogInterceptor(requestBody: kDebugMode, responseBody: kDebugMode),
       InterceptorsWrapper(
