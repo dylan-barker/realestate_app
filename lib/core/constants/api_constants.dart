@@ -1,11 +1,11 @@
 /// Network configuration constants.
 abstract final class ApiConstants {
-  static const String baseUrlAndroid = 'https://10.0.2.2:7063';
-  static const String baseUrlDesktop = 'https://localhost:7063';
+  static const String baseUrlAndroid = 'https://api.realworth.co.za';
+  static const String baseUrlDesktop = 'https://api.realworth.co.za';
 
   /// Backend base URL injected at build time via
   /// `--dart-define=API_BASE_URL=https://...`. Empty when not supplied, in
-  /// which case the local dev hosts above are used.
+  /// which case [baseUrlAndroid]/[baseUrlDesktop] are used.
   static const String baseUrlOverride = String.fromEnvironment('API_BASE_URL');
 
   static const Duration connectTimeout = Duration(seconds: 10);
