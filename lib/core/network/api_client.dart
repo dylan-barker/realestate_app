@@ -1,25 +1,13 @@
 import 'dart:async';
-import 'dart:io' show Platform, HttpClient;
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../constants/api_constants.dart';
 import 'api_endpoints.dart';
+import 'platform_config.dart';
 
 class ApiClient {
-  /// Resolves the backend base URL: a `--dart-define=API_BASE_URL` build
-  /// override wins, otherwise fall back to the local dev hosts.
-  static String _defaultBaseUrl() {
-    if (ApiConstants.baseUrlOverride.isNotEmpty) {
-      return ApiConstants.baseUrlOverride;
-    }
-    return Platform.isAndroid
-        ? ApiConstants.baseUrlAndroid
-        : ApiConstants.baseUrlDesktop;
-  }
-
   final Dio _dio;
   String? _token;
   void Function()? _onUnauthorized;
@@ -29,7 +17,7 @@ class ApiClient {
   ApiClient({String? baseUrl})
     : _dio = Dio(
         BaseOptions(
-          baseUrl: baseUrl ?? _defaultBaseUrl(),
+          baseUrl: baseUrl ?? resolveDefaultBaseUrl(),
           connectTimeout: ApiConstants.connectTimeout,
           receiveTimeout: ApiConstants.receiveTimeout,
           headers: {
@@ -39,18 +27,10 @@ class ApiClient {
           followRedirects: true,
         ),
       ) {
-    // Only bypass TLS certificate validation in debug builds, where the local
-    // dev backend serves a self-signed cert. Release builds keep the
-    // platform's default validation.
-    if (kDebugMode) {
-      _dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback = (cert, host, port) => true;
-          return client;
-        },
-      );
-    }
+    // Only bypass TLS certificate validation in debug builds on native
+    // platforms, where the local dev backend serves a self-signed cert. The
+    // web is unaffected: the browser owns TLS validation there.
+    applyDebugTlsBypass(_dio);
     _dio.interceptors.addAll([
       LogInterceptor(requestBody: kDebugMode, responseBody: kDebugMode),
       InterceptorsWrapper(

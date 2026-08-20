@@ -1,8 +1,7 @@
-import 'dart:io' show SocketException, HandshakeException;
-
 import 'package:dio/dio.dart';
 
 import 'failures.dart';
+import 'network_error_check.dart';
 
 /// Maps exceptions raised in the data layer into user-facing [Failure]s.
 Failure mapFailure(Object error) {
@@ -38,8 +37,7 @@ Failure _mapDioException(DioException error) {
     case DioExceptionType.cancel:
       return const UnknownFailure('The request was cancelled.');
     case DioExceptionType.unknown:
-      if (error.error is SocketException ||
-          error.error is HandshakeException) {
+      if (isIoNetworkError(error.error)) {
         return const NetworkFailure();
       }
       return const UnknownFailure();

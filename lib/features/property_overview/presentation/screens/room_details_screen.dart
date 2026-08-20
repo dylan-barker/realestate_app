@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +9,7 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_card.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../../../core/widgets/feature_list_widget.dart';
+import '../../../../core/widgets/platform_image.dart';
 import '../../../../core/widgets/rating_slider.dart';
 import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
@@ -553,8 +552,8 @@ class RoomDetailsScreen extends ConsumerWidget {
                   ),
                 )
               else if (hasImage && !room.photoUrl!.startsWith('http'))
-                Image.file(
-                  File(room.photoUrl!),
+                localFileImage(
+                  room.photoUrl!,
                   fit: BoxFit.cover,
                   cacheWidth: 800,
                   errorBuilder: (context, error, stackTrace) => Container(

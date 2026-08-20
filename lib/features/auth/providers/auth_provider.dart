@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -94,15 +95,19 @@ class AuthNotifier extends Notifier<AuthState> {
       final authService = ref.read(authApiServiceProvider);
       final response = await authService.login(username, password);
 
-      await _storage.write(
-        key: AppConstants.storageAuthKey,
-        value: jsonEncode({
-          'token': response.token,
-          'refreshToken': response.refreshToken,
-          'displayName': response.displayName,
-          'role': response.role,
-        }),
-      );
+      try {
+        await _storage.write(
+          key: AppConstants.storageAuthKey,
+          value: jsonEncode({
+            'token': response.token,
+            'refreshToken': response.refreshToken,
+            'displayName': response.displayName,
+            'role': response.role,
+          }),
+        );
+      } catch (e) {
+        debugPrint('AuthProvider: failed to persist auth, continuing: $e');
+      }
 
       final apiClient = ref.read(apiClientProvider);
       apiClient.setToken(response.token);
@@ -114,6 +119,7 @@ class AuthNotifier extends Notifier<AuthState> {
         role: response.role,
       );
     } catch (e) {
+      debugPrint('AuthProvider: login failed: $e');
       state = AuthState.unauthenticated(errorMessage: mapFailure(e).message);
     }
   }
