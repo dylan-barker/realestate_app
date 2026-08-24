@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,13 +10,13 @@ import 'features/auth/providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // try {
-  //   await dotenv.load();
-  // } on FileNotFoundError {
-  //   // .env is optional — fall back to build-time defines.
-  // } on EmptyEnvFileError {
-  //   // .env exists but is empty — treat as not provided.
-  // }
+  try {
+    await dotenv.load();
+  } on FileNotFoundError {
+    // .env is optional — fall back to build-time defines.
+  } on EmptyEnvFileError {
+    // .env exists but is empty — treat as not provided.
+  }
   await SharedPreferences.getInstance();
   runApp(const ProviderScope(child: MyApp()));
 }
