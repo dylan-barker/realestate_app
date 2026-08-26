@@ -9,16 +9,17 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_input.dart';
 import '../../providers/auth_provider.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends ConsumerStatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _displayNameController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -26,19 +27,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _displayNameController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     final theme = ref.read(themeConfigProvider);
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
+    final displayName = _displayNameController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) return;
+    if (username.isEmpty || password.isEmpty || displayName.isEmpty) return;
 
     setState(() => _isLoading = true);
 
-    await ref.read(authProvider.notifier).login(username, password);
+    await ref
+        .read(authProvider.notifier)
+        .register(username, password, displayName);
 
     if (mounted) {
       setState(() => _isLoading = false);
@@ -91,15 +96,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Real Estate App',
+                  'Create Account',
                   style: textTheme.titleLarge?.copyWith(
                     color: theme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 40),
                 CustomTextInput(
+                  label: 'Display Name',
+                  placeholder: 'Enter your display name',
+                  controller: _displayNameController,
+                  keyboardType: TextInputType.name,
+                  style: InputStyle.cardBorder,
+                  theme: theme,
+                ),
+                const SizedBox(height: 20),
+                CustomTextInput(
                   label: 'Username',
-                  placeholder: 'Enter your username',
+                  placeholder: 'Choose a username',
                   controller: _usernameController,
                   keyboardType: TextInputType.text,
                   style: InputStyle.cardBorder,
@@ -108,7 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 20),
                 CustomTextInput(
                   label: 'Password',
-                  placeholder: 'Enter your password',
+                  placeholder: 'Create a password',
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   style: InputStyle.cardBorder,
@@ -142,16 +156,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 _isLoading
                     ? const CircularProgressIndicator()
                     : CustomButton(
-                        text: 'Sign In',
+                        text: 'Create Account',
                         fullWidth: true,
-                        onTap: _handleLogin,
+                        onTap: _handleRegister,
                         theme: theme,
                       ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => context.go(AppRoutes.registerPath),
+                  onPressed: () => context.go(AppRoutes.loginPath),
                   child: Text(
-                    "Don't have an account? Create Account",
+                    'Already have an account? Sign In',
                     style: textTheme.bodyMedium?.copyWith(
                       color: theme.primaryColor,
                     ),

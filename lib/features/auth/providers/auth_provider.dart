@@ -155,6 +155,50 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  Future<void> register(
+    String username,
+    String password,
+    String displayName,
+  ) async {
+    state = state.copyWith(errorMessage: null);
+
+    try {
+      final authService = ref.read(authApiServiceProvider);
+      final response = await authService.register(
+        username,
+        password,
+        displayName,
+      );
+
+      try {
+        await _storage.write(
+          key: AppConstants.storageAuthKey,
+          value: jsonEncode({
+            'token': response.token,
+            'refreshToken': response.refreshToken,
+            'displayName': response.displayName,
+            'role': response.role,
+          }),
+        );
+      } catch (e) {
+        debugPrint('AuthProvider: failed to persist auth, continuing: $e');
+      }
+
+      final apiClient = ref.read(apiClientProvider);
+      apiClient.setToken(response.token);
+      apiClient.setOnUnauthorized(() => logout());
+      apiClient.setOnRefreshToken(() => refreshAuth());
+
+      state = AuthState.authenticated(
+        displayName: response.displayName,
+        role: response.role,
+      );
+    } catch (e) {
+      debugPrint('AuthProvider: register failed: $e');
+      state = AuthState.unauthenticated(errorMessage: mapFailure(e).message);
+    }
+  }
+
   Future<void> logout() async {
     await _storage.deleteAll();
     final apiClient = ref.read(apiClientProvider);

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/property_overview/presentation/screens/address_screen.dart';
@@ -28,11 +29,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isInitialized = authState.status != AuthStatus.uninitialized;
       final isLoginRoute = state.matchedLocation == AppRoutes.loginPath;
+      final isRegisterRoute = state.matchedLocation == AppRoutes.registerPath;
 
       if (!isInitialized) return null;
 
-      if (!isAuthenticated && !isLoginRoute) return AppRoutes.loginPath;
-      if (isAuthenticated && isLoginRoute) return AppRoutes.homePath;
+      if (!isAuthenticated && !isLoginRoute && !isRegisterRoute)
+        return AppRoutes.loginPath;
+      if (isAuthenticated && (isLoginRoute || isRegisterRoute))
+        return AppRoutes.homePath;
 
       return null;
     },
@@ -40,6 +44,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.loginPath,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.registerPath,
+        builder: (context, state) => const RegisterScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

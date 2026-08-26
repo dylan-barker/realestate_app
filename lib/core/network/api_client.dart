@@ -50,6 +50,7 @@ class ApiClient {
           final path = error.requestOptions.path;
           final isAuthEndpoint =
               path.contains(ApiEndpoints.login) ||
+              path.contains(ApiEndpoints.register) ||
               path.contains(ApiEndpoints.refresh);
 
           if (isAuthEndpoint) {

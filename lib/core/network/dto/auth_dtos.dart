@@ -38,3 +38,15 @@ class RefreshTokenResponse {
     required this.refreshToken,
   });
 }
+
+class RegisterRequest {
+  final String username;
+  final String password;
+  final String displayName;
+
+  const RegisterRequest({
+    required this.username,
+    required this.password,
+    required this.displayName,
+  });
+}

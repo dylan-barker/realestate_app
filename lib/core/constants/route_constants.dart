@@ -1,6 +1,7 @@
 /// Route paths shared between the router and screens.
 abstract final class AppRoutes {
   static const String loginPath = '/login';
+  static const String registerPath = '/register';
   static const String homePath = '/home';
   static const String settingsPath = '/settings';
 

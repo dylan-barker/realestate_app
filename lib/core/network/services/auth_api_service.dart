@@ -34,4 +34,27 @@ class AuthApiService {
       refreshToken: json['refreshToken'] as String,
     );
   }
+
+  Future<LoginResponse> register(
+    String username,
+    String password,
+    String displayName,
+  ) async {
+    final response = await _client.post(
+      ApiEndpoints.register,
+      data: {
+        'username': username,
+        'password': password,
+        'displayName': displayName,
+      },
+    );
+    final json = response.data as Map<String, dynamic>;
+    return LoginResponse(
+      token: json['token'] as String,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      displayName: json['displayName'] as String,
+      role: json['role'] as String,
+      refreshToken: json['refreshToken'] as String,
+    );
+  }
 }
