@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/errors/failures.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_chip.dart';
 import '../../../../core/widgets/custom_text_input.dart';
-import '../../../../core/widgets/real_estate_dialog.dart';
 import '../../../../core/widgets/wizard_app_bar.dart';
 import '../../data/models/enums/facing_direction.dart';
 import '../../providers/property_provider.dart';
@@ -23,7 +23,18 @@ class BuildingInfoScreen extends ConsumerWidget {
     );
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     await viewModel.saveBuildingInfo();
-    if (context.mounted) Navigator.pop(context);
+    if (!context.mounted) return;
+    Navigator.pop(context);
+    final error = ref.read(propertyViewModelProvider).errorMessage;
+    if (error != null && context.mounted) {
+      final theme = ref.read(themeConfigProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(friendlySaveMessage(error, 'building info')),
+          backgroundColor: theme.error,
+        ),
+      );
+    }
     if (context.mounted) context.pop();
   }
 
@@ -38,12 +49,6 @@ class BuildingInfoScreen extends ConsumerWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final discard = await showDiscardDialog(context);
-        if (!context.mounted) return;
-        if (discard == true) {
-          context.pop();
-          return;
-        }
         await _saveAndPop(context, ref);
       },
       child: Scaffold(

@@ -58,26 +58,6 @@ Widget dialogActionButton({
   );
 }
 
-Future<bool?> showDiscardDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: const Text('Unsaved Changes'),
-      content: const Text('Do you want to save your changes before leaving?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Discard'),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: const Text('Save'),
-        ),
-      ],
-    ),
-  );
-}
-
 Future<T?> showRealEstateBottomSheet<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,

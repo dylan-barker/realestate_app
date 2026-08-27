@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_constants.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
 import '../../../../core/widgets/custom_text_input.dart';
@@ -69,7 +70,18 @@ class PropertyFeaturesScreen extends ConsumerWidget {
     );
     final viewModel = ref.read(propertyViewModelProvider.notifier);
     await viewModel.savePropertyFeatures();
-    if (context.mounted) Navigator.pop(context);
+    if (!context.mounted) return;
+    Navigator.pop(context);
+    final error = ref.read(propertyViewModelProvider).errorMessage;
+    if (error != null && context.mounted) {
+      final theme = ref.read(themeConfigProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(friendlySaveMessage(error, 'property features')),
+          backgroundColor: theme.error,
+        ),
+      );
+    }
     if (context.mounted) context.pop();
   }
 
@@ -100,12 +112,6 @@ class PropertyFeaturesScreen extends ConsumerWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final discard = await showDiscardDialog(context);
-        if (!context.mounted) return;
-        if (discard == true) {
-          context.pop();
-          return;
-        }
         await _saveAndPop(context, ref);
       },
       child: Scaffold(
@@ -157,9 +163,8 @@ class PropertyFeaturesScreen extends ConsumerWidget {
                     category: category,
                     rooms: groupedRooms[category]!,
                     viewModel: viewModel,
-                    onRoomTap: (roomId) => context.push(
-                      AppRoutes.roomDetails(listingId!, roomId),
-                    ),
+                    onRoomTap: (roomId) =>
+                        context.push(AppRoutes.roomDetails(listingId!, roomId)),
                   ),
                   const SizedBox(height: 12),
                 ],

@@ -32,7 +32,7 @@ class PropertyViewModel extends Notifier<PropertyState> {
 
   Future<int> createNewListing() async {
     final result = await _repository.createListing(
-      state.propertyTypeId > 0 ? state.propertyTypeId : 1,
+      state.propertyTypeId > 0 ? state.propertyTypeId : null,
     );
     if (ref.mounted) {
       state = state.copyWith(

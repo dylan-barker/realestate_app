@@ -36,7 +36,8 @@ Feature-first: each feature under `lib/features/<feature>/` has `data/`, `presen
 ## Property wizard conventions
 
 - Non-linear overview flow: one shared `PropertyState` + `PropertyViewModel` (autoDispose `Notifier`, `lib/features/property_overview/providers/property_provider.dart`) holds all section data; each section screen calls a `save*` method that persists that section to the backend independently.
-- Screens wrap their body in `PopScope` with `onPopInvokedWithResult` to warn on unsaved changes — preserve this pattern when adding wizard screens.
+- Screens wrap their body in `PopScope` with `onPopInvokedWithResult` to auto-save on back (no
+  discard dialog; `SnackBar` on save failure) — preserve this pattern when adding wizard screens.
 - Models are plain Dart classes with `fromJson`/`toJson`; enums live under `data/models/enums/`.
 - Reference/lookup data (property types, features, etc.) is fetched via `ReferenceDataProvider` / `LookupApiService`; `lib/features/property_overview/data/default_features.dart` supplies offline defaults.
 

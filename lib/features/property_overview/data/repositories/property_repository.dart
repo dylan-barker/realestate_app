@@ -39,7 +39,7 @@ class PropertyRepository {
         id: j['id'] as int,
         referenceNumber: j['referenceNumber'] as String,
         p24Ref: j['p24Ref'] as String?,
-        propertyTypeId: j['propertyTypeId'] as int,
+        propertyTypeId: j['propertyTypeId'] as int? ?? 0,
         listingValuationId: j['listingValuationId'] as int?,
         listDate: j['listDate'] != null
             ? DateTime.parse(j['listDate'] as String)
@@ -52,11 +52,11 @@ class PropertyRepository {
   }
 
   Future<({int id, String referenceNumber})> createListing(
-    int propertyTypeId,
+    int? propertyTypeId,
   ) async {
     final response = await _client.post(
       ApiEndpoints.listings,
-      data: {'propertyTypeId': propertyTypeId},
+      data: propertyTypeId != null ? {'propertyTypeId': propertyTypeId} : {},
     );
     final json = response.data as Map<String, dynamic>;
     return (
@@ -460,9 +460,7 @@ class PropertyRepository {
       ...coContacts.where(_contactHasData),
     ];
     final existingJson = await _getContactsJson(listingId);
-    final existingById = {
-      for (final c in existingJson) (c['id'] as int): c,
-    };
+    final existingById = {for (final c in existingJson) (c['id'] as int): c};
 
     final desiredApiIds = allContacts
         .map((c) => int.tryParse(c.id))
@@ -472,9 +470,7 @@ class PropertyRepository {
     for (final cid in existingById.keys.where(
       (id) => !desiredApiIds.contains(id),
     )) {
-      await _client.delete(
-        ApiEndpoints.listingSingleContact(listingId, cid),
-      );
+      await _client.delete(ApiEndpoints.listingSingleContact(listingId, cid));
     }
 
     final syncedContacts = <Contact>[];
@@ -510,9 +506,7 @@ class PropertyRepository {
           data: data,
         );
         final created = response.data as Map<String, dynamic>;
-        syncedContacts.add(
-          contact.copyWith(id: created['id'].toString()),
-        );
+        syncedContacts.add(contact.copyWith(id: created['id'].toString()));
       }
     }
 
@@ -539,11 +533,7 @@ class PropertyRepository {
     developer.log('Listing deleted: ID=$listingId');
   }
 
-  Future<String?> uploadRoomPhoto(
-    int listingId,
-    int roomId,
-    String filePath,
-  ) {
+  Future<String?> uploadRoomPhoto(int listingId, int roomId, String filePath) {
     return _uploadRoomPhoto(listingId, roomId, filePath);
   }
 
