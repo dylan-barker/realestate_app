@@ -31,10 +31,7 @@ extension RoomCategoryExtension on RoomCategory {
   List<String> get predefinedRoomTypes {
     switch (this) {
       case RoomCategory.bedroom:
-        return [
-          'Bedroom',
-          'Main Bedroom / Master Suite',
-        ];
+        return ['Bedroom', 'Main Bedroom / Master Suite'];
       case RoomCategory.bathroom:
         return [
           'En-suite Bathroom',
@@ -51,16 +48,9 @@ extension RoomCategoryExtension on RoomCategory {
           'Entrance Hall / Foyer',
         ];
       case RoomCategory.kitchenAndUtility:
-        return [
-          'Kitchen',
-          'Scullery',
-          'Laundry Room',
-          'Pantry',
-        ];
+        return ['Kitchen', 'Scullery', 'Laundry Room', 'Pantry'];
       case RoomCategory.workAndStudy:
-        return [
-          'Study / Home Office',
-        ];
+        return ['Study / Home Office'];
       case RoomCategory.entertainment:
         return [
           'Entertainment Room',
@@ -102,5 +92,28 @@ extension RoomCategoryExtension on RoomCategory {
       default:
         return RoomCategory.additional;
     }
+  }
+
+  /// All predefined room types across every category.
+  static List<String> get allPredefinedTypes =>
+      RoomCategory.values.expand((c) => c.predefinedRoomTypes).toList();
+
+  /// Map of predefined room type name → category's roomTypeId (index+1).
+  static Map<String, int> get typeToRoomTypeId => {
+    for (var c in RoomCategory.values)
+      for (var t in c.predefinedRoomTypes) t: c.index + 1,
+  };
+
+  /// Resolves a predefined room type name to its roomTypeId, falling back to
+  /// [additional] for unknown / custom names.
+  static int roomTypeIdForType(String type) =>
+      typeToRoomTypeId[type] ?? RoomCategory.additional.index + 1;
+
+  /// Resolves a stored [roomTypeId] back to a category for display helpers.
+  static RoomCategory categoryForRoomTypeId(int id) {
+    if (id < 1 || id > RoomCategory.values.length) {
+      return RoomCategory.additional;
+    }
+    return RoomCategory.values[id - 1];
   }
 }

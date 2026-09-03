@@ -8,8 +8,8 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/property_overview/presentation/screens/address_screen.dart';
 import '../../features/property_overview/presentation/screens/building_info_screen.dart';
-import '../../features/property_overview/presentation/screens/contacts_screen.dart';
-import '../../features/property_overview/presentation/screens/listing_valuation_screen.dart';
+import '../../features/property_overview/presentation/screens/expenses_screen.dart';
+import '../../features/property_overview/presentation/screens/owner_details_screen.dart';
 import '../../features/property_overview/presentation/screens/property_features_screen.dart';
 import '../../features/property_overview/presentation/screens/property_overview_screen.dart';
 import '../../features/property_overview/presentation/screens/property_type_screen.dart';
@@ -109,14 +109,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: AppRoutes.expensesPath,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ExpensesScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.valuationCostsPath,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ListingValuationScreen(),
+        redirect: (context, state) {
+          final id = state.pathParameters['id']!;
+          return AppRoutes.expenses(int.parse(id));
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.ownerDetailsPath,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const OwnerDetailsScreen(),
       ),
       GoRoute(
         path: AppRoutes.contactsPath,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ContactsScreen(),
+        redirect: (context, state) {
+          final id = state.pathParameters['id']!;
+          return AppRoutes.ownerDetails(int.parse(id));
+        },
       ),
     ],
   );

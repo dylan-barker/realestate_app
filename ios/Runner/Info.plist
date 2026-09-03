@@ -46,9 +46,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app uses the camera to take photos of rooms in a property listing.</string>
+	<string>This app uses the camera to take photos of rooms in a property.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app accesses your photo library to attach photos of rooms to a property listing.</string>
+	<string>This app accesses your photo library to attach photos of rooms to a property.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

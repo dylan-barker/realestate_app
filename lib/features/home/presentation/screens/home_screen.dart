@@ -7,6 +7,7 @@ import '../../../../core/errors/failure_mapper.dart';
 import '../../../../core/network/dto/listing_dtos.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/theme/themes.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../../property_overview/providers/property_provider.dart';
 
 final listingsProvider = FutureProvider.autoDispose<List<ListingSummaryDto>>((
@@ -24,6 +25,11 @@ class HomeScreen extends ConsumerWidget {
     final theme = ref.watch(themeConfigProvider);
     final textTheme = theme.toThemeData().textTheme;
     final listingsAsync = ref.watch(listingsProvider);
+    final authState = ref.watch(authProvider);
+    final firstName = authState.displayName
+        ?.trim()
+        .split(RegExp(r'\s+'))
+        .firstWhere((p) => p.isNotEmpty, orElse: () => '');
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -31,6 +37,22 @@ class HomeScreen extends ConsumerWidget {
         backgroundColor: theme.cardBackgroundColor,
         surfaceTintColor: theme.cardBackgroundColor,
         title: Text('My Properties', style: textTheme.titleLarge),
+        actions: [
+          if (firstName != null && firstName.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Center(
+                child: Text(
+                  'Welcome $firstName',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(color: theme.borderLight, height: 1),
@@ -177,7 +199,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tap the button below to add your first property listing.',
+              'Tap the button below to add your first property.',
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: theme.textSecondary,

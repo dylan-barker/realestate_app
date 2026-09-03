@@ -3,9 +3,13 @@ enum PropertyWizardStep {
   address(2, 'Address', 'Property Details', '/wizard/address'),
   buildingInfo(3, 'Building Info', 'Building Info', '/wizard/building-info'),
   propertyFeatures(4, 'Property Features', 'Property Details', '/wizard/property-features'),
-  valuationCosts(5, 'Valuation & Costs', 'Valuation & Costs', '/wizard/valuation-costs'),
-  contacts(6, 'Contacts', 'Contacts', '/wizard/contacts'),
+  expenses(5, 'Expenses', 'Expenses', '/wizard/expenses'),
+  ownerDetails(6, 'Owner Details', 'Owner Details', '/wizard/owner-details'),
   review(7, 'Review', 'Review & Submit', '/wizard/review');
+
+  // Deprecated aliases
+  static const valuationCosts = expenses;
+  static const contacts = ownerDetails;
 
   final int stepNumber;
   final String title;

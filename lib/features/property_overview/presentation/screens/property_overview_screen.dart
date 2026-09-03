@@ -64,21 +64,21 @@ class PropertyOverviewScreen extends ConsumerWidget {
         isComplete: state.rooms.isNotEmpty,
       ),
       _SectionData(
-        title: 'Valuation & Costs',
+        title: 'Expenses',
         subtitle: state.listingValuation.ownersNetPrice.isNotEmpty
             ? 'R ${state.listingValuation.ownersNetPrice}'
             : 'Not provided',
         icon: Icons.account_balance_wallet_outlined,
-        route: AppRoutes.valuationCosts(propertyId),
+        route: AppRoutes.expenses(propertyId),
         isComplete: state.listingValuation.ownersNetPrice.isNotEmpty,
       ),
       _SectionData(
-        title: 'Contacts',
+        title: 'Owner Details',
         subtitle: state.primaryContact.fullName.isNotEmpty
             ? state.primaryContact.fullName
             : 'Not provided',
         icon: Icons.contacts_outlined,
-        route: AppRoutes.contacts(propertyId),
+        route: AppRoutes.ownerDetails(propertyId),
         isComplete: state.primaryContact.fullName.isNotEmpty,
       ),
     ];

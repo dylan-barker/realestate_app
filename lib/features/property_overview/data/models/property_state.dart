@@ -42,11 +42,11 @@ class PropertyState {
   final List<String> outdoorFeatures;
   final List<String> outdoorHiddenFeatures;
 
-  // Step 5: Valuation & Running Costs
+  // Step 5: Expenses
   final ListingValuation listingValuation;
   final PropertyRunningCosts propertyRunningCosts;
 
-  // Step 6: Contacts
+  // Step 6: Owner Details
   final Contact primaryContact;
   final List<Contact> coContacts;
 

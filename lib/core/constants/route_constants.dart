@@ -9,11 +9,16 @@ abstract final class AppRoutes {
   static const String propertyTypePath = '/property/:id/property-type';
   static const String addressPath = '/property/:id/address';
   static const String buildingInfoPath = '/property/:id/building-info';
-  static const String propertyFeaturesPath =
-      '/property/:id/property-features';
+  static const String propertyFeaturesPath = '/property/:id/property-features';
   static const String roomDetailsPath = '/property/:id/room-details/:roomId';
-  static const String valuationCostsPath = '/property/:id/valuation-costs';
+  static const String expensesPath = '/property/:id/expenses';
+  static const String ownerDetailsPath = '/property/:id/owner-details';
+
+  // Deprecated: use ownerDetailsPath instead
   static const String contactsPath = '/property/:id/contacts';
+
+  // Deprecated: use expensesPath instead
+  static const String valuationCostsPath = '/property/:id/valuation-costs';
 
   static String property(int id) => '/property/$id';
   static String propertyType(int id) => '/property/$id/property-type';
@@ -22,6 +27,12 @@ abstract final class AppRoutes {
   static String propertyFeatures(int id) => '/property/$id/property-features';
   static String roomDetails(int id, String roomId) =>
       '/property/$id/room-details/$roomId';
-  static String valuationCosts(int id) => '/property/$id/valuation-costs';
-  static String contacts(int id) => '/property/$id/contacts';
+
+  static String expenses(int id) => '/property/$id/expenses';
+
+  static String valuationCosts(int id) => expenses(id);
+
+  static String ownerDetails(int id) => '/property/$id/owner-details';
+
+  static String contacts(int id) => ownerDetails(id);
 }
